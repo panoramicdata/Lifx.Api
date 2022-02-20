@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <RootNamespace>LifxNet</RootNamespace>
+    <AssemblyName>LifxNet</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Company>Morten Nielsen</Company>
+    <Version>2.2.0</Version>
+    <Authors>Morten Nielsen</Authors>
+    <Description>Library for controlling LIFX light bulbs</Description>
+    <Copyright>© Morten Nielsen 2015-2020</Copyright>
+    <PackageTags>iot, lifx home automation uwp winphone winrt</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dotMorten/LifxNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotMorten/LifxNet</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <RepositoryType>git</RepositoryType>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
