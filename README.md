@@ -4,6 +4,8 @@
 
 An API for LIFX working for both LAN and API interaction.
 
+[![Nuget](https://img.shields.io/nuget/v/Lifx.Api)](https://www.nuget.org/packages/Lifx.Api/)
+
 ## Credits
 
 Draws heavily from and combines previous work:
