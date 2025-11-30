@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AnalysisMode>Recommended</AnalysisMode>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
+
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<EnableMicrosoftTestingExtensions>false</EnableMicrosoftTestingExtensions>
+		<EnableXunitMicrosoftTestingPlatform>false</EnableXunitMicrosoftTestingPlatform>
+		<UserSecretsId>b19ce93c-3048-4afa-a755-fa414053b674</UserSecretsId>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="obj\**\SelfRegisteredExtensions.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AwesomeAssertions" Version="9.3.0" />
+		<PackageReference Include="AwesomeAssertions.Analyzers" Version="9.0.8">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+		<PackageReference Include="xunit.v3" Version="3.2.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Lifx.Api\Lifx.Api.csproj" />
+	</ItemGroup>
+
+</Project>
