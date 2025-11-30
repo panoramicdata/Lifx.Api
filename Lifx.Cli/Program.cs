@@ -1,12 +1,12 @@
-using System.CommandLine;
 using Lifx.Cli.Commands;
 using Spectre.Console;
+using System.CommandLine;
 
 namespace Lifx.Cli;
 
-class Program
+public static class Program
 {
-	static async Task<int> Main(string[] args)
+	public static async Task<int> Main(string[] args)
 	{
 		try
 		{
@@ -15,10 +15,11 @@ class Program
 				CloudCommand.Create(),
 				LanCommand.Create(),
 				ConfigCommand.Create(),
+				ProductsCommand.Create(),
 				CreateVersionCommand()
 			};
 
-			rootCommand.Description = 
+			rootCommand.Description =
 				"LIFX CLI - Control your LIFX smart lights from the command line" + Environment.NewLine +
 				Environment.NewLine +
 				"Features:" + Environment.NewLine +
@@ -77,6 +78,7 @@ class Program
 			{
 				AnsiConsole.WriteException(ex);
 			}
+
 			return 1;
 		}
 	}

@@ -1,5 +1,5 @@
-using System.CommandLine;
 using Spectre.Console;
+using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
@@ -52,11 +52,13 @@ public static class CloudCommand
 			CreateDeleteKeyCommand()
 		};
 
-		command.Description = 
-			"Manage LIFX Cloud API token (securely stored in Windows Credential Manager)" + Environment.NewLine +
+		command.Description =
+			"Manage LIFX Cloud API token (securely stored)" + Environment.NewLine +
 			Environment.NewLine +
 			"The API token is required for all Cloud API features." + Environment.NewLine +
-			"Token is stored encrypted in Windows Credential Manager for security." + Environment.NewLine +
+			"Storage method depends on your platform:" + Environment.NewLine +
+			"  - Windows: Encrypted using Data Protection API (DPAPI)" + Environment.NewLine +
+			"  - Linux/macOS: Stored in ~/.lifx/credentials.json with 600 permissions" + Environment.NewLine +
 			Environment.NewLine +
 			"Get your API token:" + Environment.NewLine +
 			"  1. Visit https://cloud.lifx.com/settings" + Environment.NewLine +
@@ -66,7 +68,7 @@ public static class CloudCommand
 			Environment.NewLine +
 			"Security Note:" + Environment.NewLine +
 			"  - Never share your API token" + Environment.NewLine +
-			"  - Token is stored encrypted and never displayed in full" + Environment.NewLine +
+			"  - Token is encrypted (Windows) or protected by file permissions (Unix)" + Environment.NewLine +
 			"  - Clear your command history after setting token";
 
 		return command;
@@ -74,7 +76,7 @@ public static class CloudCommand
 
 	private static Command CreateSetKeyCommand()
 	{
-		var command = new Command("set", "Store API token securely in Windows Credential Manager");
+		var command = new Command("set", "Store API token securely using Windows DPAPI");
 
 		var tokenArg = new Argument<string>(
 			"token",
@@ -82,7 +84,7 @@ public static class CloudCommand
 
 		command.AddArgument(tokenArg);
 
-		command.SetHandler((string token) =>
+		command.SetHandler(token =>
 		{
 			if (string.IsNullOrWhiteSpace(token))
 			{
@@ -95,7 +97,7 @@ public static class CloudCommand
 			if (success)
 			{
 				AnsiConsole.MarkupLine("[green]? API token stored securely[/]");
-				AnsiConsole.MarkupLine("[dim]Location: Windows Credential Manager (encrypted)[/]");
+				AnsiConsole.MarkupLine($"[dim]Location: {SecureCredentialManager.GetStorageLocation()}[/]");
 				AnsiConsole.WriteLine();
 				AnsiConsole.MarkupLine("[yellow]? Security Reminder:[/]");
 				AnsiConsole.MarkupLine("[dim]  - Clear your command history to remove the token[/]");
@@ -109,7 +111,7 @@ public static class CloudCommand
 			else
 			{
 				AnsiConsole.MarkupLine("[red]? Failed to store API token[/]");
-				AnsiConsole.MarkupLine("[dim]Check Windows Credential Manager permissions[/]");
+				AnsiConsole.MarkupLine("[dim]Check file system permissions[/]");
 			}
 		}, tokenArg);
 
@@ -133,7 +135,7 @@ public static class CloudCommand
 
 				AnsiConsole.MarkupLine($"[green]? API token is configured[/]");
 				AnsiConsole.MarkupLine($"[dim]Token (masked): {masked}[/]");
-				AnsiConsole.MarkupLine($"[dim]Storage: Windows Credential Manager[/]");
+				AnsiConsole.MarkupLine($"[dim]Storage: {SecureCredentialManager.GetStorageLocation()}[/]");
 				AnsiConsole.WriteLine();
 				AnsiConsole.MarkupLine("[dim]Note: Full token is never displayed for security[/]");
 			}
@@ -165,7 +167,7 @@ public static class CloudCommand
 
 	private static Command CreateDeleteKeyCommand()
 	{
-		var command = new Command("delete", "Remove stored API token from Windows Credential Manager");
+		var command = new Command("delete", "Remove stored API token");
 
 		command.SetHandler(() =>
 		{
@@ -180,7 +182,7 @@ public static class CloudCommand
 			if (success)
 			{
 				AnsiConsole.MarkupLine("[green]? API token removed[/]");
-				AnsiConsole.MarkupLine("[dim]Removed from Windows Credential Manager[/]");
+				AnsiConsole.MarkupLine("[dim]Deleted encrypted credential file[/]");
 			}
 			else
 			{

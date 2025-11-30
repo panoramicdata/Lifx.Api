@@ -1,5 +1,5 @@
-using System.CommandLine;
 using Spectre.Console;
+using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
@@ -24,15 +24,17 @@ public static class ConfigCommand
 		{
 			var config = ConfigManager.Load();
 
-			var table = new Table();
-			table.Border = TableBorder.Rounded;
+			var table = new Table
+			{
+				Border = TableBorder.Rounded
+			};
 			table.AddColumn("Setting");
 			table.AddColumn("Value");
 
 			// API Token status
 			var hasSecureToken = SecureCredentialManager.HasStoredToken();
 			var envToken = Environment.GetEnvironmentVariable("LIFX_API_TOKEN");
-			
+
 			string tokenStatus;
 			if (hasSecureToken)
 			{
@@ -61,14 +63,14 @@ public static class ConfigCommand
 				"config.json");
 
 			AnsiConsole.MarkupLine($"\n[dim]Config file: {configFile}[/]");
-			
+
 			if (hasSecureToken)
 			{
-				AnsiConsole.MarkupLine("[dim]API token stored securely in Windows Credential Manager[/]");
+				AnsiConsole.MarkupLine($"[dim]API token: {SecureCredentialManager.GetStorageLocation()}[/]");
 			}
 			else
 			{
-				AnsiConsole.MarkupLine("[dim]To set API token: dotnet lifx key set <token>[/]");
+				AnsiConsole.MarkupLine("[dim]To set API token: lifx cloud key set <token>[/]");
 			}
 		});
 
@@ -96,8 +98,8 @@ public static class ConfigCommand
 				AnsiConsole.MarkupLine("[yellow]Configuration already at defaults[/]");
 			}
 
-			AnsiConsole.MarkupLine("[dim]Note: API token in Credential Manager was not affected[/]");
-			AnsiConsole.MarkupLine("[dim]To delete API token: dotnet lifx key delete[/]");
+			AnsiConsole.MarkupLine("[dim]Note: API token storage was not affected[/]");
+			AnsiConsole.MarkupLine("[dim]To delete API token: lifx cloud key delete[/]");
 		});
 
 		return command;

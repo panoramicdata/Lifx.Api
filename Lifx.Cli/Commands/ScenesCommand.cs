@@ -1,7 +1,7 @@
-using System.CommandLine;
 using Lifx.Api;
 using Lifx.Api.Models.Cloud.Requests;
 using Spectre.Console;
+using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
@@ -22,7 +22,7 @@ public static class ScenesCommand
 	{
 		var command = new Command("list", "List all scenes");
 
-		command.SetHandler(async (string? token, bool verbose) =>
+		command.SetHandler(async (token, verbose) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -69,15 +69,15 @@ public static class ScenesCommand
 		command.AddOption(durationOption);
 		command.AddOption(fastOption);
 
-		command.SetHandler(async (string? token, string scene, double duration, bool fast) =>
+		command.SetHandler(async (token, scene, duration, fast) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
 
 			// Try to find scene by name or UUID
 			var scenes = await client.Scenes.ListScenesAsync(CancellationToken.None);
-			var targetScene = scenes.FirstOrDefault(s => 
-				s.Name.Equals(scene, StringComparison.OrdinalIgnoreCase) || 
+			var targetScene = scenes.FirstOrDefault(s =>
+				s.Name.Equals(scene, StringComparison.OrdinalIgnoreCase) ||
 				s.Uuid.Equals(scene, StringComparison.OrdinalIgnoreCase));
 
 			if (targetScene == null)

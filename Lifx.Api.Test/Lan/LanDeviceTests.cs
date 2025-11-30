@@ -14,7 +14,7 @@ namespace Lifx.Api.Test.Lan;
 [Collection("LAN Tests")]
 public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 {
-	private readonly LightBulb _testDevice = new LightBulb(
+	private readonly LightBulb _testDevice = new(
 			"192.168.1.100",
 			[0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01],
 			service: 1,
@@ -37,8 +37,10 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		}
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await fixture.SharedClient!.Lan!.SetDevicePowerStateAsync(null!, PowerState.On, CancellationToken.None));
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetDevicePowerStateAsync(null!, PowerState.On, CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
@@ -51,8 +53,10 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		}
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await fixture.SharedClient!.Lan!.GetDeviceLabelAsync(null!, CancellationToken.None));
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.GetDeviceLabelAsync(null!, CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
@@ -65,8 +69,10 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		}
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await fixture.SharedClient!.Lan!.SetDeviceLabelAsync(null!, "Test", CancellationToken.None));
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetDeviceLabelAsync(null!, "Test", CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
@@ -79,8 +85,10 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		}
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await fixture.SharedClient!.Lan!.GetDeviceVersionAsync(null!, CancellationToken.None));
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.GetDeviceVersionAsync(null!, CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
@@ -93,8 +101,10 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		}
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await fixture.SharedClient!.Lan!.GetDeviceHostFirmwareAsync(null!, CancellationToken.None));
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.GetDeviceHostFirmwareAsync(null!, CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]

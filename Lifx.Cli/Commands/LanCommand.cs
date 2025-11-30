@@ -1,8 +1,8 @@
-using System.CommandLine;
-using Lifx.Api;
+﻿using Lifx.Api;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
 using Spectre.Console;
+using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
@@ -46,7 +46,8 @@ public static class LanCommand
 			CreateLanOnCommand(),
 			CreateLanOffCommand(),
 			CreateLanColorCommand(),
-			CreateLanStateCommand()
+			CreateLanStateCommand(),
+			CreateLanRenameCommand()
 		};
 
 		return command;
@@ -68,10 +69,10 @@ public static class LanCommand
 		command.AddArgument(macArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string macAddress, double duration) =>
+		command.SetHandler(async (macAddress, duration) =>
 		{
 			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
-			
+
 			var bulb = await DiscoverAndFindBulb(client, macAddress);
 			if (bulb == null) return;
 
@@ -81,7 +82,7 @@ public static class LanCommand
 				PowerState.On,
 				CancellationToken.None);
 
-			AnsiConsole.MarkupLine($"[green]?[/] Turned on light: {bulb.MacAddressName}");
+			AnsiConsole.MarkupLine($"[green]✓[/] Turned on light: {bulb.MacAddressName}");
 		}, macArg, durationOption);
 
 		return command;
@@ -103,10 +104,10 @@ public static class LanCommand
 		command.AddArgument(macArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string macAddress, double duration) =>
+		command.SetHandler(async (macAddress, duration) =>
 		{
 			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
-			
+
 			var bulb = await DiscoverAndFindBulb(client, macAddress);
 			if (bulb == null) return;
 
@@ -116,7 +117,7 @@ public static class LanCommand
 				PowerState.Off,
 				CancellationToken.None);
 
-			AnsiConsole.MarkupLine($"[green]?[/] Turned off light: {bulb.MacAddressName}");
+			AnsiConsole.MarkupLine($"[green]✓[/] Turned off light: {bulb.MacAddressName}");
 		}, macArg, durationOption);
 
 		return command;
@@ -143,7 +144,7 @@ public static class LanCommand
 		command.AddArgument(kelvinArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string macAddress, int kelvin, double duration) =>
+		command.SetHandler(async (macAddress, kelvin, duration) =>
 		{
 			if (kelvin < 2500 || kelvin > 9000)
 			{
@@ -152,7 +153,7 @@ public static class LanCommand
 			}
 
 			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
-			
+
 			var bulb = await DiscoverAndFindBulb(client, macAddress);
 			if (bulb == null) return;
 
@@ -165,7 +166,7 @@ public static class LanCommand
 				transitionDuration: TimeSpan.FromSeconds(duration),
 				CancellationToken.None);
 
-			AnsiConsole.MarkupLine($"[green]?[/] Set color to {kelvin}K: {bulb.MacAddressName}");
+			AnsiConsole.MarkupLine($"[green]✓[/] Set color to {kelvin}K: {bulb.MacAddressName}");
 		}, macArg, kelvinArg, durationOption);
 
 		return command;
@@ -181,23 +182,25 @@ public static class LanCommand
 
 		command.AddArgument(macArg);
 
-		command.SetHandler(async (string macAddress) =>
+		command.SetHandler(async macAddress =>
 		{
 			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
-			
+
 			var bulb = await DiscoverAndFindBulb(client, macAddress);
 			if (bulb == null) return;
 
 			var state = await client.Lan!.GetLightStateAsync(bulb, CancellationToken.None);
-			
+
 			if (state == null)
 			{
 				AnsiConsole.MarkupLine("[yellow]Could not get light state[/]");
 				return;
 			}
 
-			var table = new Table();
-			table.Border = TableBorder.Rounded;
+			var table = new Table
+			{
+				Border = TableBorder.Rounded
+			};
 			table.AddColumn("Property");
 			table.AddColumn("Value");
 
@@ -210,6 +213,53 @@ public static class LanCommand
 
 			AnsiConsole.Write(table);
 		}, macArg);
+
+		return command;
+	}
+
+	private static Command CreateLanRenameCommand()
+	{
+		var command = new Command("rename", "Rename a light via LAN");
+
+		var macArg = new Argument<string>(
+			"mac-address",
+			description: "MAC address of the light");
+
+		var nameArg = new Argument<string>(
+			"new-name",
+			description: "New name for the light (max 32 characters)");
+
+		command.AddArgument(macArg);
+		command.AddArgument(nameArg);
+
+		command.SetHandler(async (macAddress, newName) =>
+		{
+			if (string.IsNullOrWhiteSpace(newName))
+			{
+				AnsiConsole.MarkupLine("[red]Name cannot be empty[/]");
+				return;
+			}
+
+			if (newName.Length > 32)
+			{
+				AnsiConsole.MarkupLine("[red]Name must be 32 characters or less[/]");
+				return;
+			}
+
+			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+
+			var bulb = await DiscoverAndFindBulb(client, macAddress);
+			if (bulb == null) return;
+
+			// Get current name first
+			var oldName = await client.Lan!.GetDeviceLabelAsync(bulb, CancellationToken.None);
+
+			// Set new name
+			await client.Lan!.SetDeviceLabelAsync(bulb, newName, CancellationToken.None);
+
+			AnsiConsole.MarkupLine($"[green]✓[/] Renamed light from '[cyan]{oldName}[/]' to '[cyan]{newName}[/]'");
+			AnsiConsole.MarkupLine($"[dim]MAC: {bulb.MacAddressName}[/]");
+		}, macArg, nameArg);
 
 		return command;
 	}
@@ -234,16 +284,16 @@ public static class LanCommand
 
 		if (bulb == null)
 		{
-			AnsiConsole.MarkupLine($"[red]?[/] Light not found: {macAddress}");
+			AnsiConsole.MarkupLine($"[red]✗[/] Light not found: {macAddress}");
 			AnsiConsole.WriteLine();
 			AnsiConsole.MarkupLine("Available devices:");
-			
+
 			var devices = client.Lan?.Devices.ToList() ?? [];
 			foreach (var device in devices)
 			{
 				AnsiConsole.MarkupLine($"  [cyan]{device.MacAddressName}[/] at {device.HostName}");
 			}
-			
+
 			return null;
 		}
 
@@ -261,7 +311,7 @@ public static class LanCommand
 
 		command.AddOption(timeoutOption);
 
-		command.SetHandler(async (int timeout) =>
+		command.SetHandler(async timeout =>
 		{
 			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
 
@@ -290,8 +340,10 @@ public static class LanCommand
 				return;
 			}
 
-			var table = new Table();
-			table.Border = TableBorder.Rounded;
+			var table = new Table
+			{
+				Border = TableBorder.Rounded
+			};
 			table.AddColumn("Type");
 			table.AddColumn("MAC Address");
 			table.AddColumn("IP Address");
@@ -308,7 +360,7 @@ public static class LanCommand
 			}
 
 			AnsiConsole.Write(table);
-			AnsiConsole.MarkupLine($"[green]?[/] Found [cyan]{devices.Count}[/] device(s)");
+			AnsiConsole.MarkupLine($"[green]✓[/] Found [cyan]{devices.Count}[/] device(s)");
 		}, timeoutOption);
 
 		return command;
@@ -332,8 +384,10 @@ public static class LanCommand
 				return;
 			}
 
-			var table = new Table();
-			table.Border = TableBorder.Rounded;
+			var table = new Table
+			{
+				Border = TableBorder.Rounded
+			};
 			table.AddColumn("Type");
 			table.AddColumn("MAC Address");
 			table.AddColumn("IP Address");

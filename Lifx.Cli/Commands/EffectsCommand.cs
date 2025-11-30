@@ -1,7 +1,7 @@
-using System.CommandLine;
 using Lifx.Api;
 using Lifx.Api.Models.Cloud.Requests;
 using Spectre.Console;
+using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
@@ -39,7 +39,7 @@ public static class EffectsCommand
 		command.AddOption(periodOption);
 		command.AddOption(cyclesOption);
 
-		command.SetHandler(async (string? token, string selector, string color, double period, double cycles) =>
+		command.SetHandler(async (token, selector, color, period, cycles) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -73,7 +73,7 @@ public static class EffectsCommand
 		command.AddOption(periodOption);
 		command.AddOption(cyclesOption);
 
-		command.SetHandler(async (string? token, string selector, string color, double period, double cycles) =>
+		command.SetHandler(async (token, selector, color, period, cycles) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -105,7 +105,7 @@ public static class EffectsCommand
 		command.AddOption(periodOption);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, string selector, double period, double duration) =>
+		command.SetHandler(async (token, selector, period, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -136,7 +136,7 @@ public static class EffectsCommand
 		command.AddOption(periodOption);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, string selector, double period, double duration) =>
+		command.SetHandler(async (token, selector, period, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -167,7 +167,7 @@ public static class EffectsCommand
 		command.AddOption(directionOption);
 		command.AddOption(periodOption);
 
-		command.SetHandler(async (string? token, string selector, string direction, double period) =>
+		command.SetHandler(async (token, selector, direction, period) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -196,7 +196,7 @@ public static class EffectsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, string selector, double duration) =>
+		command.SetHandler(async (token, selector, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -224,7 +224,7 @@ public static class EffectsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, string selector, double duration) =>
+		command.SetHandler(async (token, selector, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -251,7 +251,7 @@ public static class EffectsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, string selector, double duration) =>
+		command.SetHandler(async (token, selector, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -278,7 +278,7 @@ public static class EffectsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(powerOffOption);
 
-		command.SetHandler(async (string? token, string selector, bool powerOff) =>
+		command.SetHandler(async (token, selector, powerOff) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });

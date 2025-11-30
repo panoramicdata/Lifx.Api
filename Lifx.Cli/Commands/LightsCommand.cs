@@ -1,9 +1,10 @@
-using System.CommandLine;
 using Lifx.Api;
 using Lifx.Api.Extensions;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Cloud.Requests;
 using Spectre.Console;
+using System.CommandLine;
+using System.CommandLine.Binding;
 
 namespace Lifx.Cli.Commands;
 
@@ -41,7 +42,7 @@ public static class LightsCommand
 		command.AddOption(typeOption);
 		command.AddOption(selectorOption);
 
-		command.SetHandler(async (string? token, bool verbose, string type, string selector) =>
+		command.SetHandler(async (token, verbose, type, selector) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -54,16 +55,16 @@ public static class LightsCommand
 					await ListLights(client, selectorObj, verbose);
 					break;
 				case "groups":
-					await ListGroups(client, selectorObj, verbose);
+					await ListGroups(client, selectorObj);
 					break;
 				case "locations":
-					await ListLocations(client, selectorObj, verbose);
+					await ListLocations(client, selectorObj);
 					break;
 				default:
 					AnsiConsole.MarkupLine($"[red]Unknown type: {type}[/]");
 					break;
 			}
-		}, 
+		},
 		new TokenBinder(),
 		new VerboseBinder(),
 		typeOption,
@@ -115,7 +116,7 @@ public static class LightsCommand
 		AnsiConsole.MarkupLine($"[dim]Total: {lights.Count} lights[/]");
 	}
 
-	private static async Task ListGroups(LifxClient client, Selector selector, bool verbose)
+	private static async Task ListGroups(LifxClient client, Selector selector)
 	{
 		var groups = await client.Lights.ListGroupsAsync(selector, CancellationToken.None);
 
@@ -133,7 +134,7 @@ public static class LightsCommand
 		AnsiConsole.MarkupLine($"[dim]Total: {groups.Count} groups[/]");
 	}
 
-	private static async Task ListLocations(LifxClient client, Selector selector, bool verbose)
+	private static async Task ListLocations(LifxClient client, Selector selector)
 	{
 		var locations = await client.Lights.ListLocationsAsync(selector, CancellationToken.None);
 
@@ -168,7 +169,7 @@ public static class LightsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, bool verbose, string selector, double duration) =>
+		command.SetHandler(async (token, verbose, selector, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -207,7 +208,7 @@ public static class LightsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, bool verbose, string selector, double duration) =>
+		command.SetHandler(async (token, verbose, selector, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -246,7 +247,7 @@ public static class LightsCommand
 		command.AddArgument(selectorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, bool verbose, string selector, double duration) =>
+		command.SetHandler(async (token, verbose, selector, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -289,7 +290,7 @@ public static class LightsCommand
 		command.AddArgument(colorArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, bool verbose, string selector, string color, double duration) =>
+		command.SetHandler(async (token, verbose, selector, color, duration) =>
 		{
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
@@ -334,7 +335,7 @@ public static class LightsCommand
 		command.AddArgument(brightnessArg);
 		command.AddOption(durationOption);
 
-		command.SetHandler(async (string? token, bool verbose, string selector, double brightness, double duration) =>
+		command.SetHandler(async (token, verbose, selector, brightness, duration) =>
 		{
 			if (brightness < 0 || brightness > 1)
 			{
@@ -365,9 +366,9 @@ public static class LightsCommand
 }
 
 // Helper classes for binding global options
-internal class TokenBinder : System.CommandLine.Binding.BinderBase<string?>
+internal class TokenBinder : BinderBase<string?>
 {
-	protected override string? GetBoundValue(System.CommandLine.Binding.BindingContext bindingContext)
+	protected override string? GetBoundValue(BindingContext bindingContext)
 	{
 		return bindingContext.ParseResult.GetValueForOption(
 			bindingContext.ParseResult.RootCommandResult.Command.Options
@@ -376,14 +377,14 @@ internal class TokenBinder : System.CommandLine.Binding.BinderBase<string?>
 	}
 }
 
-internal class VerboseBinder : System.CommandLine.Binding.BinderBase<bool>
+internal class VerboseBinder : BinderBase<bool>
 {
-	protected override bool GetBoundValue(System.CommandLine.Binding.BindingContext bindingContext)
+	protected override bool GetBoundValue(BindingContext bindingContext)
 	{
 		var option = bindingContext.ParseResult.RootCommandResult.Command.Options
 			.OfType<Option<bool>>()
 			.FirstOrDefault(o => o.HasAlias("--verbose"));
-		
+
 		return option != null && bindingContext.ParseResult.GetValueForOption(option);
 	}
 }

@@ -11,6 +11,11 @@ public class CliConfiguration
 
 public static class ConfigManager
 {
+	private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+	{
+		WriteIndented = true
+	};
+
 	private static readonly string ConfigDirectory = Path.Combine(
 		Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
 		".lifx");
@@ -38,10 +43,7 @@ public static class ConfigManager
 	public static void Save(CliConfiguration config)
 	{
 		Directory.CreateDirectory(ConfigDirectory);
-		var json = JsonSerializer.Serialize(config, new JsonSerializerOptions
-		{
-			WriteIndented = true
-		});
+		var json = JsonSerializer.Serialize(config, jsonSerializerOptions);
 		File.WriteAllText(ConfigFile, json);
 	}
 
@@ -80,7 +82,7 @@ public static class ConfigManager
 	public static string GetApiToken(string? overrideToken = null)
 	{
 		var token = TryGetApiToken(overrideToken);
-		
+
 		if (string.IsNullOrWhiteSpace(token))
 		{
 			throw new InvalidOperationException(

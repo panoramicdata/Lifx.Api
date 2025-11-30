@@ -51,6 +51,11 @@ public class LifxClient : IDisposable
 	public ILifxColorApi Color { get; }
 
 	/// <summary>
+	/// Products API - Get LIFX product catalog (no API token required)
+	/// </summary>
+	public ILifxProductsApi Products { get; }
+
+	/// <summary>
 	/// LAN Protocol client for direct local network communication (if enabled)
 	/// </summary>
 	public LifxLanClient? Lan { get; }
@@ -77,6 +82,9 @@ public class LifxClient : IDisposable
 			Scenes = null!;
 			Color = null!;
 		}
+
+		// Initialize Products API (no token required, uses GitHub raw URL)
+		Products = CreateProductsApiClient();
 
 		// Initialize LAN client if enabled
 		if (options.IsLanEnabled)
@@ -134,6 +142,18 @@ public class LifxClient : IDisposable
 		};
 		httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiToken);
 		return httpClient;
+	}
+
+	private static ILifxProductsApi CreateProductsApiClient()
+	{
+		var httpClient = new HttpClient
+		{
+			BaseAddress = new Uri("https://raw.githubusercontent.com")
+		};
+		return RestService.For<ILifxProductsApi>(httpClient, new RefitSettings
+		{
+			ContentSerializer = new SystemTextJsonContentSerializer(JsonSerializerOptions)
+		});
 	}
 
 	public void Dispose()
