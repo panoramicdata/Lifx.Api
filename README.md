@@ -492,6 +492,27 @@ The API is organized into logical sub-clients:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Publishing
+
+For maintainers publishing new versions to NuGet:
+
+1. Ensure you have a NuGet API key from https://www.nuget.org/account/apikeys
+2. Create `nuget-key.txt` in the repository root with your API key
+3. Run the automated publish script:
+
+```powershell
+.\Publish.ps1
+```
+
+The script will:
+- Verify clean git state (porcelain)
+- Run all tests
+- Get version from Nerdbank.GitVersioning
+- Build and publish NuGet package
+- Create and push git tag
+
+See [PUBLISHING.md](PUBLISHING.md) for detailed publishing instructions and [PRE-PUBLISH-CHECKLIST.md](PRE-PUBLISH-CHECKLIST.md) for pre-flight checks.
+
 ## Credits
 
 This library draws heavily from and combines previous work:

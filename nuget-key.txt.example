@@ -1,0 +1,13 @@
+# This is an example file. Create a file named 'nuget-key.txt' with your actual NuGet API key.
+# 
+# To get your NuGet API key:
+# 1. Go to https://www.nuget.org/account/apikeys
+# 2. Create a new API key with "Push" permissions for the Lifx.Api package
+# 3. Copy the key and paste it into nuget-key.txt (without this comment)
+#
+# The nuget-key.txt file is .gitignored for security.
+#
+# Example format (your key will be different):
+# oy2abc123def456ghi789jkl012mno345pqr678stu901vwx234yz
+
+your-nuget-api-key-here

@@ -352,3 +352,6 @@ MigrationBackup/
 # Test configuration files
 **/appsettings.json
 !**/appsettings.example.json
+
+# NuGet API key
+nuget-key.txt

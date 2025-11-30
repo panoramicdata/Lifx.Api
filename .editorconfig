@@ -1,15 +1,13 @@
 # Rules in this file were initially inferred by Visual Studio IntelliCode from the C:\Users\david\Projects\Lifx.Api codebase based on best match to current usage at 20/02/2022
 # You can modify the rules from these initially generated values to suit your own policies
 # You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+[*]
+indent_style = tab
+
 [*.cs]
-
-
-#Core editorconfig formatting - indentation
 
 #use soft tabs (spaces) for indentation
 indent_style = tab
-
-#Style - modifier options
 
 #prefer accessibility modifiers to be declared except for public interface members. This will currently not differ from always and will act as future proofing for if C# adds default interface methods.
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion

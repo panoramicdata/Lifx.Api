@@ -5,6 +5,7 @@
     <File Path="global.json" />
     <File Path="LICENSE" />
     <File Path="MASTER_PLAN.md" />
+    <File Path="nuget-key.txt" />
     <File Path="README.md" />
     <File Path="version.json" />
   </Folder>
