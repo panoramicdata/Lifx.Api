@@ -7,11 +7,14 @@
 .DESCRIPTION
     This script automates the entire publishing process:
     - Checks for clean git working directory (porcelain)
-    - Runs all tests
+    - Runs all tests (optional, can be skipped with -SkipTests)
     - Gets version from Nerdbank.GitVersioning
     - Creates git tag
     - Builds NuGet package
     - Publishes to NuGet.org
+
+.PARAMETER SkipTests
+    Skip running tests before publishing. Use with caution!
 
 .NOTES
     Requires:
@@ -22,10 +25,16 @@
 
 .EXAMPLE
     .\Publish.ps1
+    
+.EXAMPLE
+    .\Publish.ps1 -SkipTests
 #>
 
 [CmdletBinding()]
-param()
+param(
+    [Parameter(Mandatory=$false)]
+    [switch]$SkipTests
+)
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -173,39 +182,45 @@ if ($tagExists) {
 
 #region Run Tests
 
-Write-Step "Running all tests..."
-
-try {
-    # Clean previous test results
-    $testResultsDir = Join-Path $PSScriptRoot "TestResults"
-    if (Test-Path $testResultsDir) {
-        Remove-Item $testResultsDir -Recurse -Force
-    }
-    
-    # Run tests
-    $testOutput = dotnet test --configuration Release --verbosity normal 2>&1
-    $testExitCode = $LASTEXITCODE
-    
-    # Display output
-    $testOutput | ForEach-Object { Write-Host "    $_" }
-    
-    if ($testExitCode -ne 0) {
-        Exit-WithError "Tests failed. Fix failing tests before publishing."
-    }
-    
-    # Parse test results
-    $passedTests = ($testOutput | Select-String -Pattern "Passed.*(\d+)" | ForEach-Object { $_.Matches.Groups[1].Value }) -join ""
-    $totalTests = ($testOutput | Select-String -Pattern "Total.*(\d+)" | ForEach-Object { $_.Matches.Groups[1].Value }) -join ""
-    
-    if ($passedTests -and $totalTests) {
-        Write-Success "All tests passed: $passedTests/$totalTests"
-    }
-    else {
-        Write-Success "Tests completed successfully"
-    }
+if ($SkipTests) {
+    Write-Step "Skipping tests (as requested)..."
+    Write-Host "    WARNING: Publishing without running tests!" -ForegroundColor Yellow
 }
-catch {
-    Exit-WithError "Failed to run tests: $_"
+else {
+    Write-Step "Running all tests..."
+
+    try {
+        # Clean previous test results
+        $testResultsDir = Join-Path $PSScriptRoot "TestResults"
+        if (Test-Path $testResultsDir) {
+            Remove-Item $testResultsDir -Recurse -Force
+        }
+        
+        # Run tests
+        $testOutput = dotnet test --configuration Release --verbosity normal 2>&1
+        $testExitCode = $LASTEXITCODE
+        
+        # Display output
+        $testOutput | ForEach-Object { Write-Host "    $_" }
+        
+        if ($testExitCode -ne 0) {
+            Exit-WithError "Tests failed. Fix failing tests before publishing."
+        }
+        
+        # Parse test results
+        $passedTests = ($testOutput | Select-String -Pattern "Passed.*(\d+)" | ForEach-Object { $_.Matches.Groups[1].Value }) -join ""
+        $totalTests = ($testOutput | Select-String -Pattern "Total.*(\d+)" | ForEach-Object { $_.Matches.Groups[1].Value }) -join ""
+        
+        if ($passedTests -and $totalTests) {
+            Write-Success "All tests passed: $passedTests/$totalTests"
+        }
+        else {
+            Write-Success "Tests completed successfully"
+        }
+    }
+    catch {
+        Exit-WithError "Failed to run tests: $_"
+    }
 }
 
 #endregion
