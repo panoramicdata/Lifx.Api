@@ -13,9 +13,7 @@ class Program
 			var rootCommand = new RootCommand("LIFX CLI - Control your LIFX smart lights from the command line")
 			{
 				CreateKeyCommand(),
-				LightsCommand.Create(),
-				EffectsCommand.Create(),
-				ScenesCommand.Create(),
+				CloudCommand.Create(),
 				LanCommand.Create(),
 				ConfigCommand.Create(),
 				CreateVersionCommand()
@@ -32,21 +30,23 @@ class Program
 				"Quick Start:" + Environment.NewLine +
 				"  1. Get API token: https://cloud.lifx.com/settings" + Environment.NewLine +
 				"  2. Store token: lifx key set <token>" + Environment.NewLine +
-				"  3. Control lights: lifx lights on all" + Environment.NewLine +
+				"  3. Control lights: lifx cloud lights on all" + Environment.NewLine +
 				Environment.NewLine +
 				"For LAN-only usage (no API token needed):" + Environment.NewLine +
 				"  lifx lan discover" + Environment.NewLine +
 				Environment.NewLine +
 				"Examples:" + Environment.NewLine +
-				"  lifx lights list               # List all lights" + Environment.NewLine +
-				"  lifx lights on all             # Turn on all lights" + Environment.NewLine +
-				"  lifx lights color all blue     # Set all lights to blue" + Environment.NewLine +
-				"  lifx effects breathe all       # Start breathe effect" + Environment.NewLine +
-				"  lifx scenes list               # List available scenes" + Environment.NewLine +
+				"  lifx cloud lights list             # List all lights" + Environment.NewLine +
+				"  lifx cloud lights on all           # Turn on all lights" + Environment.NewLine +
+				"  lifx cloud lights color all blue   # Set all lights to blue" + Environment.NewLine +
+				"  lifx cloud effects breathe all     # Start breathe effect" + Environment.NewLine +
+				"  lifx cloud scenes list             # List available scenes" + Environment.NewLine +
+				"  lifx lan discover                  # Discover local devices" + Environment.NewLine +
 				Environment.NewLine +
 				"Get help for any command:" + Environment.NewLine +
-				"  lifx lights --help" + Environment.NewLine +
-				"  lifx effects breathe --help";
+				"  lifx cloud --help" + Environment.NewLine +
+				"  lifx lan --help" + Environment.NewLine +
+				"  lifx cloud lights --help";
 
 			// Add global options
 			var verboseOption = new Option<bool>(
@@ -130,9 +130,9 @@ class Program
 				AnsiConsole.MarkupLine("[dim]Location: Windows Credential Manager[/]");
 				AnsiConsole.WriteLine();
 				AnsiConsole.MarkupLine("You can now use LIFX Cloud commands:");
-				AnsiConsole.MarkupLine("  [cyan]lifx lights list[/]");
-				AnsiConsole.MarkupLine("  [cyan]lifx lights on all[/]");
-				AnsiConsole.MarkupLine("  [cyan]lifx effects breathe all[/]");
+				AnsiConsole.MarkupLine("  [cyan]lifx cloud lights list[/]");
+				AnsiConsole.MarkupLine("  [cyan]lifx cloud lights on all[/]");
+				AnsiConsole.MarkupLine("  [cyan]lifx cloud effects breathe all[/]");
 			}
 			else
 			{
