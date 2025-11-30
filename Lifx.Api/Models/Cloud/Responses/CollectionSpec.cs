@@ -6,13 +6,13 @@ internal class CollectionSpec
 {
 	[JsonPropertyName("id")]
 	[JsonInclude]
-	public string id { get; set; } = string.Empty;
+	public string Id { get; set; } = string.Empty;
 
 	[JsonPropertyName("name")]
 	[JsonInclude]
-	public string name { get; set; } = string.Empty;
+	public string Name { get; set; } = string.Empty;
 
-	public override bool Equals(object? obj) => obj is CollectionSpec spec && spec.id == id && spec.name == name;
+	public override bool Equals(object? obj) => obj is CollectionSpec spec && spec.Id == Id && spec.Name == Name;
 
-	public override int GetHashCode() => HashCode.Combine(id, name);
+	public override int GetHashCode() => HashCode.Combine(Id, Name);
 }

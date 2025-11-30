@@ -65,12 +65,16 @@ public class LanMessageTests
 		var tooSmallPacket = new byte[35]; // Minimum is 36 bytes
 
 		// Act & Assert
-		Assert.Throws<Exception>(() =>
+		var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() =>
 		{
 			var method = typeof(LifxLanClient).GetMethod("ParseMessage",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 			method!.Invoke(null, [tooSmallPacket]);
 		});
+		
+		// Verify the inner exception is the expected type
+		exception.InnerException.Should().BeOfType<Exception>();
+		exception.InnerException!.Message.Should().Contain("Invalid packet");
 	}
 
 	[Fact]
@@ -87,12 +91,16 @@ public class LanMessageTests
 		}
 
 		// Act & Assert
-		Assert.Throws<Exception>(() =>
+		var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() =>
 		{
 			var method = typeof(LifxLanClient).GetMethod("ParseMessage",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 			method!.Invoke(null, [packet]);
 		});
+		
+		// Verify the inner exception is the expected type
+		exception.InnerException.Should().BeOfType<Exception>();
+		exception.InnerException!.Message.Should().Contain("Invalid packet");
 	}
 
 	[Fact]

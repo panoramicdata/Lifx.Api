@@ -1,6 +1,3 @@
-using Lifx.Api.Extensions;
-using Lifx.Api.Interfaces;
-using Lifx.Api.Models.Cloud.Requests;
 using System.Text.Json.Serialization;
 using static Lifx.Api.Models.Cloud.Selector;
 
@@ -9,13 +6,10 @@ namespace Lifx.Api.Models.Cloud.Responses;
 /// <summary>
 /// Model object for a Light
 /// </summary>
-public sealed class Light : ILightTarget<ApiResponse>
+public sealed class Light
 {
 	public const string ColorCapability = "has_color";
 	public const string ColorTemperatureCapability = "has_variable_color_temp";
-
-	[JsonIgnore]
-	internal LifxClient? Client { get; set; }
 
 	/// <summary>
 	/// Serial number of the light
@@ -43,7 +37,6 @@ public sealed class Light : ILightTarget<ApiResponse>
 	public PowerState PowerState { get; private set; }
 
 	[JsonPropertyName("color")]
-	[JsonInclude]
 	public Hsbk? Color
 	{
 		get
@@ -73,20 +66,20 @@ public sealed class Light : ILightTarget<ApiResponse>
 	internal CollectionSpec Group { get; private set; } = new();
 
 	[JsonIgnore]
-	public string GroupId => Group.id;
+	public string GroupId => Group.Id;
 
 	[JsonIgnore]
-	public string GroupName => Group.name;
+	public string GroupName => Group.Name;
 
 	[JsonPropertyName("location")]
 	[JsonInclude]
 	internal CollectionSpec Location { get; private set; } = new();
 
 	[JsonIgnore]
-	public string LocationId => Location.id;
+	public string LocationId => Location.Id;
 
 	[JsonIgnore]
-	public string LocationName => Location.name;
+	public string LocationName => Location.Name;
 
 	[JsonPropertyName("last_seen")]
 	[JsonInclude]
@@ -102,7 +95,7 @@ public sealed class Light : ILightTarget<ApiResponse>
 
 	[JsonPropertyName("capabilities")]
 	[JsonInclude]
-	private Dictionary<string, bool>? _capabilities { get; init; }
+	private Dictionary<string, bool>? capabilities { get; init; }
 
 	private Hsbk? color;
 
@@ -111,9 +104,9 @@ public sealed class Light : ILightTarget<ApiResponse>
 	{
 		get
 		{
-			if (_capabilities is not null)
+			if (capabilities is not null)
 			{
-				foreach (var entry in _capabilities)
+				foreach (var entry in capabilities)
 				{
 					if (entry.Value)
 					{
@@ -125,61 +118,7 @@ public sealed class Light : ILightTarget<ApiResponse>
 	}
 
 	public bool HasCapability(string capability) =>
-		_capabilities is not null && _capabilities.ContainsKey(capability) && _capabilities[capability];
-
-	public async Task<ApiResponse> TogglePower(TogglePowerRequest request)
-	{
-		if (Client is null)
-		{
-			throw new InvalidOperationException("Client not initialized");
-		}
-
-		return await Client.Lights.TogglePowerAsync((Selector)this, request, CancellationToken.None);
-	}
-
-	public async Task<ApiResponse> SetState(SetStateRequest request)
-	{
-		if (Client is null)
-		{
-			return new ApiResponse();
-		}
-
-		return await Client.Lights.SetStateAsync((Selector)this, request, CancellationToken.None);
-	}
-
-	/// <summary>
-	/// Re-requests light information
-	/// </summary>
-	/// <returns>A new instance of this light returned from API</returns>
-	public async Task<Light> GetRefreshed()
-	{
-		if (Client is null)
-		{
-			throw new InvalidOperationException("Client not initialized");
-		}
-
-		return (await Client.Lights.ListAsync((Selector)this, CancellationToken.None)).First();
-	}
-
-	/// <summary>
-	/// Re-requests light information and updates all properties
-	/// </summary>
-	public async Task Refresh()
-	{
-		Light light = await GetRefreshed();
-		Id = light.Id;
-		Uuid = light.Uuid;
-		Label = light.Label;
-		IsConnected = light.IsConnected;
-		PowerState = light.PowerState;
-		Color = light.Color;
-		Brightness = light.Brightness;
-		Group = light.Group;
-		Location = light.Location;
-		LastSeen = light.LastSeen;
-		SecondsSinceSeen = light.SecondsSinceSeen;
-		ProductName = light.ProductName;
-	}
+		capabilities is not null && capabilities.ContainsKey(capability) && capabilities[capability];
 
 	public override string ToString() => Label;
 

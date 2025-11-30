@@ -1,7 +1,7 @@
 using AwesomeAssertions;
 using System.Text.Json;
 
-namespace Lifx.Api.Test;
+namespace Lifx.Api.Test.Unit;
 
 [Collection("Model Tests")]
 public class PowerStateTests

@@ -1,6 +1,5 @@
 using Lifx.Api.Interfaces;
 using Lifx.Api.Models.Cloud;
-using Lifx.Api.Models.Cloud.Requests;
 using Lifx.Api.Models.Cloud.Responses;
 
 namespace Lifx.Api.Extensions;
@@ -10,13 +9,6 @@ namespace Lifx.Api.Extensions;
 /// </summary>
 public static class LifxLightsApiExtensions
 {
-	private static LifxClient? _client;
-
-	/// <summary>
-	/// Sets the client for attaching to lights
-	/// </summary>
-	internal static void SetClient(LifxClient client) => _client = client;
-
 	/// <summary>
 	/// Lists lights belonging to the authenticated account
 	/// </summary>
@@ -24,13 +16,6 @@ public static class LifxLightsApiExtensions
 	{
 		var lights = await api.ListLightsAsync(selector.ToString(), cancellationToken);
 		var filteredLights = lights.Where(a => a.LastSeen is not null).ToList();
-
-		// Attach client to lights
-		foreach (var light in filteredLights)
-		{
-			light.Client = _client;
-		}
-
 		return filteredLights;
 	}
 
@@ -38,41 +23,45 @@ public static class LifxLightsApiExtensions
 	/// Gets light groups belonging to the authenticated account
 	/// </summary>
 	public static async Task<List<Group>> ListGroupsAsync(this ILifxLightsApi api, Selector selector, CancellationToken cancellationToken)
-		=> (await api.ListAsync(selector, cancellationToken)).AsGroups();
+	{
+		var lights = await api.ListAsync(selector, cancellationToken);
+
+		// Group lights by their Group property
+		Dictionary<CollectionSpec, List<Light>> groups = [];
+		foreach (Light light in lights)
+		{
+			if (!groups.TryGetValue(light.Group, out List<Light>? value))
+			{
+				value = [];
+				groups[light.Group] = value;
+			}
+
+			value.Add(light);
+		}
+
+		return [.. groups.Select(entry => new Group(entry.Key.Id, entry.Key.Name, entry.Value))];
+	}
 
 	/// <summary>
 	/// Gets locations belonging to the authenticated account
 	/// </summary>
 	public static async Task<List<Location>> ListLocationsAsync(this ILifxLightsApi api, Selector selector, CancellationToken cancellationToken)
-		=> (await api.ListAsync(selector, cancellationToken)).AsLocations();
+	{
+		var lights = await api.ListAsync(selector, cancellationToken);
 
-	/// <summary>
-	/// Sets state for lights matching the selector
-	/// </summary>
-	public static Task<ApiResponse> SetStateAsync(this ILifxLightsApi api, Selector selector, SetStateRequest request, CancellationToken cancellationToken)
-		=> api.SetStateAsync(selector.ToString(), request, cancellationToken);
+		// Group lights by their Location property
+		Dictionary<CollectionSpec, List<Light>> groups = [];
+		foreach (Light light in lights)
+		{
+			if (!groups.TryGetValue(light.Location, out List<Light>? value))
+			{
+				value = [];
+				groups[light.Location] = value;
+			}
 
-	/// <summary>
-	/// Adjusts the state delta
-	/// </summary>
-	public static Task<ApiResponse> StateDeltaAsync(this ILifxLightsApi api, Selector selector, StateDeltaRequest request, CancellationToken cancellationToken)
-		=> api.StateDeltaAsync(selector.ToString(), request, cancellationToken);
+			value.Add(light);
+		}
 
-	/// <summary>
-	/// Toggles power for lights matching the selector
-	/// </summary>
-	public static Task<ApiResponse> TogglePowerAsync(this ILifxLightsApi api, Selector selector, TogglePowerRequest request, CancellationToken cancellationToken)
-		=> api.TogglePowerAsync(selector.ToString(), request, cancellationToken);
-
-	/// <summary>
-	/// Cycles through states
-	/// </summary>
-	public static Task<ApiResponse> CycleAsync(this ILifxLightsApi api, Selector selector, CycleRequest request, CancellationToken cancellationToken)
-		=> api.CycleAsync(selector.ToString(), request, cancellationToken);
-
-	/// <summary>
-	/// Runs the HEV clean cycle
-	/// </summary>
-	public static Task<ApiResponse> CleanAsync(this ILifxLightsApi api, Selector selector, CleanRequest request, CancellationToken cancellationToken)
-		=> api.CleanAsync(selector.ToString(), request, cancellationToken);
+		return [.. groups.Select(entry => new Location(entry.Key.Id, entry.Key.Name, entry.Value))];
+	}
 }

@@ -29,6 +29,7 @@ public class LanDiscoveryTests : IDisposable
 		{
 			_client.Dispose();
 		}
+
 		GC.SuppressFinalize(this);
 	}
 

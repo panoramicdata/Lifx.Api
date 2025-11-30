@@ -1,4 +1,3 @@
-using Lifx.Api.Extensions;
 using Lifx.Api.Interfaces;
 using Lifx.Api.Lan;
 using Microsoft.Extensions.Logging;
@@ -69,9 +68,6 @@ public class LifxClient : IDisposable
 			Effects = CreateApiClient<ILifxEffectsApi>(options.ApiToken!);
 			Scenes = CreateApiClient<ILifxScenesApi>(options.ApiToken!);
 			Color = CreateApiClient<ILifxColorApi>(options.ApiToken!);
-
-			// Set the client reference for Light navigation
-			LifxLightsApiExtensions.SetClient(this);
 		}
 		else
 		{

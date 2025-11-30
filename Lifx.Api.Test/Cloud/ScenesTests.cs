@@ -1,7 +1,7 @@
 using AwesomeAssertions;
 using Microsoft.Extensions.Logging;
 
-namespace Lifx.Api.Test;
+namespace Lifx.Api.Test.Cloud;
 
 [Collection("Cloud API Tests")]
 public class ScenesTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper)
@@ -38,7 +38,7 @@ public class ScenesTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var response = await Client.Scenes.ActivateSceneAsync(
-			$"scene_id:{firstScene.UUID}",
+			$"scene_id:{firstScene.Uuid}",
 			request,
 			CancellationToken);
 
@@ -73,7 +73,7 @@ public class ScenesTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		var response = await Client
 			.Scenes
 			.ActivateSceneAsync(
-				$"scene_id:{firstScene.UUID}",
+				$"scene_id:{firstScene.Uuid}",
 				request,
 				CancellationToken);
 

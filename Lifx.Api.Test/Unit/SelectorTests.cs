@@ -1,6 +1,6 @@
 using AwesomeAssertions;
 
-namespace Lifx.Api.Test;
+namespace Lifx.Api.Test.Unit;
 
 [Collection("Unit Tests")]
 public class SelectorTests

@@ -1,3 +1,4 @@
+using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Cloud.Requests;
 using Lifx.Api.Models.Cloud.Responses;
 using Refit;
@@ -14,7 +15,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/breathe")]
 	Task<ApiResponse> BreatheAsync(
-		string selector,
+		Selector selector,
 		[Body] BreatheEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -23,7 +24,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/move")]
 	Task<ApiResponse> MoveAsync(
-		string selector,
+		Selector selector,
 		[Body] MoveEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -32,7 +33,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/morph")]
 	Task<ApiResponse> MorphAsync(
-		string selector,
+		Selector selector,
 		[Body] MorphEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -41,7 +42,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/flame")]
 	Task<ApiResponse> FlameAsync(
-		string selector,
+		Selector selector,
 		[Body] FlameEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -50,7 +51,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/pulse")]
 	Task<ApiResponse> PulseAsync(
-		string selector,
+		Selector selector,
 		[Body] PulseEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -59,7 +60,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/clouds")]
 	Task<ApiResponse> CloudsAsync(
-		string selector,
+		Selector selector,
 		[Body] CloudsEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -68,7 +69,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/sunrise")]
 	Task<ApiResponse> SunriseAsync(
-		string selector,
+		Selector selector,
 		[Body] SunriseEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -77,7 +78,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/sunset")]
 	Task<ApiResponse> SunsetAsync(
-		string selector,
+		Selector selector,
 		[Body] SunsetEffectRequest request,
 		CancellationToken cancellationToken);
 
@@ -86,7 +87,7 @@ public interface ILifxEffectsApi
 	/// </summary>
 	[Post("/lights/{selector}/effects/off")]
 	Task<ApiResponse> OffAsync(
-		string selector,
+		Selector selector,
 		[Body] EffectsOffRequest request,
 		CancellationToken cancellationToken);
 }

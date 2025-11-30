@@ -3,7 +3,7 @@ using Lifx.Api.Extensions;
 using Lifx.Api.Models.Cloud.Responses;
 using Microsoft.Extensions.Logging;
 
-namespace Lifx.Api.Test;
+namespace Lifx.Api.Test.Cloud;
 
 [Collection("Cloud API Tests")]
 public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime

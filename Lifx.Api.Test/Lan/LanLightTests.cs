@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
+using Lifx.Api.Test.Collections;
 using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Lan;
@@ -110,7 +111,7 @@ public class LanLightTests : IDisposable
 			return;
 		}
 
-		var redColor = new Lifx.Api.Models.Lan.Color { R = 255, G = 0, B = 0 };
+		var redColor = new Color { R = 255, G = 0, B = 0 };
 
 		// Act & Assert
 		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
@@ -162,7 +163,7 @@ public class LanLightTests : IDisposable
 			return;
 		}
 
-		var redColor = new Lifx.Api.Models.Lan.Color { R = 255, G = 0, B = 0 };
+		var redColor = new Color { R = 255, G = 0, B = 0 };
 
 		// Act & Assert - Negative duration
 		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
@@ -228,9 +229,9 @@ public class LanLightTests : IDisposable
 	public void Color_RGB_Values_Should_Be_In_Range()
 	{
 		// Arrange
-		var red = new Lifx.Api.Models.Lan.Color { R = 255, G = 0, B = 0 };
-		var green = new Lifx.Api.Models.Lan.Color { R = 0, G = 255, B = 0 };
-		var blue = new Lifx.Api.Models.Lan.Color { R = 0, G = 0, B = 255 };
+		var red = new Color { R = 255, G = 0, B = 0 };
+		var green = new Color { R = 0, G = 255, B = 0 };
+		var blue = new Color { R = 0, G = 0, B = 255 };
 
 		// Assert
 		red.R.Should().Be(255);

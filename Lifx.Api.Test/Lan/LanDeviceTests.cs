@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
+using Lifx.Api.Test.Collections;
 using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Lan;

@@ -5,7 +5,7 @@ namespace Lifx.Api.Models.Cloud.Responses;
 public class Scene
 {
 	[JsonPropertyName("uuid")]
-	public required string UUID { get; init; }
+	public required string Uuid { get; init; }
 
 	[JsonPropertyName("name")]
 	public required string Name { get; init; }
@@ -21,16 +21,4 @@ public class Scene
 
 	[JsonPropertyName("updated_at")]
 	public required int UpdatedAt { get; init; }
-}
-
-public class State
-{
-	[JsonPropertyName("brightness")]
-	public required float Brightness { get; init; }
-
-	[JsonPropertyName("selector")]
-	public required string Selector { get; init; }
-
-	[JsonPropertyName("color")]
-	public required Hsbk? Color { get; init; }
 }

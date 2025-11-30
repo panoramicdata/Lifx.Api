@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Lifx.Api.Test;
+namespace Lifx.Api.Test.Lan;
 
 /// <summary>
 /// Test collection for LAN protocol tests that can be run independently
@@ -17,7 +17,7 @@ public class LanTestCollection : ICollectionFixture<LanTestFixture>
 public class LanTestFixture : IAsyncLifetime
 {
 	private readonly ILogger _logger;
-	
+
 	public LifxClient? SharedClient { get; private set; }
 	public bool IsLanStarted { get; private set; }
 
@@ -58,6 +58,7 @@ public class LanTestFixture : IAsyncLifetime
 			SharedClient.Dispose();
 			await Task.Delay(100); // Give time for socket cleanup
 		}
+
 		GC.SuppressFinalize(this);
 	}
 }

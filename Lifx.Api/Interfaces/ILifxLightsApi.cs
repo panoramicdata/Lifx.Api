@@ -1,3 +1,4 @@
+using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Cloud.Requests;
 using Lifx.Api.Models.Cloud.Responses;
 using Refit;
@@ -22,7 +23,7 @@ public interface ILifxLightsApi
 	/// </summary>
 	[Put("/lights/{selector}/state")]
 	Task<ApiResponse> SetStateAsync(
-		string selector,
+		Selector selector,
 		[Body] SetStateRequest request,
 		CancellationToken cancellationToken);
 
@@ -39,7 +40,7 @@ public interface ILifxLightsApi
 	/// </summary>
 	[Post("/lights/{selector}/state/delta")]
 	Task<ApiResponse> StateDeltaAsync(
-		string selector,
+		Selector selector,
 		[Body] StateDeltaRequest request,
 		CancellationToken cancellationToken);
 
@@ -48,7 +49,7 @@ public interface ILifxLightsApi
 	/// </summary>
 	[Post("/lights/{selector}/toggle")]
 	Task<ApiResponse> TogglePowerAsync(
-		string selector,
+		Selector selector,
 		[Body] TogglePowerRequest request,
 		CancellationToken cancellationToken);
 
@@ -57,7 +58,7 @@ public interface ILifxLightsApi
 	/// </summary>
 	[Post("/lights/{selector}/cycle")]
 	Task<ApiResponse> CycleAsync(
-		string selector,
+		Selector selector,
 		[Body] CycleRequest request,
 		CancellationToken cancellationToken);
 
@@ -66,7 +67,7 @@ public interface ILifxLightsApi
 	/// </summary>
 	[Post("/lights/{selector}/clean")]
 	Task<ApiResponse> CleanAsync(
-		string selector,
+		Selector selector,
 		[Body] CleanRequest request,
 		CancellationToken cancellationToken);
 }

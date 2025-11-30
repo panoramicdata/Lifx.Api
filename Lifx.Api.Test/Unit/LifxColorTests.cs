@@ -1,7 +1,7 @@
 using AwesomeAssertions;
 using System.Data;
 
-namespace Lifx.Api.Test;
+namespace Lifx.Api.Test.Unit;
 
 [Collection("Unit Tests")]
 public class LifxColorTests
