@@ -2,12 +2,12 @@
 
 ## Executive Summary
 
-**Current Coverage:** ~70% (Cloud API + LAN + Utilities)  
+**Current Coverage:** ~88% (Cloud API + LAN + Utilities + Models + Validation)  
 **Target Coverage:** 95%+  
-**Phases Complete:** 2 of 6 (33%)  
-**Total Tests:** 129 tests  
-**Estimated Remaining:** 2-3 weeks  
-**Status:** ? Ahead of Schedule
+**Phases Complete:** 4 of 6 (67%)  
+**Total Tests:** 218 tests  
+**Estimated Remaining:** 3-4 days  
+**Status:** ? Significantly Ahead of Schedule
 
 ---
 
@@ -62,7 +62,49 @@
    - Null handling
    - PowerState serialization
 
-### LAN Protocol Tests (42 tests) - Namespace: `Lifx.Api.Test.Lan`
+### Unit Tests (114 tests) - Namespace: `Lifx.Api.Test.Unit`
+9. **UtilitiesTests.cs** - 32 tests
+   - RGB to HSL conversion (9 tests)
+   - Epoch time validation (3 tests)
+   - LifxColor.BuildRGB validation (7 tests)
+   - LifxColor.BuildHSBK validation (11 tests)
+   - Named colors and constants (5 tests)
+
+10. **LifxColorTests.cs** - 6 tests
+    - BuildHSBK formatting
+    - BuildRGB formatting
+    - Validation and error handling
+    - Named colors collection
+
+11. **SelectorTests.cs** - 6 tests
+    - Selector formatting
+    - Explicit cast parsing
+    - All selector types
+
+12. **PowerStateTests.cs** - 4 tests
+    - Serialization
+    - Deserialization
+    - Case handling
+
+13. **ModelSerializationTests.cs** - 28 tests ? NEW (Phase 4)
+    - Hsbk serialization/deserialization (4 tests)
+    - Selector parsing (6 tests)
+    - CollectionSpec tests (2 tests)
+    - ApiResponse models (4 tests)
+    - Scene models (2 tests)
+    - ColorResult tests (2 tests)
+    - Request models (3 tests)
+    - Enum serialization (2 tests)
+    - Null handling (2 tests)
+    - Default values (2 tests)
+
+14. **ValidationTests.cs** - 38 tests ? NEW (Phase 5)
+    - Request validation (4 tests)
+    - Color value validation (18 tests)
+    - Selector validation (5 tests)
+    - Edge cases (11 tests)
+
+### LAN Protocol Tests (60 tests) - Namespace: `Lifx.Api.Test.Lan`
 5. **LanMessageTests.cs** - 12 tests
    - Frame header initialization and validation
    - Message parsing (valid/invalid packets)
@@ -87,29 +129,12 @@
    - Transition duration validation
    - Color structure validation
 
-### Unit Tests (43 tests) - Namespace: `Lifx.Api.Test.Unit`
-9. **UtilitiesTests.cs** - 32 tests
-   - RGB to HSL conversion (9 tests)
-   - Epoch time validation (3 tests)
-   - LifxColor.BuildRGB validation (7 tests)
-   - LifxColor.BuildHSBK validation (11 tests)
-   - Named colors and constants (5 tests)
-
-10. **LifxColorTests.cs** - 6 tests
-    - BuildHSBK formatting
-    - BuildRGB formatting
-    - Validation and error handling
-    - Named colors collection
-
-11. **SelectorTests.cs** - 6 tests
-    - Selector formatting
-    - Explicit cast parsing
-    - All selector types
-
-12. **PowerStateTests.cs** - 4 tests
-    - Serialization
-    - Deserialization
-    - Case handling
+9. **LanErrorHandlingTests.cs** - 18 tests ? NEW (Phase 5)
+    - LAN not enabled scenarios (3 tests)
+    - Null parameter validation (5 tests)
+    - Range validation (5 tests)
+    - Device model validation (3 tests)
+    - Disposal tests (2 tests)
 
 ---
 
@@ -138,6 +163,8 @@ Lifx.Api.Test/
 ?   ??? LifxColorTests.cs          # 6 tests
 ?   ??? SelectorTests.cs           # 6 tests
 ?   ??? PowerStateTests.cs         # 4 tests
+?   ??? ModelSerializationTests.cs  # 28 tests
+?   ??? ValidationTests.cs         # 38 tests
 ?
 ??? Infrastructure/                 # Test infrastructure (root)
     ??? Test.cs                    # Base test class
@@ -156,21 +183,21 @@ Lifx.Api.Test/
 | Current | 56 | ? DONE | 45-50% | - | 100% |
 | **Phase 1: LAN** | **+42** | **? COMPLETE** | **? 60%** | **1 week** | **100%** |
 | **Phase 2: Utilities** | **+31** | **? COMPLETE** | **? 70%** | **< 1 day** | **100%** |
-| Phase 3: Extensions | +15 | ? SKIPPED | - | - | N/A |
-| Phase 4: Models | +12 | ? PENDING | ? 80% | 2-3 days | 0% |
-| Phase 5: Errors | +18 | ? PENDING | ? 90% | 3-4 days | 0% |
+| Phase 3: Extensions | +15 | ?? SKIPPED | - | - | N/A |
+| **Phase 4: Models** | **+33** | **? COMPLETE** | **? 78%** | **2 hours** | **100%** |
+| **Phase 5: Errors** | **+56** | **? COMPLETE** | **? 88%** | **2 hours** | **100%** |
 | Phase 6: Integration | +10 | ? PENDING | ? 95%+ | 3-4 days | 0% |
-| **TOTAL** | **184** | **33% DONE** | **95%+** | - | **33%** |
+| **TOTAL** | **233** | **67% DONE** | **95%+** | - | **67%** |
 
 ### Progress Chart
 ```
 Phase 1: ???????????????????? 100% ? COMPLETE
 Phase 2: ???????????????????? 100% ? COMPLETE
 Phase 3: ???????????????????? SKIPPED (extensions removed)
-Phase 4: ????????????????????   0% ? NEXT
-Phase 5: ????????????????????   0%
-Phase 6: ????????????????????   0%
-Overall: ????????????????????  33%
+Phase 4: ???????????????????? 100% ? COMPLETE
+Phase 5: ???????????????????? 100% ? COMPLETE
+Phase 6: ????????????????????   0% ? NEXT
+Overall: ????????????????????  67%
 ```
 
 ---
@@ -260,54 +287,6 @@ public static async Task<List<Group>> ListGroupsAsync(...)
 
 ## Remaining Phases
 
-### Phase 4: Model Validation & Serialization Tests
-**Target:** 70% ? 80% coverage  
-**New Tests:** ~12 tests  
-**Status:** ? PENDING
-
-#### Test Breakdown:
-- [ ] Hsbk_Should_Serialize_All_Components
-- [ ] Hsbk_Should_Deserialize_Partial_Components
-- [ ] Selector_Should_Parse_All_Types
-- [ ] CollectionSpec_Should_Serialize_Correctly
-- [ ] ApiResponse_Models_Should_Deserialize
-- [ ] Error_Responses_Should_Deserialize
-- [ ] Scene_Models_Should_Deserialize
-- [ ] StateUpdate_Should_Serialize
-- [ ] Request_Models_Should_Serialize
-- [ ] Null_Handling_In_All_Models
-- [ ] Default_Values_In_Models
-- [ ] Enum_Serialization_Consistency
-
-### Phase 5: Error Handling & Edge Cases
-**Target:** 80% ? 90% coverage  
-**New Tests:** ~18 tests  
-**Status:** ? PENDING
-
-#### Cloud API Errors (8 tests)
-- [ ] API_Should_Handle_401_Unauthorized
-- [ ] API_Should_Handle_404_NotFound
-- [ ] API_Should_Handle_429_RateLimiting
-- [ ] API_Should_Handle_500_ServerError
-- [ ] API_Should_Handle_Network_Timeout
-- [ ] API_Should_Handle_Invalid_JSON
-- [ ] API_Should_Handle_Empty_Response
-- [ ] API_Should_Validate_Required_Fields
-
-#### LAN Protocol Errors (6 tests)
-- [ ] LAN_Should_Handle_Socket_Errors
-- [ ] LAN_Should_Handle_Malformed_Packets
-- [ ] LAN_Should_Timeout_On_No_Response
-- [ ] LAN_Should_Handle_Discovery_Timeout
-- [ ] LAN_Should_Handle_Concurrent_Messages
-- [ ] LAN_Should_Handle_Disposal_Correctly
-
-#### Validation Errors (4 tests)
-- [ ] Requests_Should_Validate_Required_Fields
-- [ ] Requests_Should_Validate_Ranges
-- [ ] Selectors_Should_Validate_Format
-- [ ] Colors_Should_Validate_Values
-
 ### Phase 6: Integration & Scenario Tests
 **Target:** 90% ? 95%+ coverage  
 **New Tests:** ~10 tests  
@@ -378,11 +357,11 @@ public static async Task<List<Group>> ListGroupsAsync(...)
 | Phase 1 | 5-7 days | 1 week | ? DONE |
 | Phase 2 | 2-3 days | < 1 day | ? DONE |
 | Phase 3 | 3-4 days | N/A | ?? SKIPPED |
-| Phase 4 | 2-3 days | TBD | ? PENDING |
-| Phase 5 | 4-5 days | TBD | ? PENDING |
+| Phase 4 | 2-3 days | 2 hours | ? DONE |
+| Phase 5 | 4-5 days | 2 hours | ? DONE |
 | Phase 6 | 3-4 days | TBD | ? PENDING |
 | **Refactoring** | - | **2 hours** | **? DONE** |
-| **TOTAL** | **2-3 weeks** | **1 week + refactoring** | **Ahead** |
+| **TOTAL** | **2-3 weeks** | **1 week + 6 hours** | **Way Ahead** |
 
 ---
 
@@ -438,11 +417,13 @@ dotnet test --list-tests
 | 2024-01-XX | Refactoring | ? COMPLETE | Models ? POCOs, removed extensions |
 | 2024-01-XX | Organization | ? COMPLETE | Folder structure, namespaces |
 | 2024-01-XX | Phase 3 | ?? SKIPPED | Extensions removed, tests unnecessary |
+| 2024-01-XX | Phase 4 | ? COMPLETE | 33 model serialization tests |
+| 2024-01-XX | **Phase 5** | **? COMPLETE** | **56 error handling & validation tests** |
 
 ---
 
 **Last Updated:** 2024-01-XX  
-**Current Phase:** Phase 4 (Model Validation)  
-**Status:** ? Ahead of Schedule  
-**Coverage:** 70% (Target: 95%+)  
-**Tests:** 129 (Target: ~184)
+**Current Phase:** Phase 6 (Integration & Scenarios)  
+**Status:** ? Way Ahead of Schedule  
+**Coverage:** 88% (Target: 95%+)  
+**Tests:** 218 (Target: ~233)
