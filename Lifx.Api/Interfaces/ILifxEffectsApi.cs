@@ -14,7 +14,7 @@ public interface ILifxEffectsApi
 	/// Performs a breathe effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/breathe")]
-	Task<ApiResponse> BreatheAsync(
+	Task<SuccessResponse> BreatheAsync(
 		Selector selector,
 		[Body] BreatheEffectRequest request,
 		CancellationToken cancellationToken);
@@ -23,7 +23,7 @@ public interface ILifxEffectsApi
 	/// Performs a move effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/move")]
-	Task<ApiResponse> MoveAsync(
+	Task<SuccessResponse> MoveAsync(
 		Selector selector,
 		[Body] MoveEffectRequest request,
 		CancellationToken cancellationToken);
@@ -32,7 +32,7 @@ public interface ILifxEffectsApi
 	/// Performs a morph effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/morph")]
-	Task<ApiResponse> MorphAsync(
+	Task<SuccessResponse> MorphAsync(
 		Selector selector,
 		[Body] MorphEffectRequest request,
 		CancellationToken cancellationToken);
@@ -41,7 +41,7 @@ public interface ILifxEffectsApi
 	/// Performs a flame effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/flame")]
-	Task<ApiResponse> FlameAsync(
+	Task<SuccessResponse> FlameAsync(
 		Selector selector,
 		[Body] FlameEffectRequest request,
 		CancellationToken cancellationToken);
@@ -50,7 +50,7 @@ public interface ILifxEffectsApi
 	/// Performs a pulse effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/pulse")]
-	Task<ApiResponse> PulseAsync(
+	Task<SuccessResponse> PulseAsync(
 		Selector selector,
 		[Body] PulseEffectRequest request,
 		CancellationToken cancellationToken);
@@ -59,7 +59,7 @@ public interface ILifxEffectsApi
 	/// Performs a clouds effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/clouds")]
-	Task<ApiResponse> CloudsAsync(
+	Task<SuccessResponse> CloudsAsync(
 		Selector selector,
 		[Body] CloudsEffectRequest request,
 		CancellationToken cancellationToken);
@@ -68,7 +68,7 @@ public interface ILifxEffectsApi
 	/// Performs a sunrise effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/sunrise")]
-	Task<ApiResponse> SunriseAsync(
+	Task<SuccessResponse> SunriseAsync(
 		Selector selector,
 		[Body] SunriseEffectRequest request,
 		CancellationToken cancellationToken);
@@ -77,7 +77,7 @@ public interface ILifxEffectsApi
 	/// Performs a sunset effect
 	/// </summary>
 	[Post("/lights/{selector}/effects/sunset")]
-	Task<ApiResponse> SunsetAsync(
+	Task<SuccessResponse> SunsetAsync(
 		Selector selector,
 		[Body] SunsetEffectRequest request,
 		CancellationToken cancellationToken);
@@ -86,7 +86,7 @@ public interface ILifxEffectsApi
 	/// Turns off effects
 	/// </summary>
 	[Post("/lights/{selector}/effects/off")]
-	Task<ApiResponse> OffAsync(
+	Task<SuccessResponse> OffAsync(
 		Selector selector,
 		[Body] EffectsOffRequest request,
 		CancellationToken cancellationToken);

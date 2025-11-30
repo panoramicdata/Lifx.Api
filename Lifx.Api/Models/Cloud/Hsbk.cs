@@ -8,16 +8,16 @@ namespace Lifx.Api.Models.Cloud;
 public class Hsbk
 {
 	[JsonPropertyName("hue")]
-	public float? Hue { get; init; }
+	public float? Hue { get; set; }
 
 	[JsonPropertyName("saturation")]
-	public float? Saturation { get; init; }
+	public float? Saturation { get; set; }
 
 	[JsonPropertyName("brightness")]
-	public float? Brightness { get; init; }
+	public float? Brightness { get; set; }
 
 	[JsonPropertyName("kelvin")]
-	public int? Kelvin { get; init; }
+	public int? Kelvin { get; set; }
 
 	public override string ToString()
 	{

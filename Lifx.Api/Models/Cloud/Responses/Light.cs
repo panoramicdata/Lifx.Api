@@ -37,25 +37,7 @@ public sealed class Light
 	public PowerState PowerState { get; private set; }
 
 	[JsonPropertyName("color")]
-	public Hsbk? Color
-	{
-		get
-		{
-			if (color is null)
-			{
-				return null;
-			}
-
-			return new()
-			{
-				Hue = color.Hue,
-				Saturation = color.Saturation,
-				Brightness = color.Brightness,
-				Kelvin = color.Kelvin
-			};
-		}
-		private set => color = value;
-	}
+	public Hsbk? Color { get; set; }
 
 	[JsonPropertyName("brightness")]
 	[JsonInclude]
@@ -96,8 +78,6 @@ public sealed class Light
 	[JsonPropertyName("capabilities")]
 	[JsonInclude]
 	private Dictionary<string, bool>? capabilities { get; init; }
-
-	private Hsbk? color;
 
 	[JsonIgnore]
 	public IEnumerable<string> Capabilities
