@@ -5,7 +5,7 @@ namespace Lifx.Api.Lan;
 
 using Lifx.Api.Models.Lan;
 
-internal partial class LifxLanClient : IDisposable
+public partial class LifxLanClient : IDisposable
 {
 	private static uint identifier = 2;
 	private static readonly Lock identifierLock = new();

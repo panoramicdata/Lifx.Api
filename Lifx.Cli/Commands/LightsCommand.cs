@@ -1,5 +1,6 @@
 using System.CommandLine;
 using Lifx.Api;
+using Lifx.Api.Extensions;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Cloud.Requests;
 using Spectre.Console;
@@ -45,7 +46,7 @@ public static class LightsCommand
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
 
-			var selectorObj = Selector.Parse(selector);
+			var selectorObj = SelectorParser.ParseSelector(selector);
 
 			switch (type.ToLowerInvariant())
 			{
@@ -178,7 +179,7 @@ public static class LightsCommand
 				Duration = duration
 			};
 
-			await client.Lights.SetStateAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Lights.SetStateAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Turned on lights: {selector}");
 		},
 		new TokenBinder(),
@@ -217,7 +218,7 @@ public static class LightsCommand
 				Duration = duration
 			};
 
-			await client.Lights.SetStateAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Lights.SetStateAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Turned off lights: {selector}");
 		},
 		new TokenBinder(),
@@ -255,7 +256,7 @@ public static class LightsCommand
 				Duration = duration
 			};
 
-			await client.Lights.TogglePowerAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Lights.TogglePowerAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Toggled power: {selector}");
 		},
 		new TokenBinder(),
@@ -299,7 +300,7 @@ public static class LightsCommand
 				Duration = duration
 			};
 
-			await client.Lights.SetStateAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Lights.SetStateAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Set color to '{color}': {selector}");
 		},
 		new TokenBinder(),
@@ -350,7 +351,7 @@ public static class LightsCommand
 				Duration = duration
 			};
 
-			await client.Lights.SetStateAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Lights.SetStateAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Set brightness to {brightness:P0}: {selector}");
 		},
 		new TokenBinder(),
@@ -370,7 +371,7 @@ internal class TokenBinder : System.CommandLine.Binding.BinderBase<string?>
 	{
 		return bindingContext.ParseResult.GetValueForOption(
 			bindingContext.ParseResult.RootCommandResult.Command.Options
-				.OfType<Option<string>>()
+				.OfType<Option<string?>>()
 				.FirstOrDefault(o => o.HasAlias("--token")));
 	}
 }
@@ -379,9 +380,10 @@ internal class VerboseBinder : System.CommandLine.Binding.BinderBase<bool>
 {
 	protected override bool GetBoundValue(System.CommandLine.Binding.BindingContext bindingContext)
 	{
-		return bindingContext.ParseResult.GetValueForOption(
-			bindingContext.ParseResult.RootCommandResult.Command.Options
-				.OfType<Option<bool>>()
-				.FirstOrDefault(o => o.HasAlias("--verbose"))) ?? false;
+		var option = bindingContext.ParseResult.RootCommandResult.Command.Options
+			.OfType<Option<bool>>()
+			.FirstOrDefault(o => o.HasAlias("--verbose"));
+		
+		return option != null && bindingContext.ParseResult.GetValueForOption(option);
 	}
 }

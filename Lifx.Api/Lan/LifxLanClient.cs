@@ -9,7 +9,7 @@ using Lifx.Api.Models.Lan;
 /// <summary>
 /// LIFX Client for communicating with bulbs via LAN protocol
 /// </summary>
-internal partial class LifxLanClient(ILogger logger) : IDisposable
+public partial class LifxLanClient(ILogger logger) : IDisposable
 {
 	private static readonly DateTime Epoch = new(1970, 01, 01);
 	private const int Port = 56700;

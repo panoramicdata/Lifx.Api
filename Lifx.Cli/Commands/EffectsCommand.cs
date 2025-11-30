@@ -1,6 +1,5 @@
 using System.CommandLine;
 using Lifx.Api;
-using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Cloud.Requests;
 using Spectre.Console;
 
@@ -53,7 +52,7 @@ public static class EffectsCommand
 				PowerOn = true
 			};
 
-			await client.Effects.BreatheAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.BreatheAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started breathe effect on {selector}");
 		}, new TokenBinder(), selectorArg, colorOption, periodOption, cyclesOption);
 
@@ -87,7 +86,7 @@ public static class EffectsCommand
 				PowerOn = true
 			};
 
-			await client.Effects.PulseAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.PulseAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started pulse effect on {selector}");
 		}, new TokenBinder(), selectorArg, colorOption, periodOption, cyclesOption);
 
@@ -118,7 +117,7 @@ public static class EffectsCommand
 				PowerOn = true
 			};
 
-			await client.Effects.MorphAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.MorphAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started morph effect on {selector}");
 		}, new TokenBinder(), selectorArg, periodOption, durationOption);
 
@@ -149,7 +148,7 @@ public static class EffectsCommand
 				PowerOn = true
 			};
 
-			await client.Effects.FlameAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.FlameAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started flame effect on {selector}");
 		}, new TokenBinder(), selectorArg, periodOption, durationOption);
 
@@ -180,7 +179,7 @@ public static class EffectsCommand
 				PowerOn = true
 			};
 
-			await client.Effects.MoveAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.MoveAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started move effect on {selector}");
 		}, new TokenBinder(), selectorArg, directionOption, periodOption);
 
@@ -208,7 +207,7 @@ public static class EffectsCommand
 				PowerOn = true
 			};
 
-			await client.Effects.CloudsAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.CloudsAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started clouds effect on {selector}");
 		}, new TokenBinder(), selectorArg, durationOption);
 
@@ -235,7 +234,7 @@ public static class EffectsCommand
 				Duration = duration
 			};
 
-			await client.Effects.SunriseAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.SunriseAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started sunrise effect on {selector}");
 		}, new TokenBinder(), selectorArg, durationOption);
 
@@ -262,7 +261,7 @@ public static class EffectsCommand
 				Duration = duration
 			};
 
-			await client.Effects.SunsetAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.SunsetAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Started sunset effect on {selector}");
 		}, new TokenBinder(), selectorArg, durationOption);
 
@@ -289,7 +288,7 @@ public static class EffectsCommand
 				PowerOff = powerOff
 			};
 
-			await client.Effects.OffAsync(Selector.Parse(selector), request, CancellationToken.None);
+			await client.Effects.OffAsync(SelectorParser.ParseSelector(selector), request, CancellationToken.None);
 			AnsiConsole.MarkupLine($"[green]?[/] Stopped effects on {selector}");
 		}, new TokenBinder(), selectorArg, powerOffOption);
 

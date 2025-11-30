@@ -53,7 +53,7 @@ public class LifxClient : IDisposable
 	/// <summary>
 	/// LAN Protocol client for direct local network communication (if enabled)
 	/// </summary>
-	internal LifxLanClient? Lan { get; }
+	public LifxLanClient? Lan { get; }
 
 	public LifxClient(LifxClientOptions options)
 	{

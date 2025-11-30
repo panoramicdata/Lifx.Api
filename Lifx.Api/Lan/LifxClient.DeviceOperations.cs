@@ -5,7 +5,7 @@ namespace Lifx.Api.Lan;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
 
-internal partial class LifxLanClient : IDisposable
+public partial class LifxLanClient : IDisposable
 {
 	/// <summary>
 	/// Sets the device power state
