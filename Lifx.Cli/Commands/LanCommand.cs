@@ -1,5 +1,7 @@
 using System.CommandLine;
 using Lifx.Api;
+using Lifx.Api.Models.Cloud;
+using Lifx.Api.Models.Lan;
 using Spectre.Console;
 
 namespace Lifx.Cli.Commands;
@@ -11,7 +13,8 @@ public static class LanCommand
 		var command = new Command("lan", "Control LIFX lights via LAN protocol (no API token needed)")
 		{
 			CreateDiscoverCommand(),
-			CreateListCommand()
+			CreateListCommand(),
+			CreateLightsCommand()
 		};
 
 		command.Description =
@@ -23,14 +26,228 @@ public static class LanCommand
 			"Subcommands:" + Environment.NewLine +
 			"  discover  - Discover LIFX devices on local network" + Environment.NewLine +
 			"  list      - List cached discovered devices" + Environment.NewLine +
+			"  lights    - Control discovered lights (on/off/color)" + Environment.NewLine +
 			Environment.NewLine +
 			"Examples:" + Environment.NewLine +
 			"  lifx lan discover --timeout 10    # Discover for 10 seconds" + Environment.NewLine +
 			"  lifx lan list                     # Show discovered devices" + Environment.NewLine +
+			"  lifx lan lights on D0:73:D5:XX:XX:XX   # Turn on a light" + Environment.NewLine +
+			"  lifx lan lights color D0:73:D5:XX:XX:XX 2700  # Set to warm white" + Environment.NewLine +
 			Environment.NewLine +
 			"Note: Devices must be on the same network as your computer.";
 
 		return command;
+	}
+
+	private static Command CreateLightsCommand()
+	{
+		var command = new Command("lights", "Control LAN lights")
+		{
+			CreateLanOnCommand(),
+			CreateLanOffCommand(),
+			CreateLanColorCommand(),
+			CreateLanStateCommand()
+		};
+
+		return command;
+	}
+
+	private static Command CreateLanOnCommand()
+	{
+		var command = new Command("on", "Turn light on via LAN");
+
+		var macArg = new Argument<string>(
+			"mac-address",
+			description: "MAC address of the light (e.g., D0:73:D5:12:34:56)");
+
+		var durationOption = new Option<double>(
+			aliases: ["--duration", "-d"],
+			getDefaultValue: () => 1.0,
+			description: "Transition duration in seconds");
+
+		command.AddArgument(macArg);
+		command.AddOption(durationOption);
+
+		command.SetHandler(async (string macAddress, double duration) =>
+		{
+			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			
+			var bulb = await DiscoverAndFindBulb(client, macAddress);
+			if (bulb == null) return;
+
+			await client.Lan!.SetLightPowerAsync(
+				bulb,
+				TimeSpan.FromSeconds(duration),
+				PowerState.On,
+				CancellationToken.None);
+
+			AnsiConsole.MarkupLine($"[green]?[/] Turned on light: {bulb.MacAddressName}");
+		}, macArg, durationOption);
+
+		return command;
+	}
+
+	private static Command CreateLanOffCommand()
+	{
+		var command = new Command("off", "Turn light off via LAN");
+
+		var macArg = new Argument<string>(
+			"mac-address",
+			description: "MAC address of the light");
+
+		var durationOption = new Option<double>(
+			aliases: ["--duration", "-d"],
+			getDefaultValue: () => 1.0,
+			description: "Transition duration in seconds");
+
+		command.AddArgument(macArg);
+		command.AddOption(durationOption);
+
+		command.SetHandler(async (string macAddress, double duration) =>
+		{
+			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			
+			var bulb = await DiscoverAndFindBulb(client, macAddress);
+			if (bulb == null) return;
+
+			await client.Lan!.SetLightPowerAsync(
+				bulb,
+				TimeSpan.FromSeconds(duration),
+				PowerState.Off,
+				CancellationToken.None);
+
+			AnsiConsole.MarkupLine($"[green]?[/] Turned off light: {bulb.MacAddressName}");
+		}, macArg, durationOption);
+
+		return command;
+	}
+
+	private static Command CreateLanColorCommand()
+	{
+		var command = new Command("color", "Set light color via LAN");
+
+		var macArg = new Argument<string>(
+			"mac-address",
+			description: "MAC address of the light");
+
+		var kelvinArg = new Argument<int>(
+			"kelvin",
+			description: "Color temperature in Kelvin (2500-9000, e.g., 2700 for warm white)");
+
+		var durationOption = new Option<double>(
+			aliases: ["--duration", "-d"],
+			getDefaultValue: () => 1.0,
+			description: "Transition duration in seconds");
+
+		command.AddArgument(macArg);
+		command.AddArgument(kelvinArg);
+		command.AddOption(durationOption);
+
+		command.SetHandler(async (string macAddress, int kelvin, double duration) =>
+		{
+			if (kelvin < 2500 || kelvin > 9000)
+			{
+				AnsiConsole.MarkupLine("[red]Kelvin must be between 2500 and 9000[/]");
+				return;
+			}
+
+			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			
+			var bulb = await DiscoverAndFindBulb(client, macAddress);
+			if (bulb == null) return;
+
+			await client.Lan!.SetColorAsync(
+				bulb,
+				hue: 0,
+				saturation: 0,
+				brightness: 65535,
+				kelvin: (ushort)kelvin,
+				transitionDuration: TimeSpan.FromSeconds(duration),
+				CancellationToken.None);
+
+			AnsiConsole.MarkupLine($"[green]?[/] Set color to {kelvin}K: {bulb.MacAddressName}");
+		}, macArg, kelvinArg, durationOption);
+
+		return command;
+	}
+
+	private static Command CreateLanStateCommand()
+	{
+		var command = new Command("state", "Get light state via LAN");
+
+		var macArg = new Argument<string>(
+			"mac-address",
+			description: "MAC address of the light");
+
+		command.AddArgument(macArg);
+
+		command.SetHandler(async (string macAddress) =>
+		{
+			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			
+			var bulb = await DiscoverAndFindBulb(client, macAddress);
+			if (bulb == null) return;
+
+			var state = await client.Lan!.GetLightStateAsync(bulb, CancellationToken.None);
+			
+			if (state == null)
+			{
+				AnsiConsole.MarkupLine("[yellow]Could not get light state[/]");
+				return;
+			}
+
+			var table = new Table();
+			table.Border = TableBorder.Rounded;
+			table.AddColumn("Property");
+			table.AddColumn("Value");
+
+			table.AddRow("Label", state.Label);
+			table.AddRow("Power", state.IsOn ? "[green]On[/]" : "[dim]Off[/]");
+			table.AddRow("Hue", state.Hue.ToString());
+			table.AddRow("Saturation", state.Saturation.ToString());
+			table.AddRow("Brightness", state.Brightness.ToString());
+			table.AddRow("Kelvin", state.Kelvin.ToString());
+
+			AnsiConsole.Write(table);
+		}, macArg);
+
+		return command;
+	}
+
+	private static async Task<LightBulb?> DiscoverAndFindBulb(LifxClient client, string macAddress)
+	{
+		// Normalize MAC address
+		macAddress = macAddress.ToUpperInvariant().Replace("-", ":").Replace(".", ":");
+
+		AnsiConsole.Status()
+			.Start("Discovering devices...", ctx =>
+			{
+				client.StartLan(CancellationToken.None);
+				client.StartDeviceDiscovery(CancellationToken.None);
+				Thread.Sleep(5000);
+				client.StopDeviceDiscovery();
+			});
+
+		var bulb = client.Lan?.Devices
+			.OfType<LightBulb>()
+			.FirstOrDefault(d => d.MacAddressName.Equals(macAddress, StringComparison.OrdinalIgnoreCase));
+
+		if (bulb == null)
+		{
+			AnsiConsole.MarkupLine($"[red]?[/] Light not found: {macAddress}");
+			AnsiConsole.WriteLine();
+			AnsiConsole.MarkupLine("Available devices:");
+			
+			var devices = client.Lan?.Devices.ToList() ?? [];
+			foreach (var device in devices)
+			{
+				AnsiConsole.MarkupLine($"  [cyan]{device.MacAddressName}[/] at {device.HostName}");
+			}
+			
+			return null;
+		}
+
+		return bulb;
 	}
 
 	private static Command CreateDiscoverCommand()
@@ -52,7 +269,7 @@ public static class LanCommand
 				.Start("Discovering devices...", ctx =>
 				{
 					client.StartLan(CancellationToken.None);
-					client.StartDeviceDiscovery(CancellationToken.None); // ? FIXED: Actually start discovery!
+					client.StartDeviceDiscovery(CancellationToken.None);
 
 					// Wait for devices to respond
 					Thread.Sleep(timeout * 1000);
