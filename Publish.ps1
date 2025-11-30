@@ -237,9 +237,23 @@ try {
     }
     New-Item -ItemType Directory -Path $packOutputDir -Force | Out-Null
     
+    # Build the project first
+    Write-Host "    Building project..." -ForegroundColor Gray
+    $buildOutput = dotnet build ./Lifx.Api/Lifx.Api.csproj `
+        --configuration Release `
+        --verbosity quiet `
+        2>&1
+    
+    if ($LASTEXITCODE -ne 0) {
+        $buildOutput | ForEach-Object { Write-Host "    $_" }
+        Exit-WithError "Failed to build project."
+    }
+    
     # Build package
+    Write-Host "    Creating NuGet package..." -ForegroundColor Gray
     $packOutput = dotnet pack ./Lifx.Api/Lifx.Api.csproj `
         --configuration Release `
+        --no-build `
         --output $packOutputDir `
         --verbosity normal `
         2>&1
@@ -254,11 +268,17 @@ try {
     
     if (-not $packageFile) {
         # Try without exact version match
-        $packageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.*.nupkg" | Select-Object -First 1
+        $packageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" } | Select-Object -First 1
     }
     
     if (-not $packageFile) {
         Exit-WithError "NuGet package not found in $packOutputDir"
+    }
+    
+    # Check for symbol package
+    $symbolPackage = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.$version.snupkg" -ErrorAction SilentlyContinue
+    if ($symbolPackage) {
+        Write-Success "Symbol package created: $($symbolPackage.Name)"
     }
     
     Write-Success "Package built: $($packageFile.Name)"
