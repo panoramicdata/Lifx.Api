@@ -11,4 +11,5 @@
   </Folder>
   <Project Path="Lifx.Api.Test/Lifx.Api.Test.csproj" />
   <Project Path="Lifx.Api/Lifx.Api.csproj" />
+  <Project Path="Lifx.Cli/Lifx.Cli.csproj" />
 </Solution>

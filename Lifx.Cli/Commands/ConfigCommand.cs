@@ -7,33 +7,11 @@ public static class ConfigCommand
 {
 	public static Command Create()
 	{
-		var command = new Command("config", "Manage CLI configuration")
+		var command = new Command("config", "Manage CLI configuration (non-sensitive settings)")
 		{
-			CreateSetTokenCommand(),
 			CreateShowCommand(),
-			CreateClearCommand()
+			CreateResetCommand()
 		};
-
-		return command;
-	}
-
-	private static Command CreateSetTokenCommand()
-	{
-		var command = new Command("set-token", "Set LIFX Cloud API token");
-
-		var tokenArg = new Argument<string>("token", description: "API token from https://cloud.lifx.com/settings");
-
-		command.AddArgument(tokenArg);
-
-		command.SetHandler((string token) =>
-		{
-			var config = ConfigManager.Load();
-			config.ApiToken = token;
-			ConfigManager.Save(config);
-
-			AnsiConsole.MarkupLine("[green]?[/] API token saved");
-			AnsiConsole.MarkupLine($"[dim]Config location: {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".lifx", "config.json")}[/]");
-		}, tokenArg);
 
 		return command;
 	}
@@ -47,30 +25,59 @@ public static class ConfigCommand
 			var config = ConfigManager.Load();
 
 			var table = new Table();
+			table.Border = TableBorder.Rounded;
 			table.AddColumn("Setting");
 			table.AddColumn("Value");
 
-			table.AddRow("API Token", config.ApiToken != null ? "[dim]***configured***[/]" : "[red]not set[/]");
+			// API Token status
+			var hasSecureToken = SecureCredentialManager.HasStoredToken();
+			var envToken = Environment.GetEnvironmentVariable("LIFX_API_TOKEN");
+			
+			string tokenStatus;
+			if (hasSecureToken)
+			{
+				tokenStatus = "[green]Stored securely in Credential Manager[/]";
+			}
+			else if (!string.IsNullOrWhiteSpace(envToken))
+			{
+				tokenStatus = "[yellow]From environment variable[/]";
+			}
+			else
+			{
+				tokenStatus = "[red]Not configured[/]";
+			}
+
+			table.AddRow("API Token", tokenStatus);
 			table.AddRow("Use LAN", config.UseLan.ToString());
 			table.AddRow("Default Duration", $"{config.DefaultDuration}ms");
 			table.AddRow("Default Selector", config.DefaultSelector);
 
-			var envToken = Environment.GetEnvironmentVariable("LIFX_API_TOKEN");
-			if (!string.IsNullOrWhiteSpace(envToken))
-			{
-				table.AddRow("Environment Token", "[dim]***set***[/]");
-			}
-
 			AnsiConsole.Write(table);
-			AnsiConsole.MarkupLine($"\n[dim]Config location: {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".lifx", "config.json")}[/]");
+
+			// Show config file location
+			var configFile = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+				".lifx",
+				"config.json");
+
+			AnsiConsole.MarkupLine($"\n[dim]Config file: {configFile}[/]");
+			
+			if (hasSecureToken)
+			{
+				AnsiConsole.MarkupLine("[dim]API token stored securely in Windows Credential Manager[/]");
+			}
+			else
+			{
+				AnsiConsole.MarkupLine("[dim]To set API token: dotnet lifx key set <token>[/]");
+			}
 		});
 
 		return command;
 	}
 
-	private static Command CreateClearCommand()
+	private static Command CreateResetCommand()
 	{
-		var command = new Command("clear", "Clear configuration");
+		var command = new Command("reset", "Reset configuration to defaults (does not delete API token)");
 
 		command.SetHandler(() =>
 		{
@@ -82,12 +89,15 @@ public static class ConfigCommand
 			if (File.Exists(configFile))
 			{
 				File.Delete(configFile);
-				AnsiConsole.MarkupLine("[green]?[/] Configuration cleared");
+				AnsiConsole.MarkupLine("[green]?[/] Configuration reset to defaults");
 			}
 			else
 			{
-				AnsiConsole.MarkupLine("[yellow]No configuration file found[/]");
+				AnsiConsole.MarkupLine("[yellow]Configuration already at defaults[/]");
 			}
+
+			AnsiConsole.MarkupLine("[dim]Note: API token in Credential Manager was not affected[/]");
+			AnsiConsole.MarkupLine("[dim]To delete API token: dotnet lifx key delete[/]");
 		});
 
 		return command;

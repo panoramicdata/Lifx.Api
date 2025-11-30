@@ -4,7 +4,6 @@ namespace Lifx.Cli;
 
 public class CliConfiguration
 {
-	public string? ApiToken { get; set; }
 	public bool UseLan { get; set; } = true;
 	public int DefaultDuration { get; set; } = 1000; // milliseconds
 	public string DefaultSelector { get; set; } = "all";
@@ -46,30 +45,35 @@ public static class ConfigManager
 		File.WriteAllText(ConfigFile, json);
 	}
 
+	/// <summary>
+	/// Gets the API token with priority: override > environment > Windows Credential Store
+	/// </summary>
 	public static string GetApiToken(string? overrideToken = null)
 	{
-		// Priority: override > environment > config file
+		// Priority 1: Override token from command line
 		if (!string.IsNullOrWhiteSpace(overrideToken))
 		{
 			return overrideToken;
 		}
 
+		// Priority 2: Environment variable
 		var envToken = Environment.GetEnvironmentVariable("LIFX_API_TOKEN");
 		if (!string.IsNullOrWhiteSpace(envToken))
 		{
 			return envToken;
 		}
 
-		var config = Load();
-		if (!string.IsNullOrWhiteSpace(config.ApiToken))
+		// Priority 3: Windows Credential Store (secure storage)
+		var storedToken = SecureCredentialManager.GetApiToken();
+		if (!string.IsNullOrWhiteSpace(storedToken))
 		{
-			return config.ApiToken;
+			return storedToken;
 		}
 
 		throw new InvalidOperationException(
 			"No API token configured. Set via:" + Environment.NewLine +
-			"  1. --token option" + Environment.NewLine +
-			"  2. LIFX_API_TOKEN environment variable" + Environment.NewLine +
-			"  3. 'dotnet lifx config set-token <token>' command");
+			"  1. dotnet lifx key <token>          - Store securely in Windows Credential Manager (recommended)" + Environment.NewLine +
+			"  2. --token option                   - Override for single command" + Environment.NewLine +
+			"  3. LIFX_API_TOKEN environment var   - Set in environment");
 	}
 }
