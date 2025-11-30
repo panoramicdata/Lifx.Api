@@ -12,22 +12,13 @@ namespace Lifx.Api.Test.Lan;
 /// Full integration testing would require actual hardware or advanced mocking
 /// </summary>
 [Collection("LAN Tests")]
-public class LanDeviceTests : IDisposable
+public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 {
-	private readonly LanTestFixture _fixture;
-	private readonly LightBulb _testDevice;
-
-	public LanDeviceTests(LanTestFixture fixture)
-	{
-		_fixture = fixture;
-
-		// Create a test device
-		_testDevice = new LightBulb(
+	private readonly LightBulb _testDevice = new LightBulb(
 			"192.168.1.100",
 			[0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01],
 			service: 1,
 			port: 56700);
-	}
 
 	public void Dispose()
 	{
@@ -39,7 +30,7 @@ public class LanDeviceTests : IDisposable
 	public async Task SetDevicePowerState_Should_Require_Valid_Device()
 	{
 		// Arrange - Use shared client from fixture
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 		{
 			// Skip if LAN client couldn't start (expected in CI)
 			return;
@@ -47,63 +38,63 @@ public class LanDeviceTests : IDisposable
 
 		// Act & Assert
 		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetDevicePowerStateAsync(null!, PowerState.On, CancellationToken.None));
+			await fixture.SharedClient!.Lan!.SetDevicePowerStateAsync(null!, PowerState.On, CancellationToken.None));
 	}
 
 	[Fact]
 	public async Task GetDeviceLabel_Should_Require_Valid_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 		{
 			return;
 		}
 
 		// Act & Assert
 		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.GetDeviceLabelAsync(null!, CancellationToken.None));
+			await fixture.SharedClient!.Lan!.GetDeviceLabelAsync(null!, CancellationToken.None));
 	}
 
 	[Fact]
 	public async Task SetDeviceLabel_Should_Require_Valid_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 		{
 			return;
 		}
 
 		// Act & Assert
 		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetDeviceLabelAsync(null!, "Test", CancellationToken.None));
+			await fixture.SharedClient!.Lan!.SetDeviceLabelAsync(null!, "Test", CancellationToken.None));
 	}
 
 	[Fact]
 	public async Task GetDeviceVersion_Should_Require_Valid_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 		{
 			return;
 		}
 
 		// Act & Assert
 		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.GetDeviceVersionAsync(null!, CancellationToken.None));
+			await fixture.SharedClient!.Lan!.GetDeviceVersionAsync(null!, CancellationToken.None));
 	}
 
 	[Fact]
 	public async Task GetDeviceHostFirmware_Should_Require_Valid_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 		{
 			return;
 		}
 
 		// Act & Assert
 		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.GetDeviceHostFirmwareAsync(null!, CancellationToken.None));
+			await fixture.SharedClient!.Lan!.GetDeviceHostFirmwareAsync(null!, CancellationToken.None));
 	}
 
 	[Fact]
@@ -111,7 +102,7 @@ public class LanDeviceTests : IDisposable
 	{
 		// Assert
 		_testDevice.MacAddress.Should().NotBeNull();
-		_testDevice.MacAddress.Length.Should().Be(6);
+		_testDevice.MacAddress.Should().HaveCount(6);
 	}
 
 	[Fact]
@@ -120,7 +111,7 @@ public class LanDeviceTests : IDisposable
 		// Assert
 		_testDevice.HostName.Should().NotBeNullOrEmpty();
 		_testDevice.Port.Should().BeGreaterThan(0u);
-		_testDevice.Service.Should().BeGreaterThan((byte)0);
+		_testDevice.Service.Should().BePositive();
 	}
 
 	[Fact]

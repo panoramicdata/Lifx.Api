@@ -24,7 +24,7 @@ public class UtilitiesTests
 
 		// Assert
 		hsl.Should().NotBeNull();
-		hsl.Length.Should().Be(3);
+		hsl.Should().HaveCount(3);
 		// Red should have hue of 0 degrees
 		hsl[0].Should().Be(0); // Hue
 		hsl[1].Should().Be(65535); // Saturation (full)
@@ -42,7 +42,7 @@ public class UtilitiesTests
 
 		// Assert
 		hsl.Should().NotBeNull();
-		hsl.Length.Should().Be(3);
+		hsl.Should().HaveCount(3);
 		// Green should have hue of 120 degrees
 		hsl[0].Should().Be((ushort)(120.0 / 360.0 * 65535)); // Hue ~21845
 		hsl[1].Should().Be(65535); // Saturation (full)
@@ -60,7 +60,7 @@ public class UtilitiesTests
 
 		// Assert
 		hsl.Should().NotBeNull();
-		hsl.Length.Should().Be(3);
+		hsl.Should().HaveCount(3);
 		// Blue should have hue of 240 degrees
 		hsl[0].Should().Be((ushort)(240.0 / 360.0 * 65535)); // Hue ~43690
 		hsl[1].Should().Be(65535); // Saturation (full)
@@ -78,7 +78,7 @@ public class UtilitiesTests
 
 		// Assert
 		hsl.Should().NotBeNull();
-		hsl.Length.Should().Be(3);
+		hsl.Should().HaveCount(3);
 		hsl[0].Should().Be(0); // Hue (undefined for white, but algorithm returns 0)
 		hsl[1].Should().Be(0); // Saturation (none)
 		hsl[2].Should().Be(65535); // Lightness/Value (full)
@@ -95,7 +95,7 @@ public class UtilitiesTests
 
 		// Assert
 		hsl.Should().NotBeNull();
-		hsl.Length.Should().Be(3);
+		hsl.Should().HaveCount(3);
 		hsl[0].Should().Be(0); // Hue (undefined for black)
 		hsl[1].Should().Be(0); // Saturation (none)
 		hsl[2].Should().Be(0); // Lightness/Value (none)
@@ -112,7 +112,7 @@ public class UtilitiesTests
 
 		// Assert
 		hsl.Should().NotBeNull();
-		hsl.Length.Should().Be(3);
+		hsl.Should().HaveCount(3);
 		hsl[0].Should().Be(0); // Hue (undefined for gray)
 		hsl[1].Should().Be(0); // Saturation (none)
 		hsl[2].Should().Be(32896); // Lightness/Value (~50%)
@@ -232,28 +232,36 @@ public class UtilitiesTests
 	public void BuildRGB_Should_Throw_On_Red_Too_High()
 	{
 		// Act & Assert
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildRGB(256, 0, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(256, 0, 0)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Red_Too_Low()
 	{
 		// Act & Assert
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildRGB(-1, 0, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(-1, 0, 0)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Green_Too_High()
 	{
 		// Act & Assert
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildRGB(0, 256, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(0, 256, 0)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Blue_Too_High()
 	{
 		// Act & Assert
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildRGB(0, 0, 256));
+		((Func<string>)(() => LifxColor.BuildRGB(0, 0, 256)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	#endregion
@@ -290,47 +298,65 @@ public class UtilitiesTests
 	public void BuildHSBK_Should_Throw_When_All_Null()
 	{
 		// Act & Assert
-		Assert.Throws<ArgumentException>(() => LifxColor.BuildHSBK(null, null, null, null));
+		((Func<string>)(() => LifxColor.BuildHSBK(null, null, null, null)))
+			.Should()
+			.ThrowExactly<ArgumentException>();
 	}
 
 	[Fact]
 	public void BuildHSBK_Should_Validate_Hue_Range()
 	{
 		// Act & Assert - Too low
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(-1, 0.5, 0.5, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(-1, 0.5, 0.5, 3500)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 
 		// Too high
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(361, 0.5, 0.5, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(361, 0.5, 0.5, 3500)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void BuildHSBK_Should_Validate_Saturation_Range()
 	{
 		// Act & Assert - Too low
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, -0.1, 0.5, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(120, -0.1, 0.5, 3500)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 
 		// Too high
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, 1.1, 0.5, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(120, 1.1, 0.5, 3500)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void BuildHSBK_Should_Validate_Brightness_Range()
 	{
 		// Act & Assert - Too low
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, 0.5, -0.1, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, -0.1, 3500)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 
 		// Too high
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, 0.5, 1.1, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, 1.1, 3500)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void BuildHSBK_Should_Validate_Kelvin_Range()
 	{
 		// Act & Assert - Too low
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, 0.5, 0.5, 1499));
+		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, 0.5, 1499)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 
 		// Too high
-		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, 0.5, 0.5, 9001));
+		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, 0.5, 9001)))
+			.Should()
+			.ThrowExactly<InvalidConstraintException>();
 	}
 
 	[Fact]

@@ -1,6 +1,5 @@
 using AwesomeAssertions;
 using Lifx.Api.Models.Lan;
-using Lifx.Api.Test.Collections;
 using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Lan;
@@ -10,23 +9,16 @@ namespace Lifx.Api.Test.Lan;
 /// Tests error scenarios, timeouts, and edge cases for LAN protocol
 /// </summary>
 [Collection("LAN Tests")]
-public class LanErrorHandlingTests : IDisposable
+public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 {
-	private readonly ILogger _logger;
-	private readonly LanTestFixture _fixture;
-	private LifxClient? _client;
-
-	public LanErrorHandlingTests(LanTestFixture fixture)
-	{
-		_fixture = fixture;
-		_logger = LoggerFactory.Create(builder => { })
+	private readonly ILogger _logger = LoggerFactory.Create(builder => { })
 			.CreateLogger<LanErrorHandlingTests>();
-	}
+	private LifxClient? _client;
 
 	public void Dispose()
 	{
 		// Only dispose clients we created locally, not the shared one
-		if (_client is not null && _client != _fixture.SharedClient)
+		if (_client is not null && _client != fixture.SharedClient)
 		{
 			_client.Dispose();
 		}
@@ -47,8 +39,9 @@ public class LanErrorHandlingTests : IDisposable
 		});
 
 		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() =>
-			_client.StartLan(CancellationToken.None));
+		((Action)(() => _client.StartLan(CancellationToken.None)))
+			.Should()
+			.ThrowExactly<InvalidOperationException>();
 	}
 
 	[Fact]
@@ -62,8 +55,9 @@ public class LanErrorHandlingTests : IDisposable
 		});
 
 		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() =>
-			_client.StartDeviceDiscovery(CancellationToken.None));
+		((Action)(() => _client.StartDeviceDiscovery(CancellationToken.None)))
+			.Should()
+			.ThrowExactly<InvalidOperationException>();
 	}
 
 	[Fact]
@@ -88,78 +82,88 @@ public class LanErrorHandlingTests : IDisposable
 	public async Task SetDevicePowerState_Should_Throw_On_Null_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetDevicePowerStateAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetDevicePowerStateAsync(
 				null!,
 				PowerState.On,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
 	public async Task GetDeviceLabel_Should_Throw_On_Null_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.GetDeviceLabelAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.GetDeviceLabelAsync(
 				null!,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
 	public async Task SetDeviceLabel_Should_Throw_On_Null_Device()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetDeviceLabelAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetDeviceLabelAsync(
 				null!,
 				"Test Label",
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
 	public async Task SetLightPowerAsync_Should_Throw_On_Null_Bulb()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetLightPowerAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetLightPowerAsync(
 				null!,
 				TimeSpan.Zero,
 				PowerState.On,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	[Fact]
 	public async Task SetColorAsync_Should_Throw_On_Null_Bulb()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		var color = new Color { R = 255, G = 0, B = 0 };
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetColorAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetColorAsync(
 				null!,
 				color,
 				3500,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
 	#endregion
@@ -170,98 +174,108 @@ public class LanErrorHandlingTests : IDisposable
 	public async Task SetLightPowerAsync_Should_Reject_Negative_Duration()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetLightPowerAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetLightPowerAsync(
 				bulb,
 				TimeSpan.FromMilliseconds(-1),
 				PowerState.On,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
 	[Fact]
 	public async Task SetLightPowerAsync_Should_Reject_Duration_Too_Large()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetLightPowerAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetLightPowerAsync(
 				bulb,
 				TimeSpan.FromMilliseconds((double)uint.MaxValue + 1),
 				PowerState.On,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
 	[Fact]
 	public async Task SetColorAsync_HSBK_Should_Reject_Kelvin_Too_Low()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetColorAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetColorAsync(
 				bulb,
 				hue: 0,
 				saturation: 65535,
 				brightness: 65535,
 				kelvin: 2000, // Too low (min is 2500)
 				transitionDuration: TimeSpan.Zero,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
 	[Fact]
 	public async Task SetColorAsync_HSBK_Should_Reject_Kelvin_Too_High()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetColorAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetColorAsync(
 				bulb,
 				hue: 0,
 				saturation: 65535,
 				brightness: 65535,
 				kelvin: 10000, // Too high (max is 9000)
 				transitionDuration: TimeSpan.Zero,
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
 	[Fact]
 	public async Task SetColorAsync_Should_Reject_Negative_Duration()
 	{
 		// Arrange
-		if (!_fixture.IsLanStarted)
+		if (!fixture.IsLanStarted)
 			return;
 
 		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 		var color = new Color { R = 255, G = 0, B = 0 };
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
-			await _fixture.SharedClient!.Lan!.SetColorAsync(
+		await ((Func<Task>)(async () =>
+			await fixture.SharedClient!.Lan!.SetColorAsync(
 				bulb,
 				color,
 				3500,
 				TimeSpan.FromMilliseconds(-1),
-				CancellationToken.None));
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
 	#endregion
@@ -272,24 +286,27 @@ public class LanErrorHandlingTests : IDisposable
 	public void Device_Should_Reject_Null_Hostname()
 	{
 		// Act & Assert
-		Assert.Throws<ArgumentNullException>(() =>
-			new LightBulb(null!, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]));
+		((Func<LightBulb>)(() => new LightBulb(null!, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01])))
+			.Should()
+			.ThrowExactly<ArgumentNullException>();
 	}
 
 	[Fact]
 	public void Device_Should_Reject_Empty_Hostname()
 	{
 		// Act & Assert
-		Assert.Throws<ArgumentException>(() =>
-			new LightBulb("", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]));
+		((Func<LightBulb>)(() => new LightBulb("", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01])))
+			.Should()
+			.ThrowExactly<ArgumentException>();
 	}
 
 	[Fact]
 	public void Device_Should_Reject_Whitespace_Hostname()
 	{
 		// Act & Assert
-		Assert.Throws<ArgumentException>(() =>
-			new LightBulb("   ", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]));
+		((Func<LightBulb>)(() => new LightBulb("   ", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01])))
+			.Should()
+			.ThrowExactly<ArgumentException>();
 	}
 
 	[Fact]

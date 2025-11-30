@@ -9,23 +9,16 @@ namespace Lifx.Api.Test.Lan;
 /// Note: These tests use mock/simulated devices to avoid requiring actual hardware
 /// </summary>
 [Collection("LAN Tests")]
-public class LanDiscoveryTests : IDisposable
+public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 {
-	private readonly ILogger _logger;
-	private readonly LanTestFixture _fixture;
-	private LifxClient? _client;
-
-	public LanDiscoveryTests(LanTestFixture fixture)
-	{
-		_fixture = fixture;
-		_logger = LoggerFactory.Create(builder => { })
+	private readonly ILogger _logger = LoggerFactory.Create(builder => { })
 			.CreateLogger<LanDiscoveryTests>();
-	}
+	private LifxClient? _client;
 
 	public void Dispose()
 	{
 		// Only dispose clients we created locally, not the shared one
-		if (_client is not null && _client != _fixture.SharedClient)
+		if (_client is not null && _client != fixture.SharedClient)
 		{
 			_client.Dispose();
 		}
@@ -95,9 +88,9 @@ public class LanDiscoveryTests : IDisposable
 	public void Shared_LAN_Client_Should_Be_Started()
 	{
 		// Assert - Use the shared client from fixture
-		_fixture.SharedClient.Should().NotBeNull();
-		_fixture.SharedClient!.Lan.Should().NotBeNull();
-		_fixture.IsLanStarted.Should().BeTrue();
+		fixture.SharedClient.Should().NotBeNull();
+		fixture.SharedClient!.Lan.Should().NotBeNull();
+		fixture.IsLanStarted.Should().BeTrue();
 	}
 
 	[Fact]
@@ -128,7 +121,7 @@ public class LanDiscoveryTests : IDisposable
 		bulb.Should().NotBeNull();
 		bulb.HostName.Should().Be("192.168.1.100");
 		bulb.MacAddress.Should().NotBeNull();
-		bulb.MacAddress.Length.Should().Be(6);
+		bulb.MacAddress.Should().HaveCount(6);
 		bulb.Service.Should().Be(1);
 		bulb.Port.Should().Be(56700u);
 	}

@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Lifx.Api.Models.Cloud.Requests;
 using Lifx.Api.Models.Cloud.Responses;
 using System.Text.Json;
 
@@ -252,7 +251,7 @@ public class ModelSerializationTests
 		// Assert
 		response.Should().NotBeNull();
 		response.Errors.Should().NotBeNull();
-		response.Errors.Should().HaveCount(1);
+		response.Errors.Should().ContainSingle();
 		response.Errors![0].Field.Should().Be("color");
 	}
 
@@ -328,7 +327,7 @@ public class ModelSerializationTests
 		scene!.Uuid.Should().Be("scene-123");
 		scene.Name.Should().Be("Evening Mode");
 		scene.Account.UUID.Should().Be("account-456");
-		scene.States.Should().HaveCount(1);
+		scene.States.Should().ContainSingle();
 		scene.CreatedAt.Should().Be(1234567890);
 		scene.UpdatedAt.Should().Be(1234567900);
 	}

@@ -1,7 +1,5 @@
 using AwesomeAssertions;
-using Lifx.Api.Models.Cloud.Requests;
 using Lifx.Api.Models.Cloud.Responses;
-using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Unit;
 
@@ -71,120 +69,135 @@ public class ValidationTests
 	public void LifxColor_BuildRGB_Should_Reject_Red_Below_Zero()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildRGB(-1, 0, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(-1, 0, 0)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Red_Above_255()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildRGB(256, 0, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(256, 0, 0)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Green_Below_Zero()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildRGB(0, -1, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(0, -1, 0)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Green_Above_255()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildRGB(0, 256, 0));
+		((Func<string>)(() => LifxColor.BuildRGB(0, 256, 0)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Blue_Below_Zero()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildRGB(0, 0, -1));
+		((Func<string>)(() => LifxColor.BuildRGB(0, 0, -1)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Blue_Above_255()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildRGB(0, 0, 256));
+		((Func<string>)(() => LifxColor.BuildRGB(0, 0, 256)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Hue_Below_Zero()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(-1, 1.0, 1.0, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(-1, 1.0, 1.0, 3500)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Hue_Above_360()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(361, 1.0, 1.0, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(361, 1.0, 1.0, 3500)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Saturation_Below_Zero()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(180, -0.1, 1.0, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(180, -0.1, 1.0, 3500)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Saturation_Above_One()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(180, 1.1, 1.0, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(180, 1.1, 1.0, 3500)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Brightness_Below_Zero()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(180, 1.0, -0.1, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(180, 1.0, -0.1, 3500)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Brightness_Above_One()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(180, 1.0, 1.1, 3500));
+		((Func<string>)(() => LifxColor.BuildHSBK(180, 1.0, 1.1, 3500)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Kelvin_Below_Min()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(180, 0.0, 1.0, LifxColor.TemperatureMin - 1));
+		((Func<string>)(() => LifxColor.BuildHSBK(180, 0.0, 1.0, LifxColor.TemperatureMin - 1)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Kelvin_Above_Max()
 	{
 		// Act & Assert
-		Assert.Throws<System.Data.InvalidConstraintException>(() =>
-			LifxColor.BuildHSBK(180, 0.0, 1.0, LifxColor.TemperatureMax + 1));
+		((Func<string>)(() => LifxColor.BuildHSBK(180, 0.0, 1.0, LifxColor.TemperatureMax + 1)))
+			.Should()
+			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Throw_When_All_Null()
 	{
 		// Act & Assert
-		Assert.Throws<ArgumentException>(() =>
-			LifxColor.BuildHSBK(null, null, null, null));
+		((Func<string>?)(() => LifxColor.BuildHSBK(null, null, null, null)))
+			.Should()
+			.ThrowExactly<ArgumentException>();
 	}
 
 	#endregion
