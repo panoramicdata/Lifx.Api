@@ -4,7 +4,7 @@
 
 **Current Coverage:** ~92% (Cloud API + LAN + Utilities + Models + Validation + Integration)  
 **Target Coverage:** 95%+  
-**Phases Complete:** 5 of 6 (83%)  
+**Phases Complete:** 5 of 7 (71%)  
 **Total Tests:** 232 tests (14 integration + 218 existing)  
 **Estimated Remaining:** 1-2 days  
 **Status:** ? Significantly Ahead of Schedule
@@ -197,7 +197,8 @@ Lifx.Api.Test/
 | **Phase 4: Models** | **+33** | **? COMPLETE** | **? 78%** | **2 hours** | **100%** |
 | **Phase 5: Errors** | **+56** | **? COMPLETE** | **? 88%** | **2 hours** | **100%** |
 | **Phase 6: Integration** | **+14** | **?? IN PROGRESS** | **? 92%** | **TBD** | **60%** |
-| **TOTAL** | **247** | **83% DONE** | **95%+** | - | **83%** |
+| **Phase 7: CLI Tool** | **TBD** | **? NEXT** | **? 95%+** | **TBD** | **0%** |
+| **TOTAL** | **247+** | **83% DONE** | **95%+** | - | **83%** |
 
 ### Progress Chart
 ```
@@ -207,7 +208,8 @@ Phase 3: ???????????????????? SKIPPED (extensions removed)
 Phase 4: ???????????????????? 100% ? COMPLETE
 Phase 5: ???????????????????? 100% ? COMPLETE
 Phase 6: ????????????????????  60% ?? IN PROGRESS
-Overall: ????????????????????  83%
+Phase 7: ????????????????????   0% ? NEXT (CLI Tool)
+Overall: ????????????????????  70%
 ```
 
 ---
@@ -328,6 +330,31 @@ public static async Task<List<Group>> ListGroupsAsync(...)
 - [ ] Error_Recovery_After_Network_Failure
 - [ ] Graceful_Degradation_With_Partial_Failures
 
+### Phase 7: CLI Tool (dotnet tool)
+**Target:** Create comprehensive command-line interface  
+**Status:** ? NEXT
+
+#### Goals:
+- [x] Create Lifx.Cli project as dotnet tool
+- [x] Implement command structure with System.CommandLine
+- [x] Support all major operations (lights, effects, scenes, color)
+- [x] Both Cloud API and LAN protocol support
+- [x] Interactive and non-interactive modes
+- [x] Comprehensive help system
+- [x] Cross-platform support
+
+#### Commands:
+- `dotnet lifx list` - List all lights/groups/locations
+- `dotnet lifx on <selector>` - Turn on lights
+- `dotnet lifx off <selector>` - Turn off lights
+- `dotnet lifx toggle <selector>` - Toggle power
+- `dotnet lifx color <selector> <color>` - Set color
+- `dotnet lifx brightness <selector> <level>` - Set brightness
+- `dotnet lifx effect <type> <selector>` - Run effects
+- `dotnet lifx scene <scene-name>` - Activate scene
+- `dotnet lifx lan discover` - Discover LAN devices
+- `dotnet lifx config` - Configure API token
+
 ---
 
 ## Key Improvements Summary
@@ -387,6 +414,7 @@ public static async Task<List<Group>> ListGroupsAsync(...)
 | Phase 4 | 2-3 days | 2 hours | ? DONE |
 | Phase 5 | 4-5 days | 2 hours | ? DONE |
 | Phase 6 | 3-4 days | ~4 hours (60%) | ?? IN PROGRESS |
+| Phase 7 | 5-7 days | TBD | ? NEXT |
 | **Refactoring** | - | **2 hours** | **? DONE** |
 | **TOTAL** | **2-3 weeks** | **1 week + 10 hours** | **Way Ahead** |
 
@@ -447,6 +475,7 @@ dotnet test --list-tests
 | 2024-01-XX | Phase 4 | ? COMPLETE | 33 model serialization tests |
 | 2024-01-XX | Phase 5 | ? COMPLETE | 56 error handling & validation tests |
 | 2024-01-XX | **Phase 6** | **?? IN PROGRESS** | **14 of 24 integration tests (60%)** |
+| 2024-01-XX | Phase 7 | ? NEXT | CLI tool development planned |
 | 2024-01-XX | Code Quality | ? COMPLETE | All FAA0002 violations fixed |
 
 ---
