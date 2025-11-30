@@ -47,8 +47,9 @@ public static class ConfigManager
 
 	/// <summary>
 	/// Gets the API token with priority: override > environment > Windows Credential Store
+	/// Returns null if no token is found (for LAN-only usage)
 	/// </summary>
-	public static string GetApiToken(string? overrideToken = null)
+	public static string? TryGetApiToken(string? overrideToken = null)
 	{
 		// Priority 1: Override token from command line
 		if (!string.IsNullOrWhiteSpace(overrideToken))
@@ -70,10 +71,38 @@ public static class ConfigManager
 			return storedToken;
 		}
 
-		throw new InvalidOperationException(
-			"No API token configured. Set via:" + Environment.NewLine +
-			"  1. dotnet lifx key <token>          - Store securely in Windows Credential Manager (recommended)" + Environment.NewLine +
-			"  2. --token option                   - Override for single command" + Environment.NewLine +
-			"  3. LIFX_API_TOKEN environment var   - Set in environment");
+		return null;
+	}
+
+	/// <summary>
+	/// Gets the API token or throws an exception with helpful instructions
+	/// </summary>
+	public static string GetApiToken(string? overrideToken = null)
+	{
+		var token = TryGetApiToken(overrideToken);
+		
+		if (string.IsNullOrWhiteSpace(token))
+		{
+			throw new InvalidOperationException(
+				"No LIFX Cloud API token configured." + Environment.NewLine +
+				Environment.NewLine +
+				"To use LIFX Cloud features, you need an API token:" + Environment.NewLine +
+				Environment.NewLine +
+				"1. Get your token from https://cloud.lifx.com/settings" + Environment.NewLine +
+				"   - Log in to your LIFX account" + Environment.NewLine +
+				"   - Click 'Generate New Token'" + Environment.NewLine +
+				"   - Copy the generated token" + Environment.NewLine +
+				Environment.NewLine +
+				"2. Store it securely using:" + Environment.NewLine +
+				"   lifx key set <your-token-here>" + Environment.NewLine +
+				Environment.NewLine +
+				"Alternative options:" + Environment.NewLine +
+				"   - Use --token option for one-time use" + Environment.NewLine +
+				"   - Set LIFX_API_TOKEN environment variable" + Environment.NewLine +
+				Environment.NewLine +
+				"Note: LAN features work without an API token.");
+		}
+
+		return token;
 	}
 }
