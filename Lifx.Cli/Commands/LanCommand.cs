@@ -52,8 +52,9 @@ public static class LanCommand
 				.Start("Discovering devices...", ctx =>
 				{
 					client.StartLan(CancellationToken.None);
+					client.StartDeviceDiscovery(CancellationToken.None); // ? FIXED: Actually start discovery!
 
-					// Wait for devices
+					// Wait for devices to respond
 					Thread.Sleep(timeout * 1000);
 
 					client.StopDeviceDiscovery();
