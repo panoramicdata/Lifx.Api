@@ -1,65 +1,69 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
 
-    <!-- Package as dotnet tool -->
-    <PackAsTool>true</PackAsTool>
-    <ToolCommandName>lifx</ToolCommandName>
-    <PackageId>Lifx.Cli</PackageId>
-    <PackageOutputPath>./nupkg</PackageOutputPath>
-    
-    <!-- Package metadata -->
-    <PackageIcon>Icon.png</PackageIcon>
-    <Copyright>Panoramic Data Limited 2025</Copyright>
-    <PackageProjectUrl>https://github.com/panoramicdata/Lifx.Api</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/panoramicdata/Lifx.Api</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>LIFX;CLI;Tool;Command-Line;Smart-Lights;IoT;Home-Automation</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>Command-line tool for controlling LIFX smart lights via Cloud API or LAN protocol. Features secure credential storage, comprehensive commands for lights/effects/scenes, and works with or without internet connection.</Description>
-    <Authors>Panoramic Data Limited</Authors>
-    <Company>Panoramic Data Limited</Company>
-    <PackageReadmeFile>CLI-README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<!-- Package as dotnet tool -->
+		<PackAsTool>true</PackAsTool>
+		<ToolCommandName>lifx</ToolCommandName>
+		<PackageId>Lifx.Cli</PackageId>
+		<PackageOutputPath>./nupkg</PackageOutputPath>
 
-    <!-- Symbol packages -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<!-- Package metadata -->
+		<PackageIcon>Icon.png</PackageIcon>
+		<Copyright>Panoramic Data Limited 2025</Copyright>
+		<PackageProjectUrl>https://github.com/panoramicdata/Lifx.Api</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/panoramicdata/Lifx.Api</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>LIFX;CLI;Tool;Command-Line;Smart-Lights;IoT;Home-Automation</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Description>Command-line tool for controlling LIFX smart lights via Cloud API or LAN protocol. Features secure credential storage, comprehensive commands for lights/effects/scenes, and works with or without internet connection.</Description>
+		<Authors>Panoramic Data Limited</Authors>
+		<Company>Panoramic Data Limited</Company>
+		<PackageReadmeFile>CLI-README.md</PackageReadmeFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 
-    <PackageReleaseNotes>
-      Initial release of LIFX CLI tool
-      - Cloud API and LAN protocol support
-      - Secure Windows Credential Manager integration  
-      - Comprehensive light, effect, and scene commands
-      - Works with or without API token (LAN mode)
-    </PackageReleaseNotes>
-  </PropertyGroup>
+		<!-- Symbol packages -->
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 
-  <ItemGroup>
-    <None Include="..\Lifx.Api\Icon.png" Pack="true" PackagePath="" />
-    <None Include="CLI-README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+		<PackageReleaseNotes>
+			Initial release of LIFX CLI tool
+			- Cloud API and LAN protocol support
+			- Secure Windows Credential Manager integration
+			- Comprehensive light, effect, and scene commands
+			- Works with or without API token (LAN mode)
+		</PackageReleaseNotes>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Lifx.Api\Lifx.Api.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\Lifx.Api\Icon.png" Pack="true" PackagePath="" />
+		<None Include="CLI-README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <PackageReference Include="Spectre.Console" Version="0.54.0" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Lifx.Api\Lifx.Api.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+		<PackageReference Include="Spectre.Console" Version="0.54.0" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Nerdbank.GitVersioning" Version="3.9.50">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
 </Project>
