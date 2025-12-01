@@ -3,5 +3,4 @@
 	"publicReleaseRefSpec": [
 		"^refs/heads/main$"
 	]
-
-}
+}}
