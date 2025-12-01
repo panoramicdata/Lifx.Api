@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Automated NuGet package publishing script for Lifx.Api
+    Automated NuGet package publishing script for Lifx.Api and Lifx.Cli
 
 .DESCRIPTION
     This script automates the entire publishing process:
@@ -10,8 +10,8 @@
     - Runs all tests (optional, can be skipped with -SkipTests)
     - Gets version from Nerdbank.GitVersioning
     - Creates git tag
-    - Builds NuGet package
-    - Publishes to NuGet.org
+    - Builds NuGet packages for both Lifx.Api library and Lifx.Cli dotnet tool
+    - Publishes both packages to NuGet.org
 
 .PARAMETER SkipTests
     Skip running tests before publishing. Use with caution!
@@ -225,9 +225,9 @@ else {
 
 #endregion
 
-#region Build Package
+#region Build Packages
 
-Write-Step "Building NuGet package..."
+Write-Step "Building NuGet packages..."
 
 try {
     # Clean previous builds
@@ -237,8 +237,8 @@ try {
     }
     New-Item -ItemType Directory -Path $packOutputDir -Force | Out-Null
     
-    # Build the project first
-    Write-Host "    Building project..." -ForegroundColor Gray
+    # Build both projects first
+    Write-Host "    Building Lifx.Api library..." -ForegroundColor Gray
     $buildOutput = dotnet build ./Lifx.Api/Lifx.Api.csproj `
         --configuration Release `
         --verbosity quiet `
@@ -246,11 +246,24 @@ try {
     
     if ($LASTEXITCODE -ne 0) {
         $buildOutput | ForEach-Object { Write-Host "    $_" }
-        Exit-WithError "Failed to build project."
+        Exit-WithError "Failed to build Lifx.Api project."
     }
+    Write-Success "Lifx.Api library built"
     
-    # Build package
-    Write-Host "    Creating NuGet package..." -ForegroundColor Gray
+    Write-Host "    Building Lifx.Cli tool..." -ForegroundColor Gray
+    $buildOutput = dotnet build ./Lifx.Cli/Lifx.Cli.csproj `
+        --configuration Release `
+        --verbosity quiet `
+        2>&1
+    
+    if ($LASTEXITCODE -ne 0) {
+        $buildOutput | ForEach-Object { Write-Host "    $_" }
+        Exit-WithError "Failed to build Lifx.Cli project."
+    }
+    Write-Success "Lifx.Cli tool built"
+    
+    # Pack Lifx.Api library
+    Write-Host "    Creating Lifx.Api NuGet package..." -ForegroundColor Gray
     $packOutput = dotnet pack ./Lifx.Api/Lifx.Api.csproj `
         --configuration Release `
         --no-build `
@@ -260,32 +273,58 @@ try {
     
     if ($LASTEXITCODE -ne 0) {
         $packOutput | ForEach-Object { Write-Host "    $_" }
-        Exit-WithError "Failed to build NuGet package."
+        Exit-WithError "Failed to build Lifx.Api NuGet package."
     }
     
-    # Find the generated package
-    $packageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.$version.nupkg" -ErrorAction SilentlyContinue
+    # Pack Lifx.Cli tool
+    Write-Host "    Creating Lifx.Cli tool package..." -ForegroundColor Gray
+    $packOutput = dotnet pack ./Lifx.Cli/Lifx.Cli.csproj `
+        --configuration Release `
+        --no-build `
+        --output $packOutputDir `
+        --verbosity normal `
+        2>&1
     
-    if (-not $packageFile) {
-        # Try without exact version match
-        $packageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" } | Select-Object -First 1
+    if ($LASTEXITCODE -ne 0) {
+        $packOutput | ForEach-Object { Write-Host "    $_" }
+        Exit-WithError "Failed to build Lifx.Cli tool package."
     }
     
-    if (-not $packageFile) {
-        Exit-WithError "NuGet package not found in $packOutputDir"
+    # Find the generated packages
+    $apiPackageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.$version.nupkg" -ErrorAction SilentlyContinue
+    if (-not $apiPackageFile) {
+        $apiPackageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" } | Select-Object -First 1
     }
     
-    # Check for symbol package
-    $symbolPackage = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.$version.snupkg" -ErrorAction SilentlyContinue
-    if ($symbolPackage) {
-        Write-Success "Symbol package created: $($symbolPackage.Name)"
+    $cliPackageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Cli.$version.nupkg" -ErrorAction SilentlyContinue
+    if (-not $cliPackageFile) {
+        $cliPackageFile = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Cli.*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" } | Select-Object -First 1
     }
     
-    Write-Success "Package built: $($packageFile.Name)"
-    Write-Success "Package size: $([math]::Round($packageFile.Length / 1KB, 2)) KB"
+    if (-not $apiPackageFile) {
+        Exit-WithError "Lifx.Api NuGet package not found in $packOutputDir"
+    }
+    
+    if (-not $cliPackageFile) {
+        Exit-WithError "Lifx.Cli tool package not found in $packOutputDir"
+    }
+    
+    # Check for symbol packages
+    $apiSymbolPackage = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Api.$version.snupkg" -ErrorAction SilentlyContinue
+    if ($apiSymbolPackage) {
+        Write-Success "Lifx.Api symbol package created: $($apiSymbolPackage.Name)"
+    }
+    
+    $cliSymbolPackage = Get-ChildItem -Path $packOutputDir -Filter "Lifx.Cli.$version.snupkg" -ErrorAction SilentlyContinue
+    if ($cliSymbolPackage) {
+        Write-Success "Lifx.Cli symbol package created: $($cliSymbolPackage.Name)"
+    }
+    
+    Write-Success "Lifx.Api package: $($apiPackageFile.Name) ($([math]::Round($apiPackageFile.Length / 1KB, 2)) KB)"
+    Write-Success "Lifx.Cli package: $($cliPackageFile.Name) ($([math]::Round($cliPackageFile.Length / 1KB, 2)) KB)"
 }
 catch {
-    Exit-WithError "Failed to build package: $_"
+    Exit-WithError "Failed to build packages: $_"
 }
 
 #endregion
@@ -314,10 +353,15 @@ catch {
 
 #region Publish to NuGet
 
-Write-Step "Publishing to NuGet.org..."
+Write-Step "Publishing packages to NuGet.org..."
 
+$publishedPackages = @()
+$failedPackages = @()
+
+# Publish Lifx.Api library
 try {
-    $publishOutput = dotnet nuget push $packageFile.FullName `
+    Write-Host "    Publishing Lifx.Api library..." -ForegroundColor Gray
+    $publishOutput = dotnet nuget push $apiPackageFile.FullName `
         --api-key $nugetKey `
         --source https://api.nuget.org/v3/index.json `
         --skip-duplicate `
@@ -326,23 +370,62 @@ try {
     # Display output (but hide API key)
     $publishOutput | ForEach-Object { 
         $line = $_ -replace $nugetKey, "***HIDDEN***"
-        Write-Host "    $line"
+        Write-Host "      $line"
     }
     
-    if ($LASTEXITCODE -ne 0) {
-        # Rollback git tag
-        Write-Host "    Rolling back git tag..." -ForegroundColor Yellow
-        git tag -d $tagName
-        Exit-WithError "Failed to publish to NuGet."
+    if ($LASTEXITCODE -eq 0) {
+        Write-Success "Lifx.Api published successfully!"
+        $publishedPackages += "Lifx.Api"
     }
-    
-    Write-Success "Package published successfully!"
+    else {
+        $failedPackages += "Lifx.Api"
+        Write-Host "      WARNING: Failed to publish Lifx.Api" -ForegroundColor Yellow
+    }
 }
 catch {
-    # Rollback git tag
+    $failedPackages += "Lifx.Api"
+    Write-Host "      WARNING: Failed to publish Lifx.Api: $_" -ForegroundColor Yellow
+}
+
+# Publish Lifx.Cli tool
+try {
+    Write-Host "    Publishing Lifx.Cli tool..." -ForegroundColor Gray
+    $publishOutput = dotnet nuget push $cliPackageFile.FullName `
+        --api-key $nugetKey `
+        --source https://api.nuget.org/v3/index.json `
+        --skip-duplicate `
+        2>&1
+    
+    # Display output (but hide API key)
+    $publishOutput | ForEach-Object { 
+        $line = $_ -replace $nugetKey, "***HIDDEN***"
+        Write-Host "      $line"
+    }
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Success "Lifx.Cli published successfully!"
+        $publishedPackages += "Lifx.Cli"
+    }
+    else {
+        $failedPackages += "Lifx.Cli"
+        Write-Host "      WARNING: Failed to publish Lifx.Cli" -ForegroundColor Yellow
+    }
+}
+catch {
+    $failedPackages += "Lifx.Cli"
+    Write-Host "      WARNING: Failed to publish Lifx.Cli: $_" -ForegroundColor Yellow
+}
+
+# Check if any packages were published
+if ($publishedPackages.Count -eq 0) {
+    # Rollback git tag if nothing was published
     Write-Host "    Rolling back git tag..." -ForegroundColor Yellow
     git tag -d $tagName
-    Exit-WithError "Failed to publish to NuGet: $_"
+    Exit-WithError "Failed to publish any packages to NuGet."
+}
+
+if ($failedPackages.Count -gt 0) {
+    Write-Host "    WARNING: Some packages failed to publish: $($failedPackages -join ', ')" -ForegroundColor Yellow
 }
 
 #endregion
@@ -374,13 +457,34 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host "  PUBLISH SUCCESSFUL!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Package:  Lifx.Api v$version" -ForegroundColor White
+Write-Host "  Version:  v$version" -ForegroundColor White
 Write-Host "  Tag:      $tagName" -ForegroundColor White
-Write-Host "  File:     $($packageFile.Name)" -ForegroundColor White
 Write-Host ""
-Write-Host "  NuGet:    https://www.nuget.org/packages/Lifx.Api/$version" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "NOTE: It may take a few minutes for the package to appear on NuGet.org" -ForegroundColor Yellow
+
+if ($publishedPackages -contains "Lifx.Api") {
+    Write-Host "  ? Lifx.Api Library" -ForegroundColor Green
+    Write-Host "    File:   $($apiPackageFile.Name)" -ForegroundColor White
+    Write-Host "    NuGet:  https://www.nuget.org/packages/Lifx.Api/$version" -ForegroundColor Cyan
+    Write-Host ""
+}
+
+if ($publishedPackages -contains "Lifx.Cli") {
+    Write-Host "  ? Lifx.Cli Tool" -ForegroundColor Green
+    Write-Host "    File:   $($cliPackageFile.Name)" -ForegroundColor White
+    Write-Host "    NuGet:  https://www.nuget.org/packages/Lifx.Cli/$version" -ForegroundColor Cyan
+    Write-Host "    Install: dotnet tool install -g Lifx.Cli" -ForegroundColor Yellow
+    Write-Host ""
+}
+
+if ($failedPackages.Count -gt 0) {
+    Write-Host "  ? Failed Packages:" -ForegroundColor Yellow
+    foreach ($pkg in $failedPackages) {
+        Write-Host "    - $pkg" -ForegroundColor Yellow
+    }
+    Write-Host ""
+}
+
+Write-Host "NOTE: It may take a few minutes for packages to appear on NuGet.org" -ForegroundColor Yellow
 Write-Host ""
 
 #endregion
