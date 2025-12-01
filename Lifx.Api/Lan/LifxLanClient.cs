@@ -16,6 +16,8 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	private UdpClient? _socket;
 	private Task? _receiveLoopTask;
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
+	private bool _disposed;
+	private readonly Lock _disposeLock = new();
 
 	public void Start(CancellationToken cancellationToken)
 	{
@@ -91,17 +93,76 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	/// <summary>
 	/// Disposes the client
 	/// </summary>
-	public async void Dispose()
+	public void Dispose()
 	{
-		_cancellationTokenSource.Cancel();
-
-		if (_receiveLoopTask is not null)
+		lock (_disposeLock)
 		{
-			await _receiveLoopTask.ConfigureAwait(false);
+			if (_disposed)
+			{
+				return;
+			}
+
+			_disposed = true;
 		}
 
+		// Stop device discovery first
+		try
+		{
+			if (_DiscoverCancellationSource is not null && !_DiscoverCancellationSource.IsCancellationRequested)
+			{
+				_DiscoverCancellationSource.Cancel();
+			}
+		}
+		catch (ObjectDisposedException)
+		{
+			// Already disposed, ignore
+		}
+
+		// Cancel the main cancellation token source
+		try
+		{
+			_cancellationTokenSource.Cancel();
+		}
+		catch (ObjectDisposedException)
+		{
+			// Already disposed, ignore
+		}
+
+		// Wait for receive loop to complete
+		if (_receiveLoopTask is not null)
+		{
+			try
+			{
+				_receiveLoopTask.Wait(TimeSpan.FromSeconds(5));
+			}
+			catch (AggregateException)
+			{
+				// Task was cancelled or faulted, ignore
+			}
+		}
+
+		// Dispose the socket
 		_socket?.Dispose();
-		_cancellationTokenSource.Dispose();
+
+		// Dispose cancellation token sources
+		try
+		{
+			_DiscoverCancellationSource?.Dispose();
+		}
+		catch (ObjectDisposedException)
+		{
+			// Already disposed, ignore
+		}
+
+		try
+		{
+			_cancellationTokenSource.Dispose();
+		}
+		catch (ObjectDisposedException)
+		{
+			// Already disposed, ignore
+		}
+
 		GC.SuppressFinalize(this);
 	}
 

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Lifx.Api.Serialization;
 using static Lifx.Api.Models.Cloud.Selector;
 
 namespace Lifx.Api.Models.Cloud.Responses;
@@ -63,8 +64,13 @@ public sealed class Light
 	[JsonIgnore]
 	public string LocationName => Location.Name;
 
+	[JsonPropertyName("product")]
+	[JsonInclude]
+	private LightProduct? Product { get; init; }
+
 	[JsonPropertyName("last_seen")]
 	[JsonInclude]
+	[JsonConverter(typeof(FlexibleDateTimeConverter))]
 	public DateTime? LastSeen { get; private set; }
 
 	[JsonPropertyName("seconds_since_seen")]
@@ -77,6 +83,7 @@ public sealed class Light
 
 	[JsonPropertyName("capabilities")]
 	[JsonInclude]
+	[JsonConverter(typeof(CapabilitiesDictionaryConverter))]
 	private Dictionary<string, bool>? capabilities { get; init; }
 
 	[JsonIgnore]
