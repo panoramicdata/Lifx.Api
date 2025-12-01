@@ -5,13 +5,13 @@ namespace Lifx.Api.Models.Cloud.Responses;
 public class Result
 {
 	[JsonPropertyName("id")]
-	public required string Id { get; set; }
+	public string? Id { get; set; }
 
 	[JsonPropertyName("label")]
-	public required string Label { get; set; }
+	public string? Label { get; set; }
 
 	[JsonPropertyName("status")]
-	public required string Status { get; set; }
+	public string? Status { get; set; }
 
 	public bool IsSuccessful { get { return Status == "ok"; } }
 
