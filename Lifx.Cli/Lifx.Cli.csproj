@@ -41,6 +41,7 @@
 			- Comprehensive light, effect, and scene commands
 			- Works with or without API token (LAN mode)
 		</PackageReleaseNotes>
+
 	</PropertyGroup>
 
 	<ItemGroup>
