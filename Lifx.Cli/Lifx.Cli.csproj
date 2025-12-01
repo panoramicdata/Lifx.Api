@@ -8,6 +8,7 @@
 		<LangVersion>latest</LangVersion>
 
 		<!-- Package as dotnet tool -->
+
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>lifx</ToolCommandName>
 		<PackageId>Lifx.Cli</PackageId>
