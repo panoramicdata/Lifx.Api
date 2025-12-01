@@ -1,5 +1,6 @@
 {
 	"version": "1.0",
+	"versionHeightOffset": 12,
 	"publicReleaseRefSpec": [
 		"^refs/heads/main$"
 	]
