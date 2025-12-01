@@ -370,10 +370,13 @@ internal class TokenBinder : BinderBase<string?>
 {
 	protected override string? GetBoundValue(BindingContext bindingContext)
 	{
-		return bindingContext.ParseResult.GetValueForOption(
-			bindingContext.ParseResult.RootCommandResult.Command.Options
-				.OfType<Option<string?>>()
-				.FirstOrDefault(o => o.HasAlias("--token")));
+		var option = bindingContext.ParseResult.RootCommandResult.Command.Options
+			.OfType<Option<string?>>()
+			.FirstOrDefault(o => o.HasAlias("--token"));
+
+		return option != null 
+			? bindingContext.ParseResult.GetValueForOption(option) 
+			: null;
 	}
 }
 

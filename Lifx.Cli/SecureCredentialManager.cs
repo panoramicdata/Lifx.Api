@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
@@ -16,6 +17,11 @@ public static class SecureCredentialManager
 		Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
 		".lifx");
 
+	private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+	{
+		WriteIndented = true
+	};
+
 	private static readonly string WindowsCredentialFile = Path.Combine(CredentialDirectory, "credentials.dat");
 	private static readonly string CrossPlatformCredentialFile = Path.Combine(CredentialDirectory, "credentials.json");
 
@@ -24,6 +30,8 @@ public static class SecureCredentialManager
 	/// <summary>
 	/// Stores the API token securely
 	/// </summary>
+	[UnconditionalSuppressMessage("Interoperability", "CA1416:Validate platform compatibility",
+		Justification = "Platform check with IsWindows ensures Windows-only code only runs on Windows")]
 	public static bool StoreApiToken(string apiToken)
 	{
 		if (string.IsNullOrWhiteSpace(apiToken))
@@ -57,10 +65,13 @@ public static class SecureCredentialManager
 	/// <summary>
 	/// Retrieves the API token from storage
 	/// </summary>
+	[UnconditionalSuppressMessage("Interoperability", "CA1416:Validate platform compatibility",
+		Justification = "Platform check with IsWindows ensures Windows-only code only runs on Windows")]
 	public static string? GetApiToken()
 	{
 		try
 		{
+			// Platform check ensures we only call Windows-specific methods on Windows
 			if (IsWindows && File.Exists(WindowsCredentialFile))
 			{
 				return GetApiTokenWindows();
@@ -129,8 +140,8 @@ public static class SecureCredentialManager
 			return "~/.lifx/credentials.json (file permissions protected)";
 		}
 
-		return IsWindows 
-			? "~/.lifx/credentials.dat (DPAPI encrypted)" 
+		return IsWindows
+			? "~/.lifx/credentials.dat (DPAPI encrypted)"
 			: "~/.lifx/credentials.json (file permissions protected)";
 	}
 
@@ -179,12 +190,7 @@ public static class SecureCredentialManager
 			Platform = Environment.OSVersion.Platform.ToString()
 		};
 
-		var json = JsonSerializer.Serialize(credentialData, new JsonSerializerOptions
-		{
-			WriteIndented = true
-		});
-
-		File.WriteAllText(CrossPlatformCredentialFile, json);
+		File.WriteAllText(CrossPlatformCredentialFile, JsonSerializer.Serialize(credentialData, jsonSerializerOptions));
 
 		// On Unix-like systems, set file permissions to user-only (600)
 		if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
@@ -192,7 +198,7 @@ public static class SecureCredentialManager
 			try
 			{
 				// Set permissions to 600 (user read/write only)
-				File.SetUnixFileMode(CrossPlatformCredentialFile, 
+				File.SetUnixFileMode(CrossPlatformCredentialFile,
 					UnixFileMode.UserRead | UnixFileMode.UserWrite);
 			}
 			catch
