@@ -185,8 +185,7 @@ public partial class LifxLanClient : IDisposable
 			saturation,
 			brightness,
 			kelvin, //HSBK
-			duration,
-			cancellationToken
+			duration
 		);
 	}
 
