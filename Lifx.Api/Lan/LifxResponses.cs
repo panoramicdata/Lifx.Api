@@ -21,6 +21,7 @@ public abstract class LifxResponse
 			MessageType.DeviceStateVersion => new StateVersionResponse(header, type, payload, source),
 			MessageType.DeviceStateHostFirmware => new StateHostFirmwareResponse(header, type, payload, source),
 			MessageType.DeviceStateService => new StateServiceResponse(header, type, payload, source),
+			MessageType.DeviceStateGroup => new LightGroupResponse(header, type, payload, source),
 			_ => new UnknownResponse(header, type, payload, source),
 		};
 
@@ -102,6 +103,29 @@ public class LightStateResponse : LifxResponse
 	public bool IsOn { get; private set; }
 	/// <summary>
 	/// Light label
+	/// </summary>
+	public string Label { get; private set; }
+}
+public class LightGroupResponse : LifxResponse
+{
+	internal LightGroupResponse(FrameHeader header, MessageType type, byte[] payload, uint source) : base(header, type, payload, source)
+	{
+		byte[] guidBytes = new byte[16];
+		Array.Copy(payload, 0, guidBytes, 0, 16);
+		Group = new Guid(guidBytes);
+		Label = Encoding.UTF8.GetString(payload, 16, 32).Replace("\0", "");
+		UpdatedAt = BitConverter.ToUInt64(payload, 48);
+	}
+	/// <summary>
+	/// Group
+	/// </summary>
+	public Guid Group { get; private set; }
+	/// <summary>
+	/// UpdatedAt
+	/// </summary>
+	public ulong UpdatedAt { get; private set; }
+	/// <summary>
+	/// Group label
 	/// </summary>
 	public string Label { get; private set; }
 }
