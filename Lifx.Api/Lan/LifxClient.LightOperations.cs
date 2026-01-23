@@ -108,6 +108,23 @@ public partial class LifxLanClient : IDisposable
 			cancellationToken);
 
 	/// <summary>
+	/// Sets color and temperature for all bulbs
+	/// </summary>
+	/// <param name="bulb"></param>
+	/// <param name="color"></param>
+	/// <param name="kelvin"></param>
+	/// <returns></returns>
+	public Task SetColorBroadcastAsync(
+		Color color,
+		ushort kelvin,
+		CancellationToken cancellationToken)
+		=> SetColorAsync(
+			color,
+			kelvin,
+			TimeSpan.Zero,
+			cancellationToken);
+
+	/// <summary>
 	/// Sets color and temperature for a bulb and uses a transition time to the provided state
 	/// </summary>
 	/// <param name="bulb"></param>
@@ -127,6 +144,31 @@ public partial class LifxLanClient : IDisposable
 		var hsl = Utilities.RgbToHsl(color);
 		return SetColorAsync(
 			bulb,
+			hsl[0],
+			hsl[1],
+			hsl[2],
+			kelvin,
+			transitionDuration,
+			cancellationToken);
+	}
+
+	/// <summary>
+	/// Broadcast color state to all connected devices
+	/// </summary>
+	/// <param name="bulb"></param>
+	/// <param name="color"></param>
+	/// <param name="kelvin"></param>
+	/// <param name="transitionDuration"></param>
+	/// <returns></returns>
+	public Task SetColorAsync(
+	Color color,
+	ushort kelvin,
+	TimeSpan transitionDuration,
+	CancellationToken cancellationToken)
+	{
+
+		var hsl = Utilities.RgbToHsl(color);
+		return SetColorBroadcastAsync(
 			hsl[0],
 			hsl[1],
 			hsl[2],
@@ -185,6 +227,59 @@ public partial class LifxLanClient : IDisposable
 			saturation,
 			brightness,
 			kelvin, //HSBK
+			duration
+		);
+	}
+
+	/// <summary>
+	/// Broadcast color change to all lights
+	/// </summary>
+	/// <param name="hue">0..65535</param>
+	/// <param name="saturation">0..65535</param>
+	/// <param name="brightness">0..65535</param>
+	/// <param name="kelvin">2700..9000</param>
+	/// <param name="transitionDuration"></param>
+	/// <returns></returns>
+	public async Task SetColorBroadcastAsync(
+	ushort hue,
+	ushort saturation,
+	ushort brightness,
+	ushort kelvin,
+	TimeSpan transitionDuration,
+	CancellationToken cancellationToken)
+	{
+		if (transitionDuration.TotalMilliseconds > uint.MaxValue ||
+			transitionDuration.Ticks < 0)
+		{
+			throw new ArgumentOutOfRangeException(nameof(transitionDuration));
+		}
+
+		if (kelvin < 2500 || kelvin > 9000)
+		{
+			throw new ArgumentOutOfRangeException(nameof(kelvin), "Kelvin must be between 2500 and 9000");
+		}
+
+		logger.LogDebug("Broadcasting color update to all LIFX devices");
+
+		FrameHeader header = new()
+		{
+			Identifier = GetNextIdentifier(),
+			AcknowledgeRequired = false,
+			ResponseRequired = false
+		};
+
+		uint duration = (uint)transitionDuration.TotalMilliseconds;
+
+		await BroadcastMessageAsync<LifxResponse>(
+			System.Net.IPAddress.Broadcast.ToString(),   // "255.255.255.255"
+			header,
+			MessageType.LightSetColor,
+			cancellationToken,
+			(byte)0x00,        // reserved
+			hue,
+			saturation,
+			brightness,
+			kelvin,
 			duration
 		);
 	}
