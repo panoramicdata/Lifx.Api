@@ -117,11 +117,12 @@ public partial class LifxLanClient : IDisposable
 	public Task SetColorBroadcastAsync(
 		Color color,
 		ushort kelvin,
+		TimeSpan transitionDuration,
 		CancellationToken cancellationToken)
 		=> SetColorAsync(
 			color,
 			kelvin,
-			TimeSpan.Zero,
+			transitionDuration,
 			cancellationToken);
 
 	/// <summary>
