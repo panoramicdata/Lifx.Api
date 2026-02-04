@@ -569,6 +569,36 @@ public class ModelSerializationTests
 		light.LastSeen.Should().BeNull();
 	}
 
+	[Fact]
+	public void Light_Should_Handle_EmptyString_LastSeen()
+	{
+		// Arrange - LIFX API returns empty string for disconnected lights
+		// See: https://github.com/panoramicdata/Lifx.Api/issues/3
+		var json = """
+{
+	"id": "test123",
+	"uuid": "uuid123",
+	"label": "Test Light",
+	"connected": false,
+	"power": "off",
+	"brightness": 0.0,
+	"group": {"id": "g1", "name": "Group 1"},
+	"location": {"id": "l1", "name": "Location 1"},
+	"last_seen": "",
+	"seconds_since_seen": 0.0,
+	"product_name": "LIFX Color",
+	"capabilities": {}
+}
+""";
+
+		// Act
+		var light = JsonSerializer.Deserialize<Light>(json, LifxClient.JsonSerializerOptions);
+
+		// Assert
+		light.Should().NotBeNull();
+		light.LastSeen.Should().BeNull();
+	}
+
 	#endregion
 
 	#region Default Values Tests

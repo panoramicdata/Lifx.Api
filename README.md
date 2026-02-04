@@ -44,6 +44,8 @@ Lifx.Api is a comprehensive .NET library that provides a unified interface for c
 
 ## Installation
 
+### Library
+
 ```bash
 dotnet add package Lifx.Api
 ```
@@ -52,6 +54,32 @@ Or via NuGet Package Manager:
 
 ```powershell
 Install-Package Lifx.Api
+```
+
+### CLI Tool
+
+Install the LIFX CLI tool globally:
+
+```bash
+dotnet tool install --global Lifx.Cli
+```
+
+Once installed, you can use the `lifx` command from anywhere:
+
+```bash
+lifx --help
+```
+
+To update to the latest version:
+
+```bash
+dotnet tool update --global Lifx.Cli
+```
+
+To uninstall:
+
+```bash
+dotnet tool uninstall --global Lifx.Cli
 ```
 
 ## Quick Start
