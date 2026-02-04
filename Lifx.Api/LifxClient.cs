@@ -5,6 +5,7 @@ using Refit;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Lifx.Api;
 
@@ -22,12 +23,15 @@ public class LifxClient : IDisposable
 	/// <summary>
 	/// Standard JSON serialization options used throughout the LIFX API.
 	/// Uses snake_case_lower naming policy for property names and reads enum member values.
+	/// Explicitly configured with DefaultJsonTypeInfoResolver for .NET 10+ compatibility
+	/// where reflection-based serialization is disabled by default.
 	/// </summary>
 	public static JsonSerializerOptions JsonSerializerOptions { get; } = new JsonSerializerOptions
 	{
 		PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
 		Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false) },
-		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+		TypeInfoResolver = new DefaultJsonTypeInfoResolver()
 	};
 
 	/// <summary>
