@@ -196,8 +196,8 @@ else {
             Remove-Item $testResultsDir -Recurse -Force
         }
         
-        # Run tests
-        $testOutput = dotnet test --configuration Release --verbosity normal 2>&1
+        # Run tests (unit tests only - integration tests require LIFX API token)
+        $testOutput = dotnet test --configuration Release --verbosity normal --filter "FullyQualifiedName~Unit" 2>&1
         $testExitCode = $LASTEXITCODE
         
         # Display output
