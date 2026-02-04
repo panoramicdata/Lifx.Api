@@ -21,7 +21,7 @@
 - Set the LIFX API key with: `dotnet user-secrets set "LifxApiKey" "<your-key>"`
 
 ## Publishing
-- Use the `release.ps1` script for publishing NuGet packages
+- Use the `Publish.ps1` script for publishing NuGet packages
 - The NuGet API key is stored locally in `nuget-key.txt` (not committed to repo)
 - Packages are published to NuGet.org
 - Symbol packages (`.snupkg`) are generated automatically
