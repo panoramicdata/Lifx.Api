@@ -6,7 +6,7 @@ namespace Lifx.Cli;
 
 public static class Program
 {
-	public static async Task<int> Main(string[] args)
+	public static int Main(string[] args)
 	{
 		try
 		{
@@ -50,18 +50,10 @@ public static class Program
 				"  lifx cloud lights --help";
 
 			// Add global options
-			var verboseOption = new Option<bool>(
-				aliases: ["--verbose", "-v"],
-				description: "Enable verbose output with detailed information");
+			rootCommand.Options.Add(GlobalOptions.Verbose);
+			rootCommand.Options.Add(GlobalOptions.Token);
 
-			var apiTokenOption = new Option<string?>(
-				aliases: ["--token", "-t"],
-				description: "LIFX Cloud API token (overrides stored credential)");
-
-			rootCommand.AddGlobalOption(verboseOption);
-			rootCommand.AddGlobalOption(apiTokenOption);
-
-			return await rootCommand.InvokeAsync(args);
+			return rootCommand.Parse(args).Invoke();
 		}
 		catch (InvalidOperationException ex) when (ex.Message.Contains("No LIFX Cloud API token"))
 		{
@@ -87,7 +79,7 @@ public static class Program
 	{
 		var command = new Command("version", "Show version information");
 
-		command.SetHandler(() =>
+		command.SetAction(parseResult =>
 		{
 			var version = typeof(Program).Assembly.GetName().Version;
 			AnsiConsole.MarkupLine($"[cyan]LIFX CLI[/] version [green]{version}[/]");

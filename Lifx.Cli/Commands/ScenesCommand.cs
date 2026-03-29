@@ -22,12 +22,15 @@ public static class ScenesCommand
 	{
 		var command = new Command("list", "List all scenes");
 
-		command.SetHandler(async (token, verbose) =>
+		command.SetAction(async (parseResult, cancellationToken) =>
 		{
+			var token = parseResult.GetValue(GlobalOptions.Token);
+			var verbose = parseResult.GetValue(GlobalOptions.Verbose);
+
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
 
-			var scenes = await client.Scenes.ListScenesAsync(CancellationToken.None);
+			var scenes = await client.Scenes.ListScenesAsync(cancellationToken);
 
 			var table = new Table();
 			table.AddColumn("Name");
@@ -52,7 +55,7 @@ public static class ScenesCommand
 
 			AnsiConsole.Write(table);
 			AnsiConsole.MarkupLine($"[dim]Total: {scenes.Count} scenes[/]");
-		}, new TokenBinder(), new VerboseBinder());
+		});
 
 		return command;
 	}
@@ -61,21 +64,35 @@ public static class ScenesCommand
 	{
 		var command = new Command("activate", "Activate a scene");
 
-		var sceneArg = new Argument<string>("scene", description: "Scene name or UUID");
-		var durationOption = new Option<double>(["--duration", "-d"], () => 1.0);
-		var fastOption = new Option<bool>(["--fast"], () => false);
-
-		command.AddArgument(sceneArg);
-		command.AddOption(durationOption);
-		command.AddOption(fastOption);
-
-		command.SetHandler(async (token, scene, duration, fast) =>
+		var sceneArg = new Argument<string>("scene")
 		{
+			Description = "Scene name or UUID"
+		};
+		var durationOption = new Option<double>("--duration", "-d")
+		{
+			DefaultValueFactory = _ => 1.0
+		};
+		var fastOption = new Option<bool>("--fast")
+		{
+			DefaultValueFactory = _ => false
+		};
+
+		command.Arguments.Add(sceneArg);
+		command.Options.Add(durationOption);
+		command.Options.Add(fastOption);
+
+		command.SetAction(async (parseResult, cancellationToken) =>
+		{
+			var token = parseResult.GetValue(GlobalOptions.Token);
+			var scene = parseResult.GetValue(sceneArg);
+			var duration = parseResult.GetValue(durationOption);
+			var fast = parseResult.GetValue(fastOption);
+
 			var apiToken = ConfigManager.GetApiToken(token);
 			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
 
 			// Try to find scene by name or UUID
-			var scenes = await client.Scenes.ListScenesAsync(CancellationToken.None);
+			var scenes = await client.Scenes.ListScenesAsync(cancellationToken);
 			var targetScene = scenes.FirstOrDefault(s =>
 				s.Name.Equals(scene, StringComparison.OrdinalIgnoreCase) ||
 				s.Uuid.Equals(scene, StringComparison.OrdinalIgnoreCase));
@@ -92,9 +109,9 @@ public static class ScenesCommand
 				Fast = fast
 			};
 
-			await client.Scenes.ActivateSceneAsync($"scene_id:{targetScene.Uuid}", request, CancellationToken.None);
-			AnsiConsole.MarkupLine($"[green]?[/] Activated scene: {targetScene.Name}");
-		}, new TokenBinder(), sceneArg, durationOption, fastOption);
+			await client.Scenes.ActivateSceneAsync($"scene_id:{targetScene.Uuid}", request, cancellationToken);
+			AnsiConsole.MarkupLine($"[green]✓[/] Activated scene: {targetScene.Name}");
+		});
 
 		return command;
 	}

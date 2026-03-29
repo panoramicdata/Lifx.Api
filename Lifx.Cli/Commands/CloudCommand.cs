@@ -78,17 +78,19 @@ public static class CloudCommand
 	{
 		var command = new Command("set", "Store API token securely using Windows DPAPI");
 
-		var tokenArg = new Argument<string>(
-			"token",
-			description: "API token from https://cloud.lifx.com/settings");
-
-		command.AddArgument(tokenArg);
-
-		command.SetHandler(token =>
+		var tokenArg = new Argument<string>("token")
 		{
+			Description = "API token from https://cloud.lifx.com/settings"
+		};
+
+		command.Arguments.Add(tokenArg);
+
+		command.SetAction(parseResult =>
+		{
+			var token = parseResult.GetValue(tokenArg);
 			if (string.IsNullOrWhiteSpace(token))
 			{
-				AnsiConsole.MarkupLine("[red]? API token cannot be empty[/]");
+				AnsiConsole.MarkupLine("[red]✗ API token cannot be empty[/]");
 				return;
 			}
 
@@ -96,10 +98,10 @@ public static class CloudCommand
 
 			if (success)
 			{
-				AnsiConsole.MarkupLine("[green]? API token stored securely[/]");
+				AnsiConsole.MarkupLine("[green]✓ API token stored securely[/]");
 				AnsiConsole.MarkupLine($"[dim]Location: {SecureCredentialManager.GetStorageLocation()}[/]");
 				AnsiConsole.WriteLine();
-				AnsiConsole.MarkupLine("[yellow]? Security Reminder:[/]");
+				AnsiConsole.MarkupLine("[yellow]⚠ Security Reminder:[/]");
 				AnsiConsole.MarkupLine("[dim]  - Clear your command history to remove the token[/]");
 				AnsiConsole.MarkupLine("[dim]  - Never share screenshots containing your token[/]");
 				AnsiConsole.WriteLine();
@@ -110,10 +112,10 @@ public static class CloudCommand
 			}
 			else
 			{
-				AnsiConsole.MarkupLine("[red]? Failed to store API token[/]");
+				AnsiConsole.MarkupLine("[red]✗ Failed to store API token[/]");
 				AnsiConsole.MarkupLine("[dim]Check file system permissions[/]");
 			}
-		}, tokenArg);
+		});
 
 		return command;
 	}
@@ -122,7 +124,7 @@ public static class CloudCommand
 	{
 		var command = new Command("show", "Check if API token is configured (does not display token)");
 
-		command.SetHandler(() =>
+		command.SetAction(parseResult =>
 		{
 			var hasToken = SecureCredentialManager.HasStoredToken();
 
@@ -133,7 +135,7 @@ public static class CloudCommand
 					? $"{token[..4]}...{token[^4..]}"
 					: "***";
 
-				AnsiConsole.MarkupLine($"[green]? API token is configured[/]");
+				AnsiConsole.MarkupLine($"[green]✓ API token is configured[/]");
 				AnsiConsole.MarkupLine($"[dim]Token (masked): {masked}[/]");
 				AnsiConsole.MarkupLine($"[dim]Storage: {SecureCredentialManager.GetStorageLocation()}[/]");
 				AnsiConsole.WriteLine();
@@ -169,7 +171,7 @@ public static class CloudCommand
 	{
 		var command = new Command("delete", "Remove stored API token");
 
-		command.SetHandler(() =>
+		command.SetAction(parseResult =>
 		{
 			if (!SecureCredentialManager.HasStoredToken())
 			{
@@ -181,12 +183,12 @@ public static class CloudCommand
 
 			if (success)
 			{
-				AnsiConsole.MarkupLine("[green]? API token removed[/]");
+				AnsiConsole.MarkupLine("[green]✓ API token removed[/]");
 				AnsiConsole.MarkupLine("[dim]Deleted encrypted credential file[/]");
 			}
 			else
 			{
-				AnsiConsole.MarkupLine("[red]? Failed to delete API token[/]");
+				AnsiConsole.MarkupLine("[red]✗ Failed to delete API token[/]");
 			}
 		});
 

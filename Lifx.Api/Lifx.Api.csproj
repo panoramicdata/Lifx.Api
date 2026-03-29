@@ -2,11 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
 		<PackageIcon>Icon.png</PackageIcon>
-		<Copyright>Panoramic Data Limited 2025</Copyright>
 		<PackageProjectUrl>https://github.com/panoramicdata/Lifx.Api</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/panoramicdata/Lifx.Api</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -15,8 +12,6 @@
 		<Description>A unified .NET API for LIFX smart lighting supporting both Cloud HTTP API and LAN protocol. Built with Refit for type-safe HTTP calls, offering comprehensive control of lights, effects, and scenes with full async/await support.</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<Authors>Panoramic Data Limited</Authors>
-		<Company>Panoramic Data Limited</Company>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 
@@ -37,7 +32,6 @@
 			- Full async/await throughout
 			- .NET 10 support
 		</PackageReleaseNotes>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -50,16 +44,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Nerdbank.GitVersioning" Version="3.9.50">
+		<PackageReference Include="Nerdbank.GitVersioning">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Refit" Version="9.0.2" />
+		<PackageReference Include="Refit" />
 	</ItemGroup>
 
 </Project>

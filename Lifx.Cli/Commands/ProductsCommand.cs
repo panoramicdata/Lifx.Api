@@ -20,30 +20,38 @@ public static class ProductsCommand
 	{
 		var command = new Command("list", "List all LIFX products");
 
-		var vendorOption = new Option<string?>(
-			aliases: ["--vendor", "-v"],
-			description: "Filter by vendor name (default: LIFX)");
-
-		var colorOnlyOption = new Option<bool>(
-			aliases: ["--color-only"],
-			getDefaultValue: () => false,
-			description: "Show only color-capable products");
-
-		var multizoneOnlyOption = new Option<bool>(
-			aliases: ["--multizone-only"],
-			getDefaultValue: () => false,
-			description: "Show only multizone products");
-
-		command.AddOption(vendorOption);
-		command.AddOption(colorOnlyOption);
-		command.AddOption(multizoneOnlyOption);
-
-		command.SetHandler(async (verbose, vendorFilter, colorOnly, multizoneOnly) =>
+		var vendorOption = new Option<string?>("--vendor", "-v")
 		{
+			Description = "Filter by vendor name (default: LIFX)"
+		};
+
+		var colorOnlyOption = new Option<bool>("--color-only")
+		{
+			Description = "Show only color-capable products",
+			DefaultValueFactory = _ => false
+		};
+
+		var multizoneOnlyOption = new Option<bool>("--multizone-only")
+		{
+			Description = "Show only multizone products",
+			DefaultValueFactory = _ => false
+		};
+
+		command.Options.Add(vendorOption);
+		command.Options.Add(colorOnlyOption);
+		command.Options.Add(multizoneOnlyOption);
+
+		command.SetAction(async (parseResult, cancellationToken) =>
+		{
+			var verbose = parseResult.GetValue(GlobalOptions.Verbose);
+			var vendorFilter = parseResult.GetValue(vendorOption);
+			var colorOnly = parseResult.GetValue(colorOnlyOption);
+			var multizoneOnly = parseResult.GetValue(multizoneOnlyOption);
+
 			// Products API doesn't require a token
 			using var client = new LifxClient(new LifxClientOptions());
 
-			var vendors = await client.Products.GetAllAsync(CancellationToken.None);
+			var vendors = await client.Products.GetAllAsync(cancellationToken);
 
 			// Filter by vendor if specified
 			if (!string.IsNullOrEmpty(vendorFilter))
@@ -127,14 +135,10 @@ public static class ProductsCommand
 
 			if (multizoneOnly)
 			{
-				AnsiConsole.MarkupLine("[dim]Showing only multizone products[/]");
-			}
-		},
-		new VerboseBinder(),
-		vendorOption,
-		colorOnlyOption,
-		multizoneOnlyOption);
+					AnsiConsole.MarkupLine("[dim]Showing only multizone products[/]");
+					}
+				});
 
-		return command;
+				return command;
 	}
 }

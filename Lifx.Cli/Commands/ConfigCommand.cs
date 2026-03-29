@@ -20,7 +20,7 @@ public static class ConfigCommand
 	{
 		var command = new Command("show", "Show current configuration");
 
-		command.SetHandler(() =>
+		command.SetAction(parseResult =>
 		{
 			var config = ConfigManager.Load();
 
@@ -81,7 +81,7 @@ public static class ConfigCommand
 	{
 		var command = new Command("reset", "Reset configuration to defaults (does not delete API token)");
 
-		command.SetHandler(() =>
+		command.SetAction(parseResult =>
 		{
 			var configFile = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -91,7 +91,7 @@ public static class ConfigCommand
 			if (File.Exists(configFile))
 			{
 				File.Delete(configFile);
-				AnsiConsole.MarkupLine("[green]?[/] Configuration reset to defaults");
+				AnsiConsole.MarkupLine("[green]✓[/] Configuration reset to defaults");
 			}
 			else
 			{
