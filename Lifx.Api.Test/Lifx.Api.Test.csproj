@@ -1,49 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<AnalysisMode>Recommended</AnalysisMode>
-		<AnalysisLevel>latest-recommended</AnalysisLevel>
-		<NoWarn>CA1873</NoWarn>
-
-		<IsPackable>false</IsPackable>
-		<IsTestProject>true</IsTestProject>
-		<EnableMicrosoftTestingExtensions>false</EnableMicrosoftTestingExtensions>
-		<EnableXunitMicrosoftTestingPlatform>false</EnableXunitMicrosoftTestingPlatform>
-		<UserSecretsId>b19ce93c-3048-4afa-a755-fa414053b674</UserSecretsId>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="Collections\**" />
-		<Compile Remove="obj\**\SelfRegisteredExtensions.cs" />
-		<EmbeddedResource Remove="Collections\**" />
-		<None Remove="Collections\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="AwesomeAssertions" />
-		<PackageReference Include="AwesomeAssertions.Analyzers">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
-		<PackageReference Include="Microsoft.Extensions.Logging" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="xunit.v3" />
-		<PackageReference Include="xunit.runner.visualstudio">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="xunit.runner.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Lifx.Api\Lifx.Api.csproj" />
-	</ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <NoWarn>CA1873</NoWarn>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <EnableMicrosoftTestingExtensions>false</EnableMicrosoftTestingExtensions>
+    <EnableXunitMicrosoftTestingPlatform>false</EnableXunitMicrosoftTestingPlatform>
+    <UserSecretsId>b19ce93c-3048-4afa-a755-fa414053b674</UserSecretsId>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Collections\**" />
+    <Compile Remove="obj\**\SelfRegisteredExtensions.cs" />
+    <EmbeddedResource Remove="Collections\**" />
+    <None Remove="Collections\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="AwesomeAssertions.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lifx.Api\Lifx.Api.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,3 +1,5 @@
+root = true
+
 # Rules in this file were initially inferred by Visual Studio IntelliCode from the C:\Users\david\Projects\Lifx.Api codebase based on best match to current usage at 20/02/2022
 # You can modify the rules from these initially generated values to suit your own policies
 # You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
@@ -85,3 +87,4 @@ dotnet_style_collection_initializer = true:suggestion
 dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 dotnet_style_prefer_conditional_expression_over_return = true:silent
+csharp_style_namespace_declarations = file_scoped:error
