@@ -33,6 +33,7 @@
 			- Works with or without API token (LAN mode)
 		</PackageReleaseNotes>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\Lifx.Api\Icon.png" Pack="true" PackagePath="" />
