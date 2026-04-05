@@ -15,6 +15,7 @@
     <PackageProjectUrl>https://github.com/dotMorten/LifxNet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dotMorten/LifxNet</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RepositoryType>git</RepositoryType>
     <LangVersion>8.0</LangVersion>
