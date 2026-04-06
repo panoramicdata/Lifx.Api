@@ -414,11 +414,19 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 	[Fact]
 	public async Task StateDelta_Incremental_Changes()
 	{
-		// Get initial brightness
-		var initialLights = await Client.Lights.ListAsync(
+		const double baselineBrightness = 0.4;
+
+		await Client.Lights.SetStateAsync(
 			new Selector.LightId(_testLight!.Id),
+			new SetStateRequest
+			{
+				Power = PowerState.On,
+				Brightness = baselineBrightness,
+				Duration = 0.5
+			},
 			CancellationToken);
-		var initialBrightness = initialLights[0].Brightness;
+
+		await Task.Delay(1000, CancellationToken);
 
 		// Increase brightness by 10%
 		await Client.Lights.StateDeltaAsync(
@@ -437,7 +445,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 			new Selector.LightId(_testLight.Id),
 			CancellationToken);
 
-		updatedLights[0].Brightness.Should().BeGreaterThan(initialBrightness);
+		updatedLights[0].Brightness.Should().BeGreaterThan((float)baselineBrightness);
 	}
 
 	#endregion

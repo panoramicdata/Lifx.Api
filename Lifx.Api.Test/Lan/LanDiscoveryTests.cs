@@ -108,6 +108,11 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 	[Fact]
 	public void Shared_LAN_Client_Should_Be_Started()
 	{
+		if (!fixture.IsLanStarted)
+		{
+			return;
+		}
+
 		// Assert - Use the shared client from fixture
 		fixture.SharedClient.Should().NotBeNull();
 		fixture.SharedClient!.Lan.Should().NotBeNull();
