@@ -26,6 +26,9 @@ Thank you for your interest in contributing to this project!
 - Use xUnit v3 for all tests
 - Use AwesomeAssertions for fluent assertions
 - Ensure all existing tests pass before submitting a PR
+- Run coverage with: `dotnet test --settings coverlet.runsettings --collect:"XPlat Code Coverage"`
+- Coverage reports (Cobertura XML) are generated in `TestResults/Coverage/`
+- In VS Code, use the Testing panel's built-in coverage view
 
 ## License
 

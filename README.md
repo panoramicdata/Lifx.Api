@@ -38,7 +38,7 @@ Lifx.Api is a comprehensive .NET library that provides a unified interface for c
 - Models are POCOs (no dependencies, easy to serialize)
 - Fully async/await throughout
 - Comprehensive error handling
-- Extensive unit and integration test coverage (232+ tests, 92% coverage)
+- Extensive unit and integration test coverage (232+ tests)
 - .NET 10.0 support
 - MIT licensed
 
@@ -469,13 +469,24 @@ All async methods follow these conventions:
 
 The library has comprehensive test coverage:
 
-- 232+ tests with 92% code coverage
+- 232+ tests across unit, integration, and LAN protocol testing
 - Unit tests for utilities, models, and validation
 - Integration tests for Cloud API operations
 - LAN protocol tests with proper fixture management
 - Tests organized by namespace (Cloud, LAN, Unit)
+- Code coverage collected via Coverlet (Cobertura format)
 
 Run tests:
+
+```bash
+# Run tests
+dotnet test
+
+# Run tests with coverage
+dotnet test --settings coverlet.runsettings --collect:"XPlat Code Coverage" --results-directory TestResults/Coverage
+```
+
+Coverage results are written to `TestResults/Coverage/` as Cobertura XML. CI automatically reports coverage in the GitHub Actions job summary.
 
 ```bash
 dotnet test

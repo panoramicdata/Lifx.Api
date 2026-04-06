@@ -20,6 +20,14 @@
 - The test project UserSecretsId is `b19ce93c-3048-4afa-a755-fa414053b674`
 - Set the LIFX API key with: `dotnet user-secrets set "LifxApiKey" "<your-key>"`
 
+## Code Coverage
+- Use Coverlet (coverlet.collector) for code coverage via `--collect:"XPlat Code Coverage"`
+- Coverage configuration is in `coverlet.runsettings` at the solution root
+- Output format is Cobertura XML (written to `TestResults/Coverage/`)
+- CI reports coverage in the GitHub Actions job summary
+- In VS Code, use the Testing panel's built-in coverage view
+- Run: `dotnet test --settings coverlet.runsettings --collect:"XPlat Code Coverage" --results-directory TestResults/Coverage`
+
 ## Publishing
 - Use the `Publish.ps1` script for publishing NuGet packages
 - The NuGet API key is stored locally in `nuget-key.txt` (not committed to repo)

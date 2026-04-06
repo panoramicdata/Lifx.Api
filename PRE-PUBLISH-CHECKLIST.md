@@ -25,7 +25,7 @@ Use this checklist before running `Publish.ps1` to ensure a smooth release.
 - [ ] All LAN tests passing (`dotnet test --filter "Lan"`)
 - [ ] Integration tests reviewed (may require hardware)
 - [ ] No skipped tests without good reason
-- [ ] Test coverage acceptable (target: 92%+)
+- [ ] Test coverage reviewed (`dotnet test --settings coverlet.runsettings --collect:"XPlat Code Coverage"`)
 
 ## Documentation
 

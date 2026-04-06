@@ -25,7 +25,7 @@
 			- Full Cloud HTTP API coverage (Lights, Effects, Scenes, Colors)
 			- LAN protocol for local network control
 			- Type-safe Refit-based API
-			- Comprehensive test coverage (232+ tests, 92%)
+			- Comprehensive test coverage (232+ tests)
 			- Models are POCOs (no dependencies)
 			- Full async/await throughout
 			- .NET 10 support
