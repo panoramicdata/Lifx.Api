@@ -1,5 +1,4 @@
-using Lifx.Api;
-using Lifx.Api.Models.Cloud.Requests;
+using Lifx.Cli.Handlers;
 using Spectre.Console;
 using System.CommandLine;
 
@@ -33,8 +32,8 @@ public static class ScenesCommand
 			var token = parseResult.GetValue(GlobalOptions.Token);
 			var verbose = parseResult.GetValue(GlobalOptions.Verbose);
 
-			var apiToken = ConfigManager.GetApiToken(token);
-			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateCloudClient(token);
 
 			var scenes = await client.Scenes.ListScenesAsync(cancellationToken);
 
@@ -94,14 +93,11 @@ public static class ScenesCommand
 			var duration = parseResult.GetValue(durationOption);
 			var fast = parseResult.GetValue(fastOption);
 
-			var apiToken = ConfigManager.GetApiToken(token);
-			using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateCloudClient(token);
 
-			// Try to find scene by name or UUID
 			var scenes = await client.Scenes.ListScenesAsync(cancellationToken);
-			var targetScene = scenes.FirstOrDefault(s =>
-				s.Name.Equals(scene, StringComparison.OrdinalIgnoreCase) ||
-				s.Uuid.Equals(scene, StringComparison.OrdinalIgnoreCase));
+			var targetScene = ScenesHandler.FindScene(scenes, scene!);
 
 			if (targetScene == null)
 			{
@@ -109,13 +105,10 @@ public static class ScenesCommand
 				return;
 			}
 
-			var request = new ActivateSceneRequest
-			{
-				Duration = duration,
-				Fast = fast
-			};
+			var request = ScenesHandler.BuildActivateRequest(duration, fast);
+			var sceneSelector = ScenesHandler.BuildSceneSelector(targetScene.Uuid);
 
-			await client.Scenes.ActivateSceneAsync($"scene_id:{targetScene.Uuid}", request, cancellationToken);
+			await client.Scenes.ActivateSceneAsync(sceneSelector, request, cancellationToken);
 			AnsiConsole.MarkupLine($"[green]✓[/] Activated scene: {targetScene.Name}");
 		});
 

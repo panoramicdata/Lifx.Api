@@ -1,6 +1,7 @@
 using Lifx.Api;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
+using Lifx.Cli.Handlers;
 using Spectre.Console;
 using System.CommandLine;
 
@@ -82,7 +83,8 @@ public static class LanCommand
 			var macAddress = parseResult.GetValue(macArg);
 			var duration = parseResult.GetValue(durationOption);
 
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
 			if (bulb == null) return;
@@ -122,7 +124,8 @@ public static class LanCommand
 			var macAddress = parseResult.GetValue(macArg);
 			var duration = parseResult.GetValue(durationOption);
 
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
 			if (bulb == null) return;
@@ -169,13 +172,18 @@ public static class LanCommand
 			var kelvin = parseResult.GetValue(kelvinArg);
 			var duration = parseResult.GetValue(durationOption);
 
-			if (kelvin < 2500 || kelvin > 9000)
+			try
 			{
-				AnsiConsole.MarkupLine("[red]Kelvin must be between 2500 and 9000[/]");
+				LanHandler.ValidateKelvin(kelvin);
+			}
+			catch (ArgumentOutOfRangeException ex)
+			{
+				AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
 				return;
 			}
 
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
 			if (bulb == null) return;
@@ -210,7 +218,8 @@ public static class LanCommand
 		{
 			var macAddress = parseResult.GetValue(macArg);
 
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
 			if (bulb == null) return;
@@ -264,19 +273,19 @@ public static class LanCommand
 		{
 			var macAddress = parseResult.GetValue(macArg);
 			var newName = parseResult.GetValue(nameArg);
-			if (string.IsNullOrWhiteSpace(newName))
+
+			try
 			{
-				AnsiConsole.MarkupLine("[red]Name cannot be empty[/]");
+				LanHandler.ValidateLightName(newName!);
+			}
+			catch (ArgumentException ex)
+			{
+				AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
 				return;
 			}
 
-			if (newName.Length > 32)
-			{
-				AnsiConsole.MarkupLine("[red]Name must be 32 characters or less[/]");
-				return;
-			}
-
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
 			if (bulb == null) return;
@@ -285,7 +294,7 @@ public static class LanCommand
 			var oldName = await client.Lan!.GetDeviceLabelAsync(bulb, cancellationToken);
 
 			// Set new name
-			await client.Lan!.SetDeviceLabelAsync(bulb, newName, cancellationToken);
+			await client.Lan!.SetDeviceLabelAsync(bulb, newName!, cancellationToken);
 
 			AnsiConsole.MarkupLine($"[green]✓[/] Renamed light from '[cyan]{oldName}[/]' to '[cyan]{newName}[/]'");
 			AnsiConsole.MarkupLine($"[dim]MAC: {bulb.MacAddressName}[/]");
@@ -294,10 +303,10 @@ public static class LanCommand
 		return command;
 	}
 
-	private static async Task<LightBulb?> DiscoverAndFindBulb(LifxClient client, string macAddress)
+	private static async Task<LightBulb?> DiscoverAndFindBulb(ILifxClient client, string macAddress)
 	{
 		// Normalize MAC address
-		macAddress = macAddress.ToUpperInvariant().Replace("-", ":").Replace(".", ":");
+		macAddress = LanHandler.NormalizeMacAddress(macAddress);
 
 		AnsiConsole.Status()
 			.Start("Discovering devices...", ctx =>
@@ -346,7 +355,8 @@ public static class LanCommand
 		{
 			var timeout = parseResult.GetValue(timeoutOption);
 
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
 			AnsiConsole.Status()
 				.Start("Discovering devices...", ctx =>
@@ -401,19 +411,27 @@ public static class LanCommand
 
 	private static Command CreateListCommand()
 	{
-		var command = new Command("list", "List cached LAN devices from previous discovery");
+		var command = new Command("list", "List cached discovered devices");
 
-		command.SetAction(parseResult =>
+		command.SetAction(async (parseResult, cancellationToken) =>
 		{
-			using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
-			client.StartLan(CancellationToken.None);
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
+
+			AnsiConsole.Status()
+				.Start("Discovering devices...", ctx =>
+				{
+					client.StartLan(CancellationToken.None);
+					client.StartDeviceDiscovery(CancellationToken.None);
+					Thread.Sleep(5000);
+					client.StopDeviceDiscovery();
+				});
 
 			var devices = client.Lan?.Devices.ToList() ?? [];
 
 			if (devices.Count == 0)
 			{
-				AnsiConsole.MarkupLine("[yellow]No cached devices found[/]");
-				AnsiConsole.MarkupLine("[dim]Run 'lifx lan discover' first[/]");
+				AnsiConsole.MarkupLine("[yellow]No devices found[/]");
 				return;
 			}
 
@@ -435,7 +453,7 @@ public static class LanCommand
 			}
 
 			AnsiConsole.Write(table);
-			AnsiConsole.MarkupLine($"[dim]Total: {devices.Count} device(s)[/]");
+			AnsiConsole.MarkupLine($"[dim]Total: {devices.Count} devices[/]");
 		});
 
 		return command;

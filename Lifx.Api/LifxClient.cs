@@ -12,7 +12,7 @@ namespace Lifx.Api;
 /// <summary>
 /// Represents the LifxClient type.
 /// </summary>
-public class LifxClient : IDisposable
+public class LifxClient : ILifxClient
 {
 	private readonly ILogger _logger;
 	private readonly HttpClient? _httpClient;

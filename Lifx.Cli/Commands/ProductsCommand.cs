@@ -1,4 +1,4 @@
-using Lifx.Api;
+using Lifx.Cli.Handlers;
 using Spectre.Console;
 using System.CommandLine;
 
@@ -55,15 +55,13 @@ public static class ProductsCommand
 			var multizoneOnly = parseResult.GetValue(multizoneOnlyOption);
 
 			// Products API doesn't require a token
-			using var client = new LifxClient(new LifxClientOptions());
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateAnonymousClient();
 
 			var vendors = await client.Products.GetAllAsync(cancellationToken);
 
 			// Filter by vendor if specified
-			if (!string.IsNullOrEmpty(vendorFilter))
-			{
-				vendors = [.. vendors.Where(v => v.Name.Contains(vendorFilter, StringComparison.OrdinalIgnoreCase))];
-			}
+			var filteredVendors = ProductsHandler.FilterByVendor(vendors, vendorFilter);
 
 			var table = new Table
 			{
@@ -82,22 +80,11 @@ public static class ProductsCommand
 				table.AddColumn("Matrix");
 			}
 
-			int totalCount = 0;
+			var totalCount = 0;
 
-			foreach (var vendor in vendors)
+			foreach (var vendor in filteredVendors)
 			{
-				var products = vendor.Products.AsEnumerable();
-
-				// Apply filters
-				if (colorOnly)
-				{
-					products = products.Where(p => p.Features.Color);
-				}
-
-				if (multizoneOnly)
-				{
-					products = products.Where(p => p.Features.Multizone);
-				}
+				var products = ProductsHandler.FilterProducts(vendor.Products, colorOnly, multizoneOnly);
 
 				foreach (var product in products)
 				{
@@ -141,10 +128,10 @@ public static class ProductsCommand
 
 			if (multizoneOnly)
 			{
-					AnsiConsole.MarkupLine("[dim]Showing only multizone products[/]");
-					}
-				});
+				AnsiConsole.MarkupLine("[dim]Showing only multizone products[/]");
+			}
+		});
 
-				return command;
+		return command;
 	}
 }

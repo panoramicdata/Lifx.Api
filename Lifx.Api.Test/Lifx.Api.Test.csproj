@@ -44,5 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lifx.Api\Lifx.Api.csproj" />
+    <ProjectReference Include="..\Lifx.Cli\Lifx.Cli.csproj" />
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.201" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50" />
     <PackageVersion Include="Refit" Version="10.1.6" />
-    <PackageVersion Include="Spectre.Console" Version="0.54.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.55.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.5" />
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="10.0.5" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />

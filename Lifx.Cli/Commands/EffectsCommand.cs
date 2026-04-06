@@ -1,5 +1,4 @@
-using Lifx.Api;
-using Lifx.Api.Models.Cloud.Requests;
+using Lifx.Cli.Handlers;
 using Spectre.Console;
 using System.CommandLine;
 
@@ -53,17 +52,10 @@ public static class EffectsCommand
             var period = parseResult.GetValue(periodOption);
             var cycles = parseResult.GetValue(cyclesOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new BreatheEffectRequest
-            {
-                Color = color,
-                Period = period,
-                Cycles = cycles,
-                PowerOn = true
-            };
-
+            var request = EffectsHandler.BuildBreatheRequest(color, period, cycles);
             await client.Effects.BreatheAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started breathe effect on {selector}");
         });
@@ -93,17 +85,10 @@ public static class EffectsCommand
             var period = parseResult.GetValue(periodOption);
             var cycles = parseResult.GetValue(cyclesOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new PulseEffectRequest
-            {
-                Color = color,
-                Period = period,
-                Cycles = cycles,
-                PowerOn = true
-            };
-
+            var request = EffectsHandler.BuildPulseRequest(color, period, cycles);
             await client.Effects.PulseAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started pulse effect on {selector}");
         });
@@ -130,16 +115,10 @@ public static class EffectsCommand
             var period = parseResult.GetValue(periodOption);
             var duration = parseResult.GetValue(durationOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new MorphEffectRequest
-            {
-                Period = period,
-                Duration = duration,
-                PowerOn = true
-            };
-
+            var request = EffectsHandler.BuildMorphRequest(period, duration);
             await client.Effects.MorphAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started morph effect on {selector}");
         });
@@ -166,16 +145,10 @@ public static class EffectsCommand
             var period = parseResult.GetValue(periodOption);
             var duration = parseResult.GetValue(durationOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new FlameEffectRequest
-            {
-                Period = period,
-                Duration = duration,
-                PowerOn = true
-            };
-
+            var request = EffectsHandler.BuildFlameRequest(period, duration);
             await client.Effects.FlameAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started flame effect on {selector}");
         });
@@ -202,16 +175,10 @@ public static class EffectsCommand
             var direction = parseResult.GetValue(directionOption)!;
             var period = parseResult.GetValue(periodOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new MoveEffectRequest
-            {
-                Direction = direction,
-                Period = period,
-                PowerOn = true
-            };
-
+            var request = EffectsHandler.BuildMoveRequest(direction, period);
             await client.Effects.MoveAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started move effect on {selector}");
         });
@@ -235,15 +202,10 @@ public static class EffectsCommand
             var selector = parseResult.GetValue(selectorArg)!;
             var duration = parseResult.GetValue(durationOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new CloudsEffectRequest
-            {
-                Duration = duration,
-                PowerOn = true
-            };
-
+            var request = EffectsHandler.BuildCloudsRequest(duration);
             await client.Effects.CloudsAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started clouds effect on {selector}");
         });
@@ -267,14 +229,10 @@ public static class EffectsCommand
             var selector = parseResult.GetValue(selectorArg)!;
             var duration = parseResult.GetValue(durationOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new SunriseEffectRequest
-            {
-                Duration = duration
-            };
-
+            var request = EffectsHandler.BuildSunriseRequest(duration);
             await client.Effects.SunriseAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started sunrise effect on {selector}");
         });
@@ -298,14 +256,10 @@ public static class EffectsCommand
             var selector = parseResult.GetValue(selectorArg)!;
             var duration = parseResult.GetValue(durationOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new SunsetEffectRequest
-            {
-                Duration = duration
-            };
-
+            var request = EffectsHandler.BuildSunsetRequest(duration);
             await client.Effects.SunsetAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Started sunset effect on {selector}");
         });
@@ -329,14 +283,10 @@ public static class EffectsCommand
             var selector = parseResult.GetValue(selectorArg)!;
             var powerOff = parseResult.GetValue(powerOffOption);
 
-            var apiToken = ConfigManager.GetApiToken(token);
-            using var client = new LifxClient(new LifxClientOptions { ApiToken = apiToken });
+            var factory = new LifxClientFactory();
+            using var client = factory.CreateCloudClient(token);
 
-            var request = new EffectsOffRequest
-            {
-                PowerOff = powerOff
-            };
-
+            var request = EffectsHandler.BuildOffRequest(powerOff);
             await client.Effects.OffAsync(SelectorParser.ParseSelector(selector), request, cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Stopped effects on {selector}");
         });
