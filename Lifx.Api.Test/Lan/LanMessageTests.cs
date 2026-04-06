@@ -7,9 +7,15 @@ namespace Lifx.Api.Test.Lan;
 /// <summary>
 /// Tests for LAN message parsing and serialization
 /// </summary>
+/// <summary>
+/// Represents the LanMessageTests type.
+/// </summary>
 [Collection("LAN Tests")]
 public class LanMessageTests
 {
+	/// <summary>
+	/// Performs FrameHeader_Should_Initialize_With_Defaults operation.
+	/// </summary>
 	[Fact]
 	public void FrameHeader_Should_Initialize_With_Defaults()
 	{
@@ -26,6 +32,9 @@ public class LanMessageTests
 		header.AtTime.Should().Be(DateTime.MinValue);
 	}
 
+	/// <summary>
+	/// Performs FrameHeader_TargetMacAddressName_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void FrameHeader_TargetMacAddressName_Should_Format_Correctly()
 	{
@@ -42,6 +51,9 @@ public class LanMessageTests
 		macAddress.Should().Be("D0:73:D5:00:00:01");
 	}
 
+	/// <summary>
+	/// Performs FrameHeader_TargetMacAddressName_Should_Handle_Null operation.
+	/// </summary>
 	[Fact]
 	public void FrameHeader_TargetMacAddressName_Should_Handle_Null()
 	{
@@ -58,6 +70,9 @@ public class LanMessageTests
 		macAddress.Should().Be(string.Empty);
 	}
 
+	/// <summary>
+	/// Performs ParseMessage_Should_Reject_Packet_Too_Small operation.
+	/// </summary>
 	[Fact]
 	public void ParseMessage_Should_Reject_Packet_Too_Small()
 	{
@@ -77,6 +92,9 @@ public class LanMessageTests
 		exception.InnerException!.Message.Should().Contain("Invalid packet");
 	}
 
+	/// <summary>
+	/// Performs ParseMessage_Should_Reject_Invalid_Packet_Size operation.
+	/// </summary>
 	[Fact]
 	public void ParseMessage_Should_Reject_Invalid_Packet_Size()
 	{
@@ -103,6 +121,9 @@ public class LanMessageTests
 		exception.InnerException!.Message.Should().Contain("Invalid packet");
 	}
 
+	/// <summary>
+	/// Performs WritePacketToStream_Should_Create_Valid_Packet operation.
+	/// </summary>
 	[Fact]
 	public void WritePacketToStream_Should_Create_Valid_Packet()
 	{
@@ -150,6 +171,9 @@ public class LanMessageTests
 		}
 	}
 
+	/// <summary>
+	/// Performs WritePacketToStream_Should_Include_Correct_Flags operation.
+	/// </summary>
 	[Fact]
 	public void WritePacketToStream_Should_Include_Correct_Flags()
 	{
@@ -179,6 +203,9 @@ public class LanMessageTests
 		packet[23].Should().Be(5);
 	}
 
+	/// <summary>
+	/// Performs WritePacketToStream_Should_Handle_String_Payload operation.
+	/// </summary>
 	[Fact]
 	public void WritePacketToStream_Should_Handle_String_Payload()
 	{
@@ -206,6 +233,9 @@ public class LanMessageTests
 		extractedLabel.Should().Be(testLabel);
 	}
 
+	/// <summary>
+	/// Performs BroadcastMessage_Should_Handle_UShort_Payload operation.
+	/// </summary>
 	[Fact]
 	public void BroadcastMessage_Should_Handle_UShort_Payload()
 	{
@@ -222,6 +252,9 @@ public class LanMessageTests
 		expectedBytes[1].Should().Be(0xFF);
 	}
 
+	/// <summary>
+	/// Performs BroadcastMessage_Should_Handle_UInt_Payload operation.
+	/// </summary>
 	[Fact]
 	public void BroadcastMessage_Should_Handle_UInt_Payload()
 	{
@@ -237,6 +270,9 @@ public class LanMessageTests
 		expectedBytes[3].Should().Be(0x12);
 	}
 
+	/// <summary>
+	/// Performs MessageType_Enum_Should_Have_Expected_Values operation.
+	/// </summary>
 	[Fact]
 	public void MessageType_Enum_Should_Have_Expected_Values()
 	{

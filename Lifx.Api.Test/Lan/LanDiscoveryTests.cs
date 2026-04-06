@@ -8,6 +8,9 @@ namespace Lifx.Api.Test.Lan;
 /// Tests for LAN device discovery functionality
 /// Note: These tests use mock/simulated devices to avoid requiring actual hardware
 /// </summary>
+/// <summary>
+/// Represents the LanDiscoveryTests type.
+/// </summary>
 [Collection("LAN Tests")]
 public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 {
@@ -15,6 +18,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 			.CreateLogger<LanDiscoveryTests>();
 	private LifxClient? _client;
 
+	/// <summary>
+	/// Performs Dispose operation.
+	/// </summary>
 	public void Dispose()
 	{
 		// Only dispose clients we created locally, not the shared one
@@ -26,6 +32,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		GC.SuppressFinalize(this);
 	}
 
+	/// <summary>
+	/// Performs LAN_Client_Should_Initialize_When_Enabled operation.
+	/// </summary>
 	[Fact]
 	public void LAN_Client_Should_Initialize_When_Enabled()
 	{
@@ -40,6 +49,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		_client.Lan.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs LAN_Client_Should_Be_Null_When_Disabled operation.
+	/// </summary>
 	[Fact]
 	public void LAN_Client_Should_Be_Null_When_Disabled()
 	{
@@ -54,6 +66,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		_client.Lan.Should().BeNull();
 	}
 
+	/// <summary>
+	/// Performs StartLan_Should_Throw_When_LAN_Not_Enabled operation.
+	/// </summary>
 	[Fact]
 	public void StartLan_Should_Throw_When_LAN_Not_Enabled()
 	{
@@ -69,6 +84,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 			_client.StartLan(CancellationToken.None));
 	}
 
+	/// <summary>
+	/// Performs StartDeviceDiscovery_Should_Throw_When_LAN_Not_Enabled operation.
+	/// </summary>
 	[Fact]
 	public void StartDeviceDiscovery_Should_Throw_When_LAN_Not_Enabled()
 	{
@@ -84,6 +102,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 			_client.StartDeviceDiscovery(CancellationToken.None));
 	}
 
+	/// <summary>
+	/// Performs Shared_LAN_Client_Should_Be_Started operation.
+	/// </summary>
 	[Fact]
 	public void Shared_LAN_Client_Should_Be_Started()
 	{
@@ -93,6 +114,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		fixture.IsLanStarted.Should().BeTrue();
 	}
 
+	/// <summary>
+	/// Performs StopDeviceDiscovery_Should_Not_Throw_When_Not_Started operation.
+	/// </summary>
 	[Fact]
 	public void StopDeviceDiscovery_Should_Not_Throw_When_Not_Started()
 	{
@@ -107,6 +131,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		_client.StopDeviceDiscovery();
 	}
 
+	/// <summary>
+	/// Performs LightBulb_Should_Initialize_With_Required_Parameters operation.
+	/// </summary>
 	[Fact]
 	public void LightBulb_Should_Initialize_With_Required_Parameters()
 	{
@@ -126,6 +153,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		bulb.Port.Should().Be(56700u);
 	}
 
+	/// <summary>
+	/// Performs LightBulb_Should_Inherit_From_Device operation.
+	/// </summary>
 	[Fact]
 	public void LightBulb_Should_Inherit_From_Device()
 	{
@@ -140,6 +170,9 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		bulb.MacAddress.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs LightBulb_MacAddressName_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void LightBulb_MacAddressName_Should_Format_Correctly()
 	{

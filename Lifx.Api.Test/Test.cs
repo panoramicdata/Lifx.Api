@@ -5,16 +5,31 @@ using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test;
 
+/// <summary>
+/// Represents the Test type.
+/// </summary>
 public abstract class Test(ITestOutputHelper testOutputHelper)
 {
+	/// <summary>
+	/// Gets the logger used by test classes.
+	/// </summary>
 	protected ILogger Logger { get; } = LoggerFactory.Create(builder => builder
 			.AddProvider(new XunitLoggerProvider(testOutputHelper)))
 			.CreateLogger<Test>();
 
+	/// <summary>
+	/// Gets the configured LIFX client for integration tests.
+	/// </summary>
 	protected LifxClient Client { get; } = CreateClient(GetTestConfiguration());
 
+	/// <summary>
+	/// Gets the cancellation token for the current test context.
+	/// </summary>
 	protected static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 
+	/// <summary>
+	/// Gets test configuration loaded from configuration sources.
+	/// </summary>
 	protected static TestConfiguration Configuration { get; } = GetTestConfiguration();
 
 	private static LifxClient CreateClient(TestConfiguration config)
@@ -123,15 +138,45 @@ public abstract class Test(ITestOutputHelper testOutputHelper)
 	}
 }
 
+/// <summary>
+/// Represents the TestConfiguration type.
+/// </summary>
 public class TestConfiguration
 {
+	/// <summary>
+	/// Gets or sets AppToken.
+	/// </summary>
 	public string AppToken { get; set; } = string.Empty;
+	/// <summary>
+	/// Gets or sets TestLightId.
+	/// </summary>
 	public string? TestLightId { get; set; }
+	/// <summary>
+	/// Gets or sets TestLightLabel.
+	/// </summary>
 	public string? TestLightLabel { get; set; }
+	/// <summary>
+	/// Gets or sets TestGroupId.
+	/// </summary>
 	public string? TestGroupId { get; set; }
+	/// <summary>
+	/// Gets or sets TestGroupLabel.
+	/// </summary>
 	public string? TestGroupLabel { get; set; }
+	/// <summary>
+	/// Gets or sets TestLocationId.
+	/// </summary>
 	public string? TestLocationId { get; set; }
+	/// <summary>
+	/// Gets or sets TestLocationLabel.
+	/// </summary>
 	public string? TestLocationLabel { get; set; }
+	/// <summary>
+	/// Gets or sets EnableLanTests.
+	/// </summary>
 	public bool EnableLanTests { get; set; }
+	/// <summary>
+	/// Gets or sets LanTestTimeout.
+	/// </summary>
 	public int LanTestTimeout { get; set; } = 10000;
 }

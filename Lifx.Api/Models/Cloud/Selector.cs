@@ -1,7 +1,7 @@
 namespace Lifx.Api.Models.Cloud;
 
 /// <summary>
-/// Used for addressing one or many Lights belonging to the authenticated account.
+/// Represents the Selector type.
 /// </summary>
 public class Selector
 {
@@ -14,7 +14,7 @@ public class Selector
 	private const string TYPE_LOCATION_LABEL = "location";
 
 	/// <summary>
-	/// All lights belonging to the authenticated account.
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly Selector All = new(TYPE_ALL);
 	/// <summary>
@@ -29,33 +29,42 @@ public class Selector
 
 	private Selector(string type, string criteria) : this(string.Format("{0}:{1}", type, criteria)) { }
 
+	/// <summary>
+	/// Performs ToString operation.
+	/// </summary>
 	public override string ToString() => selector;
 
 	/// <summary>
-	/// Only the light with the given ID.
+	/// Represents the LightId type.
 	/// </summary>
 	public class LightId : Selector
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public LightId(string id) : base(TYPE_LIGHT_ID, id) { IsSingle = true; }
 	}
 
 	/// <summary>
-	/// The first light that matches the label.
+	/// Represents the LightLabel type.
 	/// </summary>
 	public class LightLabel : Selector
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public LightLabel(string label) : base("label", label) { IsSingle = true; }
 	}
 
 	/// <summary>
-	/// Only the lights belonging to the group with the given ID.
+	/// Represents the GroupId type.
 	/// </summary>
 	public class GroupId(string id) : Selector(TYPE_GROUP_ID, id)
 	{
 	}
 
 	/// <summary>
-	/// Only the lights belonging to the groups matching the given label.
+	/// Represents the GroupLabel type.
 	/// </summary>
 	public class GroupLabel(string label) : Selector(TYPE_GROUP_LABEL, label)
 	{
@@ -63,19 +72,22 @@ public class Selector
 
 
 	/// <summary>
-	/// OOnly the lights belonging to the location matching the given ID.
+	/// Represents the LocationId type.
 	/// </summary>
 	public class LocationId(string id) : Selector(TYPE_LOCATION_ID, id)
 	{
 	}
 
 	/// <summary>
-	/// Only the lights belonging to the locations matching the given label.
+	/// Represents the LocationLabel type.
 	/// </summary>
 	public class LocationLabel(string label) : Selector(TYPE_LOCATION_LABEL, label)
 	{
 	}
 
+	/// <summary>
+	/// Converts between supported types.
+	/// </summary>
 	public static explicit operator Selector(string selector)
 	{
 		switch (selector)

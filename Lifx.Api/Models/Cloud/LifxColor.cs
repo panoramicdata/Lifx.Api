@@ -3,72 +3,76 @@ using System.Data;
 namespace Lifx.Api.Models.Cloud;
 
 /// <summary>
-/// The color of light is best represented in terms of hue, saturation,
-/// kelvin, and brightness components. However, other means of expressing
-/// colors are available
+/// Represents the LifxColor type.
 /// </summary>
 public abstract class LifxColor
 {
 	/// <summary>
-	/// Color temperature should be at least 1500K
+	/// Represents a public API member.
 	/// </summary>
 	public const int TemperatureMin = 1500;
 	/// <summary>
-	/// Color temperature should be at most 9000K
+	/// Represents a public API member.
 	/// </summary>
 	public const int TemperatureMax = 9000;
 	/// <summary>
-	/// A normal white color temperature, this corresponds to the DefaultWhite color.
+	/// Represents a public API member.
 	/// </summary>
 	public const int TemperatureDefault = 3500;
 	/// <summary>
-	/// Sets saturation to 0
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string DefaultWhite = "white";
 	/// <summary>
-	/// Sets hue to 0
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Red = "red";
 	/// <summary>
-	/// Sets hue to 34
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Orange = "orange";
 	/// <summary>
-	/// Sets hue to 60
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Yellow = "yellow";
 	/// <summary>
-	/// Sets hue to 180
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Cyan = "cyan";
 	/// <summary>
-	/// Sets hue to 120
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Green = "green";
 	/// <summary>
-	/// Sets hue to 250
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Blue = "blue";
 	/// <summary>
-	/// Sets hue to 280
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Purple = "purple";
 	/// <summary>
-	/// Sets hue to 325
+	/// Represents a public API member.
 	/// </summary>
 	public static readonly string Pink = "pink";
 
 	/// <summary>
-	/// A configurable white Light Color
+	/// Represents a public API member.
 	/// </summary>
 	public static string White = BuildHSBK(null, null, 1f, TemperatureDefault);
 
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static readonly IEnumerable<string> NamedColors =
 	[
 		DefaultWhite, Red, Orange, Yellow, Cyan, Green, Blue, Purple, Pink
 	];
 
+	/// <summary>
+	/// Performs BuildHSBK operation.
+	/// </summary>
 	public static string BuildHSBK(double? hue, double? saturation, double? brightness, int? kelvin)
 	{
 		if (hue is null && saturation is null && brightness is null && kelvin is null)
@@ -125,6 +129,9 @@ public abstract class LifxColor
 		return colorString.ToString();
 	}
 
+	/// <summary>
+	/// Performs BuildHSB operation.
+	/// </summary>
 	public static string BuildHSB(
 		double? hue,
 		double? saturation,
@@ -173,6 +180,9 @@ public abstract class LifxColor
 		return colorString.ToString();
 	}
 
+	/// <summary>
+	/// Performs BuildRGB operation.
+	/// </summary>
 	public static string BuildRGB(int red, int green, int blue)
 	{
 		//check red

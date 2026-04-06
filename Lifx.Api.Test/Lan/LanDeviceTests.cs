@@ -11,6 +11,9 @@ namespace Lifx.Api.Test.Lan;
 /// Note: These tests verify the method signatures and basic parameter validation
 /// Full integration testing would require actual hardware or advanced mocking
 /// </summary>
+/// <summary>
+/// Represents the LanDeviceTests type.
+/// </summary>
 [Collection("LAN Tests")]
 public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 {
@@ -20,12 +23,18 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 			service: 1,
 			port: 56700);
 
+	/// <summary>
+	/// Performs Dispose operation.
+	/// </summary>
 	public void Dispose()
 	{
 		// Don't dispose the shared client - the fixture handles that
 		GC.SuppressFinalize(this);
 	}
 
+	/// <summary>
+	/// Performs SetDevicePowerState_Should_Require_Valid_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task SetDevicePowerState_Should_Require_Valid_Device()
 	{
@@ -43,6 +52,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs GetDeviceLabel_Should_Require_Valid_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task GetDeviceLabel_Should_Require_Valid_Device()
 	{
@@ -59,6 +71,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetDeviceLabel_Should_Require_Valid_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task SetDeviceLabel_Should_Require_Valid_Device()
 	{
@@ -75,6 +90,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs GetDeviceVersion_Should_Require_Valid_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task GetDeviceVersion_Should_Require_Valid_Device()
 	{
@@ -91,6 +109,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs GetDeviceHostFirmware_Should_Require_Valid_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task GetDeviceHostFirmware_Should_Require_Valid_Device()
 	{
@@ -107,6 +128,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs Device_MacAddress_Should_Be_6_Bytes operation.
+	/// </summary>
 	[Fact]
 	public void Device_MacAddress_Should_Be_6_Bytes()
 	{
@@ -115,6 +139,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		_testDevice.MacAddress.Should().HaveCount(6);
 	}
 
+	/// <summary>
+	/// Performs Device_Should_Have_Network_Properties operation.
+	/// </summary>
 	[Fact]
 	public void Device_Should_Have_Network_Properties()
 	{
@@ -124,6 +151,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		_testDevice.Service.Should().BePositive();
 	}
 
+	/// <summary>
+	/// Performs PowerState_On_Should_Have_Correct_Value operation.
+	/// </summary>
 	[Fact]
 	public void PowerState_On_Should_Have_Correct_Value()
 	{
@@ -131,6 +161,9 @@ public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 		PowerState.On.ToString().ToLowerInvariant().Should().Be("on");
 	}
 
+	/// <summary>
+	/// Performs PowerState_Off_Should_Have_Correct_Value operation.
+	/// </summary>
 	[Fact]
 	public void PowerState_Off_Should_Have_Correct_Value()
 	{

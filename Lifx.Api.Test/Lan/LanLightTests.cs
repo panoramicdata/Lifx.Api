@@ -7,6 +7,9 @@ namespace Lifx.Api.Test.Lan;
 /// Tests for LAN light operations (color, power, state, infrared)
 /// Note: These tests verify method signatures and basic validation
 /// </summary>
+/// <summary>
+/// Represents the LanLightTests type.
+/// </summary>
 [Collection("LAN Tests")]
 public class LanLightTests(LanTestFixture fixture) : IDisposable
 {
@@ -16,12 +19,18 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			service: 1,
 			port: 56700);
 
+	/// <summary>
+	/// Performs Dispose operation.
+	/// </summary>
 	public void Dispose()
 	{
 		// Don't dispose the shared client - the fixture handles that
 		GC.SuppressFinalize(this);
 	}
 
+	/// <summary>
+	/// Performs SetLightPower_Should_Require_Valid_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task SetLightPower_Should_Require_Valid_Bulb()
 	{
@@ -42,6 +51,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetLightPower_Should_Validate_Transition_Duration operation.
+	/// </summary>
 	[Fact]
 	public async Task SetLightPower_Should_Validate_Transition_Duration()
 	{
@@ -62,6 +74,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs SetLightPower_Should_Validate_Max_Duration operation.
+	/// </summary>
 	[Fact]
 	public async Task SetLightPower_Should_Validate_Max_Duration()
 	{
@@ -82,6 +97,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs GetLightPower_Should_Require_Valid_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task GetLightPower_Should_Require_Valid_Bulb()
 	{
@@ -98,6 +116,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetColor_Should_Require_Valid_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColor_Should_Require_Valid_Bulb()
 	{
@@ -120,6 +141,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetColor_HSBK_Should_Validate_Kelvin_Range operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColor_HSBK_Should_Validate_Kelvin_Range()
 	{
@@ -156,6 +180,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs SetColor_Should_Validate_Transition_Duration operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColor_Should_Validate_Transition_Duration()
 	{
@@ -179,6 +206,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs GetLightState_Should_Require_Valid_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task GetLightState_Should_Require_Valid_Bulb()
 	{
@@ -195,6 +225,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs GetInfrared_Should_Require_Valid_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task GetInfrared_Should_Require_Valid_Bulb()
 	{
@@ -211,6 +244,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetInfrared_Should_Require_Valid_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task SetInfrared_Should_Require_Valid_Device()
 	{
@@ -227,6 +263,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs LightBulb_Should_Be_Device operation.
+	/// </summary>
 	[Fact]
 	public void LightBulb_Should_Be_Device()
 	{
@@ -235,6 +274,9 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 		_testBulb.Should().BeAssignableTo<Device>();
 	}
 
+	/// <summary>
+	/// Performs Color_RGB_Values_Should_Be_In_Range operation.
+	/// </summary>
 	[Fact]
 	public void Color_RGB_Values_Should_Be_In_Range()
 	{

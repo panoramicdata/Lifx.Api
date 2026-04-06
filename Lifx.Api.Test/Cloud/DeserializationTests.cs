@@ -4,9 +4,15 @@ using System.Text.Json;
 
 namespace Lifx.Api.Test.Cloud;
 
+/// <summary>
+/// Represents the DeserializationTests type.
+/// </summary>
 [Collection("Model Tests")]
 public class DeserializationTests
 {
+	/// <summary>
+	/// Performs Light_Should_Deserialize_From_Json operation.
+	/// </summary>
 	[Fact]
 	public void Light_Should_Deserialize_From_Json()
 	{
@@ -73,6 +79,9 @@ public class DeserializationTests
 		light.HasCapability("has_variable_color_temp").Should().BeTrue();
 	}
 
+	/// <summary>
+	/// Performs Hsbk_Should_Deserialize_From_Json operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_Should_Deserialize_From_Json()
 	{
@@ -97,6 +106,9 @@ public class DeserializationTests
 		hsbk.Kelvin.Should().Be(4000);
 	}
 
+	/// <summary>
+	/// Performs Light_With_Null_Color_Should_Deserialize operation.
+	/// </summary>
 	[Fact]
 	public void Light_With_Null_Color_Should_Deserialize()
 	{
@@ -129,6 +141,9 @@ public class DeserializationTests
 		light.LastSeen.Should().BeNull();
 	}
 
+	/// <summary>
+	/// Performs PowerState_Should_Serialize_And_Deserialize operation.
+	/// </summary>
 	[Fact]
 	public void PowerState_Should_Serialize_And_Deserialize()
 	{

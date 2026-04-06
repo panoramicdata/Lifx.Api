@@ -4,14 +4,16 @@ using Lifx.Api.Models.Cloud.Responses;
 namespace Lifx.Api.Test.Unit;
 
 /// <summary>
-/// Phase 5: Error Handling & Edge Cases Tests
-/// Tests validation, error scenarios, and edge cases
+/// Validation and edge-case tests for request and color handling.
 /// </summary>
 [Collection("Unit Tests")]
 public class ValidationTests
 {
 	#region Request Validation Tests
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Accept_Valid_Duration operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Accept_Valid_Duration()
 	{
@@ -25,6 +27,9 @@ public class ValidationTests
 		request.Duration.Should().Be(1.5);
 	}
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Accept_Zero_Duration operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Accept_Zero_Duration()
 	{
@@ -38,6 +43,9 @@ public class ValidationTests
 		request.Duration.Should().Be(0.0);
 	}
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Have_Default_Duration operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Have_Default_Duration()
 	{
@@ -48,6 +56,9 @@ public class ValidationTests
 		request.Duration.Should().Be(1.0);
 	}
 
+	/// <summary>
+	/// Performs TogglePowerRequest_Should_Accept_Valid_Duration operation.
+	/// </summary>
 	[Fact]
 	public void TogglePowerRequest_Should_Accept_Valid_Duration()
 	{
@@ -65,6 +76,9 @@ public class ValidationTests
 
 	#region Color Value Validation Tests
 
+	/// <summary>
+	/// Performs LifxColor_BuildRGB_Should_Reject_Red_Below_Zero operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Red_Below_Zero()
 	{
@@ -74,6 +88,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildRGB_Should_Reject_Red_Above_255 operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Red_Above_255()
 	{
@@ -83,6 +100,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildRGB_Should_Reject_Green_Below_Zero operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Green_Below_Zero()
 	{
@@ -92,6 +112,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildRGB_Should_Reject_Green_Above_255 operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Green_Above_255()
 	{
@@ -101,6 +124,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildRGB_Should_Reject_Blue_Below_Zero operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Blue_Below_Zero()
 	{
@@ -110,6 +136,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildRGB_Should_Reject_Blue_Above_255 operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildRGB_Should_Reject_Blue_Above_255()
 	{
@@ -119,6 +148,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Hue_Below_Zero operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Hue_Below_Zero()
 	{
@@ -128,6 +160,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Hue_Above_360 operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Hue_Above_360()
 	{
@@ -137,6 +172,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Saturation_Below_Zero operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Saturation_Below_Zero()
 	{
@@ -146,6 +184,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Saturation_Above_One operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Saturation_Above_One()
 	{
@@ -155,6 +196,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Brightness_Below_Zero operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Brightness_Below_Zero()
 	{
@@ -164,6 +208,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Brightness_Above_One operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Brightness_Above_One()
 	{
@@ -173,6 +220,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Kelvin_Below_Min operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Kelvin_Below_Min()
 	{
@@ -182,6 +232,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Reject_Kelvin_Above_Max operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Reject_Kelvin_Above_Max()
 	{
@@ -191,6 +244,9 @@ public class ValidationTests
 			.ThrowExactly<System.Data.InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs LifxColor_BuildHSBK_Should_Throw_When_All_Null operation.
+	/// </summary>
 	[Fact]
 	public void LifxColor_BuildHSBK_Should_Throw_When_All_Null()
 	{
@@ -204,6 +260,9 @@ public class ValidationTests
 
 	#region Selector Validation Tests
 
+	/// <summary>
+	/// Performs Selector_LightId_Should_Accept_Valid_Id operation.
+	/// </summary>
 	[Fact]
 	public void Selector_LightId_Should_Accept_Valid_Id()
 	{
@@ -214,6 +273,9 @@ public class ValidationTests
 		selector.ToString().Should().Be("id:d073d5000001");
 	}
 
+	/// <summary>
+	/// Performs Selector_GroupLabel_Should_Accept_Spaces operation.
+	/// </summary>
 	[Fact]
 	public void Selector_GroupLabel_Should_Accept_Spaces()
 	{
@@ -224,6 +286,9 @@ public class ValidationTests
 		selector.ToString().Should().Be("group:Living Room");
 	}
 
+	/// <summary>
+	/// Performs Selector_LocationLabel_Should_Accept_Special_Characters operation.
+	/// </summary>
 	[Fact]
 	public void Selector_LocationLabel_Should_Accept_Special_Characters()
 	{
@@ -234,6 +299,9 @@ public class ValidationTests
 		selector.ToString().Should().Be("location:Mom's House");
 	}
 
+	/// <summary>
+	/// Performs Selector_Cast_Should_Handle_Plain_Label operation.
+	/// </summary>
 	[Fact]
 	public void Selector_Cast_Should_Handle_Plain_Label()
 	{
@@ -244,6 +312,9 @@ public class ValidationTests
 		selector.ToString().Should().Be("label:Kitchen Light");
 	}
 
+	/// <summary>
+	/// Performs Selector_Cast_Should_Handle_Label_With_Colon operation.
+	/// </summary>
 	[Fact]
 	public void Selector_Cast_Should_Handle_Label_With_Colon()
 	{
@@ -258,6 +329,9 @@ public class ValidationTests
 
 	#region Edge Cases Tests
 
+	/// <summary>
+	/// Performs Hsbk_ToString_Should_Clamp_Hue_To_Range operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_ToString_Should_Clamp_Hue_To_Range()
 	{
@@ -277,6 +351,9 @@ public class ValidationTests
 		result.Should().Contain("hue:360");
 	}
 
+	/// <summary>
+	/// Performs Hsbk_ToString_Should_Clamp_Saturation_To_Range operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_ToString_Should_Clamp_Saturation_To_Range()
 	{
@@ -295,6 +372,9 @@ public class ValidationTests
 		result.Should().Contain("saturation:1");
 	}
 
+	/// <summary>
+	/// Performs Hsbk_ToString_Should_Clamp_Brightness_To_Range operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_ToString_Should_Clamp_Brightness_To_Range()
 	{
@@ -313,6 +393,9 @@ public class ValidationTests
 		result.Should().Contain("brightness:0");
 	}
 
+	/// <summary>
+	/// Performs Hsbk_ToString_Should_Clamp_Kelvin_To_Range operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_ToString_Should_Clamp_Kelvin_To_Range()
 	{
@@ -332,6 +415,9 @@ public class ValidationTests
 		result.Should().Contain($"kelvin:{LifxColor.TemperatureMax}");
 	}
 
+	/// <summary>
+	/// Performs Hsbk_ToString_Should_Omit_Kelvin_When_Saturation_High operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_ToString_Should_Omit_Kelvin_When_Saturation_High()
 	{
@@ -351,6 +437,9 @@ public class ValidationTests
 		result.Should().NotContain("kelvin:");
 	}
 
+	/// <summary>
+	/// Performs Light_Implicit_Operator_Should_Create_LightId_Selector operation.
+	/// </summary>
 	[Fact]
 	public void Light_Implicit_Operator_Should_Create_LightId_Selector()
 	{
@@ -378,6 +467,9 @@ public class ValidationTests
 		selector.ToString().Should().Be("id:test123");
 	}
 
+	/// <summary>
+	/// Performs LightCollection_Implicit_Operator_Should_Use_ToSelector operation.
+	/// </summary>
 	[Fact]
 	public void LightCollection_Implicit_Operator_Should_Use_ToSelector()
 	{
@@ -392,6 +484,9 @@ public class ValidationTests
 		selector.ToString().Should().Be("group_id:group123");
 	}
 
+	/// <summary>
+	/// Performs CollectionSpec_Should_Handle_Empty_Strings operation.
+	/// </summary>
 	[Fact]
 	public void CollectionSpec_Should_Handle_Empty_Strings()
 	{
@@ -407,6 +502,9 @@ public class ValidationTests
 		spec.Name.Should().Be(string.Empty);
 	}
 
+	/// <summary>
+	/// Performs Result_Status_Should_Be_Case_Sensitive operation.
+	/// </summary>
 	[Fact]
 	public void Result_Status_Should_Be_Case_Sensitive()
 	{
@@ -423,6 +521,9 @@ public class ValidationTests
 
 	#region Null/Empty Handling Tests
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Handle_Null_Color operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Handle_Null_Color()
 	{
@@ -437,6 +538,9 @@ public class ValidationTests
 		request.Color.Should().BeNull();
 	}
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Handle_Empty_Color operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Handle_Empty_Color()
 	{
@@ -451,6 +555,9 @@ public class ValidationTests
 		request.Color.Should().Be(string.Empty);
 	}
 
+	/// <summary>
+	/// Performs Hsbk_Should_Handle_All_Null_Values operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_Should_Handle_All_Null_Values()
 	{

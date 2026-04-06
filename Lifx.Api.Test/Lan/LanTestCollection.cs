@@ -5,28 +5,42 @@ namespace Lifx.Api.Test.Lan;
 /// <summary>
 /// Test collection for LAN protocol tests that can be run independently
 /// </summary>
+/// <summary>
+/// Represents the LanTestCollection type.
+/// </summary>
 [CollectionDefinition("LAN Tests")]
 public class LanTestCollection : ICollectionFixture<LanTestFixture>
 {
 }
 
 /// <summary>
-/// Shared fixture for LAN protocol tests
-/// Ensures only one UDP socket is bound to port 56700 at a time
+/// Represents the LanTestFixture type.
 /// </summary>
 public class LanTestFixture : IAsyncLifetime
 {
 	private readonly ILogger _logger;
 
+	/// <summary>
+	/// Gets or sets SharedClient.
+	/// </summary>
 	public LifxClient? SharedClient { get; private set; }
+	/// <summary>
+	/// Gets or sets IsLanStarted.
+	/// </summary>
 	public bool IsLanStarted { get; private set; }
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public LanTestFixture()
 	{
 		_logger = LoggerFactory.Create(builder => { })
 			.CreateLogger<LanTestFixture>();
 	}
 
+	/// <summary>
+	/// Performs InitializeAsync operation.
+	/// </summary>
 	public async ValueTask InitializeAsync()
 	{
 		// Create a single shared LAN client for all tests in this collection
@@ -51,6 +65,9 @@ public class LanTestFixture : IAsyncLifetime
 		await Task.CompletedTask;
 	}
 
+	/// <summary>
+	/// Performs DisposeAsync operation.
+	/// </summary>
 	public async ValueTask DisposeAsync()
 	{
 		if (SharedClient is not null)

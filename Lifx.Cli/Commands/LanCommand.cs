@@ -1,4 +1,4 @@
-﻿using Lifx.Api;
+using Lifx.Api;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
 using Spectre.Console;
@@ -6,8 +6,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the LanCommand type.
+/// </summary>
 public static class LanCommand
 {
+	/// <summary>
+	/// Performs Create operation.
+	/// </summary>
 	public static Command Create()
 	{
 		var command = new Command("lan", "Control LIFX lights via LAN protocol (no API token needed)")

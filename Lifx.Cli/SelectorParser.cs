@@ -3,8 +3,14 @@ using static Lifx.Api.Models.Cloud.Selector;
 
 namespace Lifx.Cli;
 
+/// <summary>
+/// Represents the SelectorParser type.
+/// </summary>
 public static class SelectorParser
 {
+	/// <summary>
+	/// Performs ParseSelector operation.
+	/// </summary>
 	public static Selector ParseSelector(string input)
 	{
 		if (string.IsNullOrWhiteSpace(input) || input.Equals("all", StringComparison.OrdinalIgnoreCase))

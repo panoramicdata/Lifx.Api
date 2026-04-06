@@ -7,9 +7,7 @@ using System.Text.Json;
 namespace Lifx.Cli;
 
 /// <summary>
-/// Manages secure storage of LIFX API credentials
-/// - Windows: Uses Data Protection API (DPAPI) for encryption
-/// - Non-Windows: Stores in ~/.lifx/credentials.json (file permissions based security)
+/// Represents the SecureCredentialManager type.
 /// </summary>
 public static class SecureCredentialManager
 {
@@ -90,7 +88,7 @@ public static class SecureCredentialManager
 	}
 
 	/// <summary>
-	/// Removes the API token from storage
+	/// Performs DeleteApiToken operation.
 	/// </summary>
 	public static bool DeleteApiToken()
 	{
@@ -119,7 +117,7 @@ public static class SecureCredentialManager
 	}
 
 	/// <summary>
-	/// Checks if an API token is stored
+	/// Performs HasStoredToken operation.
 	/// </summary>
 	public static bool HasStoredToken()
 	{
@@ -127,7 +125,7 @@ public static class SecureCredentialManager
 	}
 
 	/// <summary>
-	/// Gets a description of where credentials are stored
+	/// Performs GetStorageLocation operation.
 	/// </summary>
 	public static string GetStorageLocation()
 	{
@@ -219,8 +217,17 @@ public static class SecureCredentialManager
 
 	private class CredentialFile
 	{
+		/// <summary>
+		/// Gets or sets ApiToken.
+		/// </summary>
 		public string ApiToken { get; set; } = string.Empty;
+		/// <summary>
+		/// Gets or sets CreatedAt.
+		/// </summary>
 		public DateTime CreatedAt { get; set; }
+		/// <summary>
+		/// Gets or sets Platform.
+		/// </summary>
 		public string Platform { get; set; } = string.Empty;
 	}
 

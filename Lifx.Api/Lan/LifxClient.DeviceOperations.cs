@@ -5,14 +5,14 @@ namespace Lifx.Api.Lan;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
 
+/// <summary>
+/// Represents the LifxLanClient type.
+/// </summary>
 public partial class LifxLanClient : IDisposable
 {
 	/// <summary>
-	/// Sets the device power state
+	/// Performs SetDevicePowerStateAsync operation.
 	/// </summary>
-	/// <param name="device"></param>
-	/// <param name="isOn"></param>
-	/// <returns></returns>
 	public async Task SetDevicePowerStateAsync(
 		Device device,
 		PowerState powerState,
@@ -42,10 +42,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Gets the label for the device
+	/// Performs GetDeviceLabelAsync operation.
 	/// </summary>
-	/// <param name="device"></param>
-	/// <returns></returns>
 	public async Task<string?> GetDeviceLabelAsync(
 		Device device,
 		CancellationToken cancellationToken)
@@ -67,11 +65,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Sets the label on the device
+	/// Performs SetDeviceLabelAsync operation.
 	/// </summary>
-	/// <param name="device"></param>
-	/// <param name="label"></param>
-	/// <returns></returns>
 	public async Task SetDeviceLabelAsync(
 		Device device,
 		string label,
@@ -89,7 +84,7 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Gets the device version
+	/// Performs GetDeviceVersionAsync operation.
 	/// </summary>
 	public async Task<StateVersionResponse?> GetDeviceVersionAsync(
 		Device device,
@@ -111,10 +106,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Gets the device's host firmware
+	/// Performs GetDeviceHostFirmwareAsync operation.
 	/// </summary>
-	/// <param name="device"></param>
-	/// <returns></returns>
 	public async Task<StateHostFirmwareResponse?> GetDeviceHostFirmwareAsync(
 		Device device,
 		CancellationToken cancellationToken)

@@ -4,12 +4,15 @@ using System.Text.Json.Serialization;
 namespace Lifx.Api.Serialization;
 
 /// <summary>
-/// JSON converter for dictionaries with string keys and boolean values that may be represented as numbers
+/// Represents the CapabilitiesDictionaryConverter type.
 /// </summary>
 public class CapabilitiesDictionaryConverter : JsonConverter<Dictionary<string, bool>>
 {
 	private readonly BooleanOrNumberConverter _boolConverter = new();
 
+	/// <summary>
+	/// Performs Read operation.
+	/// </summary>
 	public override Dictionary<string, bool>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		if (reader.TokenType == JsonTokenType.Null)
@@ -47,6 +50,9 @@ public class CapabilitiesDictionaryConverter : JsonConverter<Dictionary<string, 
 		throw new JsonException("Unexpected end of JSON");
 	}
 
+	/// <summary>
+	/// Performs Write operation.
+	/// </summary>
 	public override void Write(Utf8JsonWriter writer, Dictionary<string, bool> value, JsonSerializerOptions options)
 	{
 		writer.WriteStartObject();

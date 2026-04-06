@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Cloud;
 
+/// <summary>
+/// Represents the LightsTests type.
+/// </summary>
 [Collection("Cloud API Tests")]
 public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
 {
@@ -75,6 +78,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 	#region List Operations
 
+	/// <summary>
+	/// Performs ListAsync_All_Should_Return_Lights operation.
+	/// </summary>
 	[Fact]
 	public async Task ListAsync_All_Should_Return_Lights()
 	{
@@ -87,6 +93,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		Logger.LogInformation("Found {Count} lights", lights.Count);
 	}
 
+	/// <summary>
+	/// Performs ListAsync_ByLightId_Should_Return_Single_Light operation.
+	/// </summary>
 	[Fact]
 	public async Task ListAsync_ByLightId_Should_Return_Single_Light()
 	{
@@ -102,6 +111,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		lights[0].Id.Should().Be(lightId);
 	}
 
+	/// <summary>
+	/// Performs ListAsync_ByLabel_Should_Return_Matching_Light operation.
+	/// </summary>
 	[Fact]
 	public async Task ListAsync_ByLabel_Should_Return_Matching_Light()
 	{
@@ -119,6 +131,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		lights.Should().Contain(l => l.Label == label);
 	}
 
+	/// <summary>
+	/// Performs ListGroupsAsync_Should_Return_Groups operation.
+	/// </summary>
 	[Fact]
 	public async Task ListGroupsAsync_Should_Return_Groups()
 	{
@@ -130,6 +145,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		Logger.LogInformation("Found {Count} groups", groups.Count);
 	}
 
+	/// <summary>
+	/// Performs ListLocationsAsync_Should_Return_Locations operation.
+	/// </summary>
 	[Fact]
 	public async Task ListLocationsAsync_Should_Return_Locations()
 	{
@@ -145,6 +163,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 	#region Power Operations - Single Light
 
+	/// <summary>
+	/// Performs SetState_TurnOn_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_TurnOn_Single_Light_Should_Succeed()
 	{
@@ -163,6 +184,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		Logger.LogInformation("Turned on light: {Label}", _testLight.Label);
 	}
 
+	/// <summary>
+	/// Performs SetState_TurnOff_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_TurnOff_Single_Light_Should_Succeed()
 	{
@@ -180,6 +204,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs TogglePower_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task TogglePower_Single_Light_Should_Succeed()
 	{
@@ -201,6 +228,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 	#region Color Operations - Single Light
 
+	/// <summary>
+	/// Performs SetState_Color_Red_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_Color_Red_Single_Light_Should_Succeed()
 	{
@@ -223,6 +253,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs SetState_Color_RGB_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_Color_RGB_Single_Light_Should_Succeed()
 	{
@@ -245,6 +278,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs SetState_Color_HSBK_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_Color_HSBK_Single_Light_Should_Succeed()
 	{
@@ -266,6 +302,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs SetState_Kelvin_Single_Light_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_Kelvin_Single_Light_Should_Succeed()
 	{
@@ -292,6 +331,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 	#region Group Operations
 
+	/// <summary>
+	/// Performs SetState_Group_Should_Affect_Multiple_Lights operation.
+	/// </summary>
 	[Fact]
 	public async Task SetState_Group_Should_Affect_Multiple_Lights()
 	{
@@ -316,6 +358,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		Logger.LogInformation("Set state for group {Name} with {Count} lights", group.Label, 0);
 	}
 
+	/// <summary>
+	/// Performs TogglePower_Group_Should_Affect_Multiple_Lights operation.
+	/// </summary>
 	[Fact]
 	public async Task TogglePower_Group_Should_Affect_Multiple_Lights()
 	{
@@ -338,6 +383,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 	#region Advanced Operations
 
+	/// <summary>
+	/// Performs SetStatesAsync_Multiple_Lights_Different_Colors_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task SetStatesAsync_Multiple_Lights_Different_Colors_Should_Succeed()
 	{
@@ -368,6 +416,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs StateDelta_Increase_Brightness_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task StateDelta_Increase_Brightness_Should_Succeed()
 	{
@@ -392,6 +443,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 	#region Color Validation
 
+	/// <summary>
+	/// Performs ValidateColor_Red_Should_Return_Valid_Result operation.
+	/// </summary>
 	[Fact]
 	public async Task ValidateColor_Red_Should_Return_Valid_Result()
 	{
@@ -404,6 +458,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Hue!.Value.Should().BeGreaterThanOrEqualTo(0);
 	}
 
+	/// <summary>
+	/// Performs ValidateColor_RGB_Should_Return_Valid_Result operation.
+	/// </summary>
 	[Fact]
 	public async Task ValidateColor_RGB_Should_Return_Valid_Result()
 	{
@@ -416,6 +473,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		result.Hue!.Value.Should().BeGreaterThanOrEqualTo(0);
 	}
 
+	/// <summary>
+	/// Performs ValidateColor_HSBK_Should_Return_Valid_Result operation.
+	/// </summary>
 	[Fact]
 	public async Task ValidateColor_HSBK_Should_Return_Valid_Result()
 	{

@@ -1,7 +1,7 @@
 namespace Lifx.Api.Models.Lan;
 
 /// <summary>
-/// LIFX Generic Device
+/// Represents the Device type.
 /// </summary>
 public abstract class Device
 {
@@ -22,29 +22,29 @@ public abstract class Device
 	}
 
 	/// <summary>
-	/// Hostname for the device
+	/// Gets or sets HostName.
 	/// </summary>
 	public string HostName { get; internal set; }
 
 	/// <summary>
-	/// Service ID
+	/// Gets or sets Service.
 	/// </summary>
 	public byte Service { get; }
 
 	/// <summary>
-	/// Service port
+	/// Gets or sets Port.
 	/// </summary>
 	public uint Port { get; }
 
 	internal DateTime LastSeen { get; set; }
 
 	/// <summary>
-	/// Gets the MAC address
+	/// Gets or sets MacAddress.
 	/// </summary>
 	public byte[] MacAddress { get; }
 
 	/// <summary>
-	/// Gets the MAC address
+	/// Represents a public API member.
 	/// </summary>
 	public string MacAddressName
 	{

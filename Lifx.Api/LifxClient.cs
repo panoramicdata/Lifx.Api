@@ -10,7 +10,7 @@ using System.Text.Json.Serialization.Metadata;
 namespace Lifx.Api;
 
 /// <summary>
-/// Unified LIFX client supporting both Cloud HTTP API and LAN protocol
+/// Represents the LifxClient type.
 /// </summary>
 public class LifxClient : IDisposable
 {
@@ -21,10 +21,7 @@ public class LifxClient : IDisposable
 	private const string BaseUrl = "https://api.lifx.com/v1";
 
 	/// <summary>
-	/// Standard JSON serialization options used throughout the LIFX API.
-	/// Uses snake_case_lower naming policy for property names and reads enum member values.
-	/// Explicitly configured with DefaultJsonTypeInfoResolver for .NET 10+ compatibility
-	/// where reflection-based serialization is disabled by default.
+	/// Gets or sets JsonSerializerOptions.
 	/// </summary>
 	public static JsonSerializerOptions JsonSerializerOptions { get; } = new JsonSerializerOptions
 	{
@@ -35,35 +32,38 @@ public class LifxClient : IDisposable
 	};
 
 	/// <summary>
-	/// Cloud HTTP API - Lights operations
+	/// Gets or sets Lights.
 	/// </summary>
 	public ILifxLightsApi Lights { get; }
 
 	/// <summary>
-	/// Cloud HTTP API - Effects operations
+	/// Gets or sets Effects.
 	/// </summary>
 	public ILifxEffectsApi Effects { get; }
 
 	/// <summary>
-	/// Cloud HTTP API - Scenes operations
+	/// Gets or sets Scenes.
 	/// </summary>
 	public ILifxScenesApi Scenes { get; }
 
 	/// <summary>
-	/// Cloud HTTP API - Color operations
+	/// Gets or sets Color.
 	/// </summary>
 	public ILifxColorApi Color { get; }
 
 	/// <summary>
-	/// Products API - Get LIFX product catalog (no API token required)
+	/// Gets or sets Products.
 	/// </summary>
 	public ILifxProductsApi Products { get; }
 
 	/// <summary>
-	/// LAN Protocol client for direct local network communication (if enabled)
+	/// Gets or sets Lan.
 	/// </summary>
 	public LifxLanClient? Lan { get; }
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public LifxClient(LifxClientOptions options)
 	{
 		_logger = options.Logger;
@@ -98,9 +98,8 @@ public class LifxClient : IDisposable
 	}
 
 	/// <summary>
-	/// Starts the LAN client for device discovery and communication
+	/// Performs StartLan operation.
 	/// </summary>
-	/// <param name="cancellationToken">Cancellation token</param>
 	public void StartLan(CancellationToken cancellationToken)
 	{
 		if (Lan is null)
@@ -112,7 +111,7 @@ public class LifxClient : IDisposable
 	}
 
 	/// <summary>
-	/// Starts device discovery on the LAN
+	/// Performs StartDeviceDiscovery operation.
 	/// </summary>
 	public void StartDeviceDiscovery(CancellationToken cancellationToken)
 	{
@@ -125,7 +124,7 @@ public class LifxClient : IDisposable
 	}
 
 	/// <summary>
-	/// Stops device discovery on the LAN
+	/// Performs StopDeviceDiscovery operation.
 	/// </summary>
 	public void StopDeviceDiscovery() => Lan?.StopDeviceDiscovery();
 
@@ -160,12 +159,19 @@ public class LifxClient : IDisposable
 		});
 	}
 
+	/// <summary>
+	/// Performs Dispose operation.
+	/// </summary>
 	public void Dispose()
 	{
 		Dispose(true);
 		GC.SuppressFinalize(this);
 	}
 
+	/// <summary>
+	/// Releases resources used by this instance.
+	/// </summary>
+	/// <param name="disposing"><c>true</c> when called from <see cref="Dispose()"/>; otherwise <c>false</c>.</param>
 	protected virtual void Dispose(bool disposing)
 	{
 		if (disposing)
@@ -175,6 +181,9 @@ public class LifxClient : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Finalizes an instance of the <see cref="LifxClient"/> class.
+	/// </summary>
 	~LifxClient()
 	{
 		Dispose(false);

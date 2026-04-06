@@ -3,9 +3,15 @@ using System.Data;
 
 namespace Lifx.Api.Test.Unit;
 
+/// <summary>
+/// Represents the LifxColorTests type.
+/// </summary>
 [Collection("Unit Tests")]
 public class LifxColorTests
 {
+	/// <summary>
+	/// Performs BuildHSBK_With_All_Parameters_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_With_All_Parameters_Should_Format_Correctly()
 	{
@@ -19,6 +25,9 @@ public class LifxColorTests
 		color.Should().Contain("kelvin:3500");
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Format_Correctly()
 	{
@@ -29,21 +38,33 @@ public class LifxColorTests
 		color.Should().Be("rgb:255,0,0");
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_With_Invalid_Red_Should_Throw operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_With_Invalid_Red_Should_Throw() =>
 		// Act & Assert
 		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildRGB(256, 0, 0));
 
+	/// <summary>
+	/// Performs BuildHSBK_With_Invalid_Hue_Should_Throw operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_With_Invalid_Hue_Should_Throw() =>
 		// Act & Assert
 		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(361, 0.5, 0.5, 3500));
 
+	/// <summary>
+	/// Performs BuildHSBK_With_Invalid_Saturation_Should_Throw operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_With_Invalid_Saturation_Should_Throw() =>
 		// Act & Assert
 		Assert.Throws<InvalidConstraintException>(() => LifxColor.BuildHSBK(120, 1.5, 0.5, 3500));
 
+	/// <summary>
+	/// Performs Named_Colors_Should_Contain_Expected_Values operation.
+	/// </summary>
 	[Fact]
 	public void Named_Colors_Should_Contain_Expected_Values()
 	{

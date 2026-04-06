@@ -6,7 +6,7 @@ using Refit;
 namespace Lifx.Api.Interfaces;
 
 /// <summary>
-/// Refit interface for LIFX Lights operations
+/// Defines the ILifxLightsApi contract.
 /// </summary>
 public interface ILifxLightsApi
 {

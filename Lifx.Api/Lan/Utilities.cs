@@ -4,8 +4,14 @@ using Lifx.Api.Models.Lan;
 
 internal static class Utilities
 {
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static readonly DateTime Epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+	/// <summary>
+	/// Performs RgbToHsl operation.
+	/// </summary>
 	public static ushort[] RgbToHsl(Color rgb)
 	{
 		// normalize red, green and blue values

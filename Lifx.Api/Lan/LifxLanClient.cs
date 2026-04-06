@@ -7,7 +7,7 @@ namespace Lifx.Api.Lan;
 using Lifx.Api.Models.Lan;
 
 /// <summary>
-/// LIFX Client for communicating with bulbs via LAN protocol
+/// Represents the LifxLanClient type.
 /// </summary>
 public partial class LifxLanClient(ILogger logger) : IDisposable
 {
@@ -19,6 +19,9 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	private bool _disposed;
 	private readonly Lock _disposeLock = new();
 
+	/// <summary>
+	/// Performs Start operation.
+	/// </summary>
 	public void Start(CancellationToken cancellationToken)
 	{
 		lock (this)
@@ -91,7 +94,7 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	}
 
 	/// <summary>
-	/// Disposes the client
+	/// Performs Dispose operation.
 	/// </summary>
 	public void Dispose()
 	{
@@ -378,12 +381,33 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 
 internal class FrameHeader
 {
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint Identifier;
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public byte Sequence;
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool AcknowledgeRequired;
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool ResponseRequired;
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public byte[] TargetMacAddress;
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public DateTime AtTime;
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public FrameHeader()
 	{
 		Identifier = 0;
@@ -393,6 +417,9 @@ internal class FrameHeader
 		TargetMacAddress = [0, 0, 0, 0, 0, 0, 0, 0];
 		AtTime = DateTime.MinValue;
 	}
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string TargetMacAddressName
 	{
 		get

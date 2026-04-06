@@ -1,22 +1,22 @@
 namespace Lifx.Api.Models.Lan;
 
 /// <summary>
-/// RGB Color structure
+/// Represents the Color value type.
 /// </summary>
 public struct Color
 {
 	/// <summary>
-	/// Red
+	/// Gets or sets R.
 	/// </summary>
 	public byte R { get; set; }
 
 	/// <summary>
-	/// Green
+	/// Gets or sets G.
 	/// </summary>
 	public byte G { get; set; }
 
 	/// <summary>
-	/// Blue
+	/// Gets or sets B.
 	/// </summary>
 	public byte B { get; set; }
 }

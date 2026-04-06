@@ -4,6 +4,9 @@ namespace Lifx.Api.Test.Collections;
 /// Collection definition for LIFX Cloud API tests.
 /// These tests use the LIFX Cloud API and may make actual HTTP calls.
 /// </summary>
+/// <summary>
+/// Represents the CloudApiTestCollection type.
+/// </summary>
 [CollectionDefinition("Cloud API Tests", DisableParallelization = false)]
 public class CloudApiTestCollection
 {

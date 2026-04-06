@@ -6,7 +6,7 @@ using Refit;
 namespace Lifx.Api.Interfaces;
 
 /// <summary>
-/// Refit interface for LIFX Effects operations
+/// Defines the ILifxEffectsApi contract.
 /// </summary>
 public interface ILifxEffectsApi
 {

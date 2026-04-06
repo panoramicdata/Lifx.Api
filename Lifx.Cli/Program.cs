@@ -4,8 +4,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli;
 
+/// <summary>
+/// Represents the Program type.
+/// </summary>
 public static class Program
 {
+	/// <summary>
+	/// Performs Main operation.
+	/// </summary>
 	public static int Main(string[] args)
 	{
 		try

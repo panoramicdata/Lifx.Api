@@ -8,6 +8,9 @@ namespace Lifx.Api.Test.Lan;
 /// Phase 5: LAN Protocol Error Handling Tests
 /// Tests error scenarios, timeouts, and edge cases for LAN protocol
 /// </summary>
+/// <summary>
+/// Represents the LanErrorHandlingTests type.
+/// </summary>
 [Collection("LAN Tests")]
 public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 {
@@ -15,6 +18,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.CreateLogger<LanErrorHandlingTests>();
 	private LifxClient? _client;
 
+	/// <summary>
+	/// Performs Dispose operation.
+	/// </summary>
 	public void Dispose()
 	{
 		// Only dispose clients we created locally, not the shared one
@@ -28,6 +34,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 
 	#region LAN Not Enabled Tests
 
+	/// <summary>
+	/// Performs StartLan_Should_Throw_When_LAN_Not_Enabled operation.
+	/// </summary>
 	[Fact]
 	public void StartLan_Should_Throw_When_LAN_Not_Enabled()
 	{
@@ -44,6 +53,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactly<InvalidOperationException>();
 	}
 
+	/// <summary>
+	/// Performs StartDeviceDiscovery_Should_Throw_When_LAN_Not_Enabled operation.
+	/// </summary>
 	[Fact]
 	public void StartDeviceDiscovery_Should_Throw_When_LAN_Not_Enabled()
 	{
@@ -60,6 +72,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactly<InvalidOperationException>();
 	}
 
+	/// <summary>
+	/// Performs StopDeviceDiscovery_Should_Not_Throw_When_Not_Started operation.
+	/// </summary>
 	[Fact]
 	public void StopDeviceDiscovery_Should_Not_Throw_When_Not_Started()
 	{
@@ -78,6 +93,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 
 	#region Null Parameter Tests
 
+	/// <summary>
+	/// Performs SetDevicePowerState_Should_Throw_On_Null_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task SetDevicePowerState_Should_Throw_On_Null_Device()
 	{
@@ -95,6 +113,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs GetDeviceLabel_Should_Throw_On_Null_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task GetDeviceLabel_Should_Throw_On_Null_Device()
 	{
@@ -111,6 +132,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetDeviceLabel_Should_Throw_On_Null_Device operation.
+	/// </summary>
 	[Fact]
 	public async Task SetDeviceLabel_Should_Throw_On_Null_Device()
 	{
@@ -128,6 +152,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetLightPowerAsync_Should_Throw_On_Null_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task SetLightPowerAsync_Should_Throw_On_Null_Bulb()
 	{
@@ -146,6 +173,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs SetColorAsync_Should_Throw_On_Null_Bulb operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColorAsync_Should_Throw_On_Null_Bulb()
 	{
@@ -170,6 +200,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 
 	#region Range Validation Tests
 
+	/// <summary>
+	/// Performs SetLightPowerAsync_Should_Reject_Negative_Duration operation.
+	/// </summary>
 	[Fact]
 	public async Task SetLightPowerAsync_Should_Reject_Negative_Duration()
 	{
@@ -190,6 +223,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs SetLightPowerAsync_Should_Reject_Duration_Too_Large operation.
+	/// </summary>
 	[Fact]
 	public async Task SetLightPowerAsync_Should_Reject_Duration_Too_Large()
 	{
@@ -210,6 +246,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs SetColorAsync_HSBK_Should_Reject_Kelvin_Too_Low operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColorAsync_HSBK_Should_Reject_Kelvin_Too_Low()
 	{
@@ -233,6 +272,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs SetColorAsync_HSBK_Should_Reject_Kelvin_Too_High operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColorAsync_HSBK_Should_Reject_Kelvin_Too_High()
 	{
@@ -256,6 +298,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
 	}
 
+	/// <summary>
+	/// Performs SetColorAsync_Should_Reject_Negative_Duration operation.
+	/// </summary>
 	[Fact]
 	public async Task SetColorAsync_Should_Reject_Negative_Duration()
 	{
@@ -282,6 +327,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 
 	#region Device Model Validation Tests
 
+	/// <summary>
+	/// Performs Device_Should_Reject_Null_Hostname operation.
+	/// </summary>
 	[Fact]
 	public void Device_Should_Reject_Null_Hostname()
 	{
@@ -291,6 +339,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactly<ArgumentNullException>();
 	}
 
+	/// <summary>
+	/// Performs Device_Should_Reject_Empty_Hostname operation.
+	/// </summary>
 	[Fact]
 	public void Device_Should_Reject_Empty_Hostname()
 	{
@@ -300,6 +351,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactly<ArgumentException>();
 	}
 
+	/// <summary>
+	/// Performs Device_Should_Reject_Whitespace_Hostname operation.
+	/// </summary>
 	[Fact]
 	public void Device_Should_Reject_Whitespace_Hostname()
 	{
@@ -309,6 +363,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			.ThrowExactly<ArgumentException>();
 	}
 
+	/// <summary>
+	/// Performs Device_MacAddress_Should_Be_Six_Bytes operation.
+	/// </summary>
 	[Fact]
 	public void Device_MacAddress_Should_Be_Six_Bytes()
 	{
@@ -319,6 +376,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 		device.MacAddress.Should().HaveCount(6);
 	}
 
+	/// <summary>
+	/// Performs Device_MacAddressName_Should_Handle_Null_MacAddress operation.
+	/// </summary>
 	[Fact]
 	public void Device_MacAddressName_Should_Handle_Null_MacAddress()
 	{
@@ -334,6 +394,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 
 	#region Disposal Tests
 
+	/// <summary>
+	/// Performs LifxClient_Should_Dispose_Without_Error operation.
+	/// </summary>
 	[Fact]
 	public void LifxClient_Should_Dispose_Without_Error()
 	{
@@ -348,6 +411,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 		client.Dispose();
 	}
 
+	/// <summary>
+	/// Performs LifxClient_Should_Handle_Multiple_Dispose_Calls operation.
+	/// </summary>
 	[Fact]
 	public void LifxClient_Should_Handle_Multiple_Dispose_Calls()
 	{

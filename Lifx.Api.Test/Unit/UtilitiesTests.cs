@@ -8,11 +8,17 @@ namespace Lifx.Api.Test.Unit;
 /// <summary>
 /// Tests for utility methods (RGB to HSL conversion, epoch time, color helpers)
 /// </summary>
+/// <summary>
+/// Represents the UtilitiesTests type.
+/// </summary>
 [Collection("Unit Tests")]
 public class UtilitiesTests
 {
 	#region RGB to HSL Conversion Tests
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_Red_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Convert_Red_Correctly()
 	{
@@ -31,6 +37,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(65535); // Lightness/Value (full)
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_Green_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Convert_Green_Correctly()
 	{
@@ -49,6 +58,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(65535); // Lightness/Value (full)
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_Blue_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Convert_Blue_Correctly()
 	{
@@ -67,6 +79,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(65535); // Lightness/Value (full)
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_White_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Convert_White_Correctly()
 	{
@@ -84,6 +99,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(65535); // Lightness/Value (full)
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_Black_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Convert_Black_Correctly()
 	{
@@ -101,6 +119,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(0); // Lightness/Value (none)
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_Gray_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Convert_Gray_Correctly()
 	{
@@ -118,6 +139,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(32896); // Lightness/Value (~50%)
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Handle_Cyan operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Handle_Cyan()
 	{
@@ -134,6 +158,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(65535); // Full value
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Handle_Magenta operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Handle_Magenta()
 	{
@@ -150,6 +177,9 @@ public class UtilitiesTests
 		hsl[2].Should().Be(65535); // Full value
 	}
 
+	/// <summary>
+	/// Performs RgbToHsl_Should_Handle_Yellow operation.
+	/// </summary>
 	[Fact]
 	public void RgbToHsl_Should_Handle_Yellow()
 	{
@@ -170,6 +200,9 @@ public class UtilitiesTests
 
 	#region Epoch Tests
 
+	/// <summary>
+	/// Performs Epoch_Should_Be_Unix_Epoch operation.
+	/// </summary>
 	[Fact]
 	public void Epoch_Should_Be_Unix_Epoch()
 	{
@@ -177,6 +210,9 @@ public class UtilitiesTests
 		Utilities.Epoch.Should().Be(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 	}
 
+	/// <summary>
+	/// Performs Epoch_Should_Be_UTC operation.
+	/// </summary>
 	[Fact]
 	public void Epoch_Should_Be_UTC()
 	{
@@ -184,6 +220,9 @@ public class UtilitiesTests
 		Utilities.Epoch.Kind.Should().Be(DateTimeKind.Utc);
 	}
 
+	/// <summary>
+	/// Performs Epoch_Should_Have_Zero_Time_Components operation.
+	/// </summary>
 	[Fact]
 	public void Epoch_Should_Have_Zero_Time_Components()
 	{
@@ -198,6 +237,9 @@ public class UtilitiesTests
 
 	#region LifxColor BuildRGB Tests
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Format_Correctly()
 	{
@@ -208,6 +250,9 @@ public class UtilitiesTests
 		color.Should().Be("rgb:255,0,0");
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Handle_All_Zeros operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Handle_All_Zeros()
 	{
@@ -218,6 +263,9 @@ public class UtilitiesTests
 		color.Should().Be("rgb:0,0,0");
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Handle_All_Max_Values operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Handle_All_Max_Values()
 	{
@@ -228,6 +276,9 @@ public class UtilitiesTests
 		color.Should().Be("rgb:255,255,255");
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Throw_On_Red_Too_High operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Red_Too_High()
 	{
@@ -237,6 +288,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Throw_On_Red_Too_Low operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Red_Too_Low()
 	{
@@ -246,6 +300,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Throw_On_Green_Too_High operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Green_Too_High()
 	{
@@ -255,6 +312,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildRGB_Should_Throw_On_Blue_Too_High operation.
+	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Throw_On_Blue_Too_High()
 	{
@@ -268,6 +328,9 @@ public class UtilitiesTests
 
 	#region LifxColor BuildHSBK Tests
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Format_All_Components operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Format_All_Components()
 	{
@@ -281,6 +344,9 @@ public class UtilitiesTests
 		color.Should().Contain("kelvin:3500");
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Allow_Null_Hue operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Allow_Null_Hue()
 	{
@@ -294,6 +360,9 @@ public class UtilitiesTests
 		color.Should().Contain("kelvin:3500");
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Throw_When_All_Null operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Throw_When_All_Null()
 	{
@@ -303,6 +372,9 @@ public class UtilitiesTests
 			.ThrowExactly<ArgumentException>();
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Validate_Hue_Range operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Validate_Hue_Range()
 	{
@@ -317,6 +389,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Validate_Saturation_Range operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Validate_Saturation_Range()
 	{
@@ -331,6 +406,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Validate_Brightness_Range operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Validate_Brightness_Range()
 	{
@@ -345,6 +423,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Validate_Kelvin_Range operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Validate_Kelvin_Range()
 	{
@@ -359,6 +440,9 @@ public class UtilitiesTests
 			.ThrowExactly<InvalidConstraintException>();
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Allow_Min_Kelvin operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Allow_Min_Kelvin()
 	{
@@ -369,6 +453,9 @@ public class UtilitiesTests
 		color.Should().Contain("kelvin:1500");
 	}
 
+	/// <summary>
+	/// Performs BuildHSBK_Should_Allow_Max_Kelvin operation.
+	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Allow_Max_Kelvin()
 	{
@@ -383,6 +470,9 @@ public class UtilitiesTests
 
 	#region LifxColor Named Colors Tests
 
+	/// <summary>
+	/// Performs NamedColors_Should_Contain_Expected_Values operation.
+	/// </summary>
 	[Fact]
 	public void NamedColors_Should_Contain_Expected_Values()
 	{
@@ -398,6 +488,9 @@ public class UtilitiesTests
 		LifxColor.NamedColors.Should().Contain("pink");
 	}
 
+	/// <summary>
+	/// Performs NamedColors_Should_Have_Nine_Colors operation.
+	/// </summary>
 	[Fact]
 	public void NamedColors_Should_Have_Nine_Colors()
 	{
@@ -405,6 +498,9 @@ public class UtilitiesTests
 		LifxColor.NamedColors.Should().HaveCount(9);
 	}
 
+	/// <summary>
+	/// Performs DefaultWhite_Should_Be_White_String operation.
+	/// </summary>
 	[Fact]
 	public void DefaultWhite_Should_Be_White_String()
 	{
@@ -412,6 +508,9 @@ public class UtilitiesTests
 		LifxColor.DefaultWhite.Should().Be("white");
 	}
 
+	/// <summary>
+	/// Performs Color_Constants_Should_Have_Correct_Values operation.
+	/// </summary>
 	[Fact]
 	public void Color_Constants_Should_Have_Correct_Values()
 	{

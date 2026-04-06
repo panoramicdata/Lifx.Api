@@ -3,22 +3,73 @@ using System.Text.Json.Serialization;
 namespace Lifx.Api.Models.Cloud;
 
 /// <summary>
-/// A color in its natural Lifx representation
+/// Represents the Hsbk type.
 /// </summary>
 public class Hsbk
 {
+	/// <summary>
+	/// Gets or sets Hue.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Hue.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Hue.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Hue.
+	/// </summary>
 	[JsonPropertyName("hue")]
 	public float? Hue { get; set; }
 
+	/// <summary>
+	/// Gets or sets Saturation.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Saturation.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Saturation.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Saturation.
+	/// </summary>
 	[JsonPropertyName("saturation")]
 	public float? Saturation { get; set; }
 
+	/// <summary>
+	/// Gets or sets Brightness.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Brightness.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Brightness.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Brightness.
+	/// </summary>
 	[JsonPropertyName("brightness")]
 	public float? Brightness { get; set; }
 
+	/// <summary>
+	/// Gets or sets Kelvin.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Kelvin.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Kelvin.
+	/// </summary>
+	/// <summary>
+	/// Gets or sets Kelvin.
+	/// </summary>
 	[JsonPropertyName("kelvin")]
 	public int? Kelvin { get; set; }
 
+	/// <summary>
+	/// Performs ToString operation.
+	/// </summary>
 	public override string ToString()
 	{
 		StringBuilder sb = new();

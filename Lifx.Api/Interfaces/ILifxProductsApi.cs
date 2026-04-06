@@ -4,8 +4,7 @@ using Refit;
 namespace Lifx.Api.Interfaces;
 
 /// <summary>
-/// Refit interface for LIFX Products operations
-/// Fetches from GitHub products repository
+/// Defines the ILifxProductsApi contract.
 /// </summary>
 public interface ILifxProductsApi
 {

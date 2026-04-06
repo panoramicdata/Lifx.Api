@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Cloud;
 
+/// <summary>
+/// Represents the EffectsTests type.
+/// </summary>
 [Collection("Cloud API Tests")]
 public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
 {
@@ -79,6 +82,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 	#region Single Light Effects
 
+	/// <summary>
+	/// Performs BreatheEffect_Single_Light_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task BreatheEffect_Single_Light_Should_Execute()
 	{
@@ -104,6 +110,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		Logger.LogInformation("BreatheEffect executed on {Label}", _testLight.Label);
 	}
 
+	/// <summary>
+	/// Performs PulseEffect_Single_Light_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task PulseEffect_Single_Light_Should_Execute()
 	{
@@ -128,6 +137,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs MorphEffect_Single_Light_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task MorphEffect_Single_Light_Should_Execute()
 	{
@@ -150,6 +162,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs FlameEffect_Single_Light_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task FlameEffect_Single_Light_Should_Execute()
 	{
@@ -176,6 +191,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 	#region Group Effects
 
+	/// <summary>
+	/// Performs CloudsEffect_Group_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task CloudsEffect_Group_Should_Execute()
 	{
@@ -199,6 +217,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		Logger.LogInformation("CloudsEffect executed on group {Name}", group.Label);
 	}
 
+	/// <summary>
+	/// Performs MoveEffect_Group_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task MoveEffect_Group_Should_Execute()
 	{
@@ -226,6 +247,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 	#region Environment Effects
 
+	/// <summary>
+	/// Performs SunriseEffect_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task SunriseEffect_Should_Execute()
 	{
@@ -247,6 +271,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs SunsetEffect_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task SunsetEffect_Should_Execute()
 	{
@@ -272,6 +299,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 	#region Effect Control
 
+	/// <summary>
+	/// Performs EffectsOff_Should_Stop_Running_Effects operation.
+	/// </summary>
 	[Fact]
 	public async Task EffectsOff_Should_Stop_Running_Effects()
 	{
@@ -300,6 +330,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		result.Should().NotBeNull();
 	}
 
+	/// <summary>
+	/// Performs EffectsOff_WithPowerOff_Should_Turn_Off_Light operation.
+	/// </summary>
 	[Fact]
 	public async Task EffectsOff_WithPowerOff_Should_Turn_Off_Light()
 	{
@@ -324,6 +357,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 	#region Clean Cycle
 
+	/// <summary>
+	/// Performs Clean_Start_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task Clean_Start_Should_Execute()
 	{
@@ -346,6 +382,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 		Logger.LogInformation("Clean cycle started");
 	}
 
+	/// <summary>
+	/// Performs Clean_Stop_Should_Execute operation.
+	/// </summary>
 	[Fact]
 	public async Task Clean_Stop_Should_Execute()
 	{

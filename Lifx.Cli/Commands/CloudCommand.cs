@@ -3,8 +3,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the CloudCommand type.
+/// </summary>
 public static class CloudCommand
 {
+	/// <summary>
+	/// Performs Create operation.
+	/// </summary>
 	public static Command Create()
 	{
 		var command = new Command("cloud", "Control LIFX lights via Cloud API (requires API token)")

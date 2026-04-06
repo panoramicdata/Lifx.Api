@@ -4,7 +4,7 @@ using Refit;
 namespace Lifx.Api.Interfaces;
 
 /// <summary>
-/// Refit interface for LIFX Color operations
+/// Defines the ILifxColorApi contract.
 /// </summary>
 public interface ILifxColorApi
 {

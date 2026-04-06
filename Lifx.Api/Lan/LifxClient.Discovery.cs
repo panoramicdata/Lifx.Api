@@ -5,6 +5,9 @@ namespace Lifx.Api.Lan;
 
 using Lifx.Api.Models.Lan;
 
+/// <summary>
+/// Represents the LifxLanClient type.
+/// </summary>
 public partial class LifxLanClient : IDisposable
 {
 	private static uint identifier = 2;
@@ -22,30 +25,30 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Event fired when a LIFX bulb is discovered on the network
+	/// Represents a public API member.
 	/// </summary>
 	public event EventHandler<DeviceDiscoveryEventArgs>? DeviceDiscovered;
 
 	/// <summary>
-	/// Event fired when a LIFX bulb hasn't been seen on the network for a while (for more than 5 minutes)
+	/// Represents a public API member.
 	/// </summary>
 	public event EventHandler<DeviceDiscoveryEventArgs>? DeviceLost;
 
 	private readonly IList<Device> devices = [];
 
 	/// <summary>
-	/// Gets a list of currently known devices
+	/// Gets or sets Devices.
 	/// </summary>
 	public IEnumerable<Device> Devices { get { return devices; } }
 
 	/// <summary>
-	/// Event args for <see cref="DeviceDiscovered"/> and <see cref="DeviceLost"/> events.
+	/// Represents the DeviceDiscoveryEventArgs type.
 	/// </summary>
 	public sealed class DeviceDiscoveryEventArgs : EventArgs
 	{
 		internal DeviceDiscoveryEventArgs(Device device) => Device = device;
 		/// <summary>
-		/// The device the event relates to
+		/// Gets or sets Device.
 		/// </summary>
 		public Device Device { get; }
 	}
@@ -79,11 +82,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Begins searching for bulbs.
+	/// Performs StartDeviceDiscovery operation.
 	/// </summary>
-	/// <seealso cref="DeviceDiscovered"/>
-	/// <seealso cref="DeviceLost"/>
-	/// <seealso cref="StopDeviceDiscovery"/>
 	public void StartDeviceDiscovery(CancellationToken cancellationToken)
 	{
 		if (_DiscoverCancellationSource is not null && !_DiscoverCancellationSource.IsCancellationRequested)
@@ -133,9 +133,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Stops device discovery
+	/// Performs StopDeviceDiscovery operation.
 	/// </summary>
-	/// <seealso cref="StartDeviceDiscovery"/>
 	public void StopDeviceDiscovery()
 	{
 		if (_DiscoverCancellationSource is null || _DiscoverCancellationSource.IsCancellationRequested)

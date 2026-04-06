@@ -3,8 +3,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the ConfigCommand type.
+/// </summary>
 public static class ConfigCommand
 {
+	/// <summary>
+	/// Performs Create operation.
+	/// </summary>
 	public static Command Create()
 	{
 		var command = new Command("config", "Manage CLI configuration (non-sensitive settings)")

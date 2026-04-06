@@ -1,4 +1,4 @@
-﻿namespace Lifx.Api.Lan;
+namespace Lifx.Api.Lan;
 
 internal abstract record LifxPacket
 {
@@ -40,6 +40,9 @@ internal abstract record LifxPacket
 		Payload = ms.ToArray();
 	}
 
+	/// <summary>
+	/// Performs FromByteArray operation.
+	/// </summary>
 	public static LifxPacket FromByteArray(byte[] data)
 	{
 		//			preambleFields = [
@@ -85,16 +88,28 @@ internal abstract record LifxPacket
 
 	private record UnknownPacket : LifxPacket
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public UnknownPacket(ushort packetType, byte[] payload, byte[] bulbAddress, byte[] site) : base(packetType, payload)
 		{
 			BulbAddress = bulbAddress;
 			Site = site;
 		}
 
+		/// <summary>
+		/// Gets or sets BulbAddress.
+		/// </summary>
 		public byte[] BulbAddress { get; }
 
+		/// <summary>
+		/// Gets or sets TimeStamp.
+		/// </summary>
 		public DateTime TimeStamp { get; set; }
 
+		/// <summary>
+		/// Gets or sets Site.
+		/// </summary>
 		public byte[] Site { get; set; }
 	}
 }

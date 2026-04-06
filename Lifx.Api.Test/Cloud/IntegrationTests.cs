@@ -6,8 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Lifx.Api.Test.Cloud;
 
 /// <summary>
-/// Phase 6: Integration & Scenario Tests
-/// Tests complete workflows, multi-device scenarios, and end-to-end integration
+/// Integration and scenario tests for complete cloud workflows.
 /// </summary>
 [Collection("Cloud API Tests")]
 public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
@@ -64,6 +63,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 	#region Complete Workflow Tests
 
+	/// <summary>
+	/// Performs Complete_Workflow_List_SetState_Verify operation.
+	/// </summary>
 	[Fact]
 	public async Task Complete_Workflow_List_SetState_Verify()
 	{
@@ -98,6 +100,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		updatedLight.Brightness.Should().BeGreaterThanOrEqualTo((float)targetBrightness - 0.1f);
 	}
 
+	/// <summary>
+	/// Performs Scene_Activation_Workflow operation.
+	/// </summary>
 	[Fact]
 	public async Task Scene_Activation_Workflow()
 	{
@@ -127,6 +132,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		lights.Should().NotBeEmpty();
 	}
 
+	/// <summary>
+	/// Performs Effect_Lifecycle_Management operation.
+	/// </summary>
 	[Fact]
 	public async Task Effect_Lifecycle_Management()
 	{
@@ -170,6 +178,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 	#region Group Operations Tests
 
+	/// <summary>
+	/// Performs Group_State_Changes_Should_Affect_All_Lights operation.
+	/// </summary>
 	[Fact]
 	public async Task Group_State_Changes_Should_Affect_All_Lights()
 	{
@@ -205,6 +216,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		});
 	}
 
+	/// <summary>
+	/// Performs Multiple_Groups_Should_Be_Independently_Controllable operation.
+	/// </summary>
 	[Fact]
 	public async Task Multiple_Groups_Should_Be_Independently_Controllable()
 	{
@@ -248,6 +262,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 	#region State Management Tests
 
+	/// <summary>
+	/// Performs State_Restore_After_Changes operation.
+	/// </summary>
 	[Fact]
 	public async Task State_Restore_After_Changes()
 	{
@@ -294,6 +311,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		restoredLights[0].PowerState.Should().Be(initialPower);
 	}
 
+	/// <summary>
+	/// Performs Rapid_State_Changes_Should_Not_Fail operation.
+	/// </summary>
 	[Fact]
 	public async Task Rapid_State_Changes_Should_Not_Fail()
 	{
@@ -335,6 +355,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 	#region Advanced Operations Tests
 
+	/// <summary>
+	/// Performs SetStates_Multiple_Lights_Different_Colors operation.
+	/// </summary>
 	[Fact]
 	public async Task SetStates_Multiple_Lights_Different_Colors()
 	{
@@ -385,6 +408,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		light2[0].IsOn.Should().BeTrue();
 	}
 
+	/// <summary>
+	/// Performs StateDelta_Incremental_Changes operation.
+	/// </summary>
 	[Fact]
 	public async Task StateDelta_Incremental_Changes()
 	{
@@ -418,6 +444,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 	#region Color Validation Integration Tests
 
+	/// <summary>
+	/// Performs Color_Validation_Before_Setting_State operation.
+	/// </summary>
 	[Fact]
 	public async Task Color_Validation_Before_Setting_State()
 	{
@@ -450,6 +479,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 	#region Cleanup and Disposal Tests
 
+	/// <summary>
+	/// Performs Client_Disposal_Should_Be_Safe operation.
+	/// </summary>
 	[Fact]
 	public async Task Client_Disposal_Should_Be_Safe()
 	{
@@ -468,6 +500,9 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		// This test verifies no exceptions are thrown
 	}
 
+	/// <summary>
+	/// Performs Multiple_Sequential_Operations_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task Multiple_Sequential_Operations_Should_Succeed()
 	{

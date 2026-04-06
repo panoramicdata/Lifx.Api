@@ -4,10 +4,13 @@ using System.Text.Json.Serialization;
 namespace Lifx.Api.Serialization;
 
 /// <summary>
-/// JSON converter that handles boolean values that may be represented as numbers (0/1) in JSON
+/// Represents the BooleanOrNumberConverter type.
 /// </summary>
 public class BooleanOrNumberConverter : JsonConverter<bool>
 {
+	/// <summary>
+	/// Performs Read operation.
+	/// </summary>
 	public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		return reader.TokenType switch
@@ -20,6 +23,9 @@ public class BooleanOrNumberConverter : JsonConverter<bool>
 		};
 	}
 
+	/// <summary>
+	/// Performs Write operation.
+	/// </summary>
 	public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
 	{
 		writer.WriteBooleanValue(value);

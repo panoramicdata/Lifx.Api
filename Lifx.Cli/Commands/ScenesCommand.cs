@@ -5,8 +5,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the ScenesCommand type.
+/// </summary>
 public static class ScenesCommand
 {
+	/// <summary>
+	/// Performs Create operation.
+	/// </summary>
 	public static Command Create()
 	{
 		var command = new Command("scenes", "Manage and activate scenes")

@@ -3,7 +3,7 @@ namespace Lifx.Api.Lan;
 using Lifx.Api.Models.Lan;
 
 /// <summary>
-/// Base class for LIFX response types
+/// Represents the LifxResponse type.
 /// </summary>
 public abstract class LifxResponse
 {
@@ -49,7 +49,13 @@ internal class StateServiceResponse : LifxResponse
 		Service = payload[0];
 		Port = BitConverter.ToUInt32(payload, 1);
 	}
+	/// <summary>
+	/// Gets or sets Service.
+	/// </summary>
 	public byte Service { get; }
+	/// <summary>
+	/// Gets or sets Port.
+	/// </summary>
 	public uint Port { get; }
 }
 /// <summary>
@@ -64,10 +70,13 @@ internal class StateLabelResponse : LifxResponse
 			Label = Encoding.UTF8.GetString(payload, 0, payload.Length).Replace("\0", "");
 		}
 	}
+	/// <summary>
+	/// Gets or sets Label.
+	/// </summary>
 	public string? Label { get; private set; }
 }
 /// <summary>
-/// Sent by a device to provide the current light state
+/// Represents the LightStateResponse type.
 /// </summary>
 public class LightStateResponse : LifxResponse
 {
@@ -81,27 +90,27 @@ public class LightStateResponse : LifxResponse
 		Label = Encoding.UTF8.GetString(payload, 12, 32).Replace("\0", "");
 	}
 	/// <summary>
-	/// Hue
+	/// Gets or sets Hue.
 	/// </summary>
 	public ushort Hue { get; private set; }
 	/// <summary>
-	/// Saturation (0=desaturated, 65535 = fully saturated)
+	/// Gets or sets Saturation.
 	/// </summary>
 	public ushort Saturation { get; private set; }
 	/// <summary>
-	/// Brightness (0=off, 65535=full brightness)
+	/// Gets or sets Brightness.
 	/// </summary>
 	public ushort Brightness { get; private set; }
 	/// <summary>
-	/// Bulb color temperature
+	/// Gets or sets Kelvin.
 	/// </summary>
 	public ushort Kelvin { get; private set; }
 	/// <summary>
-	/// Power state
+	/// Gets or sets IsOn.
 	/// </summary>
 	public bool IsOn { get; private set; }
 	/// <summary>
-	/// Light label
+	/// Gets or sets Label.
 	/// </summary>
 	public string Label { get; private set; }
 }
@@ -111,6 +120,9 @@ internal class LightPowerResponse : LifxResponse
 	{
 		IsOn = BitConverter.ToUInt16(payload, 0) > 0;
 	}
+	/// <summary>
+	/// Gets or sets IsOn.
+	/// </summary>
 	public bool IsOn { get; private set; }
 }
 
@@ -120,11 +132,14 @@ internal class InfraredStateRespone : LifxResponse
 	{
 		Brightness = BitConverter.ToUInt16(payload, 0);
 	}
+	/// <summary>
+	/// Gets or sets Brightness.
+	/// </summary>
 	public ushort Brightness { get; private set; }
 }
 
 /// <summary>
-/// Response to GetVersion message.	Provides the hardware version of the device.
+/// Represents the StateVersionResponse type.
 /// </summary>
 public class StateVersionResponse : LifxResponse
 {
@@ -135,20 +150,20 @@ public class StateVersionResponse : LifxResponse
 		Version = BitConverter.ToUInt32(payload, 8);
 	}
 	/// <summary>
-	/// Vendor ID
+	/// Gets or sets Vendor.
 	/// </summary>
 	public uint Vendor { get; private set; }
 	/// <summary>
-	/// Product ID
+	/// Gets or sets Product.
 	/// </summary>
 	public uint Product { get; private set; }
 	/// <summary>
-	/// Hardware version
+	/// Gets or sets Version.
 	/// </summary>
 	public uint Version { get; private set; }
 }
 /// <summary>
-/// Response to GetHostFirmware message. Provides host firmware information.
+/// Represents the StateHostFirmwareResponse type.
 /// </summary>
 public class StateHostFirmwareResponse : LifxResponse
 {
@@ -160,11 +175,11 @@ public class StateHostFirmwareResponse : LifxResponse
 		Version = BitConverter.ToUInt32(payload, 16);
 	}
 	/// <summary>
-	/// Firmware build time
+	/// Gets or sets Build.
 	/// </summary>
 	public DateTime Build { get; private set; }
 	/// <summary>
-	/// Firmware version
+	/// Gets or sets Version.
 	/// </summary>
 	public uint Version { get; private set; }
 }

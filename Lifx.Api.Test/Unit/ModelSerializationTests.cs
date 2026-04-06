@@ -5,14 +5,16 @@ using System.Text.Json;
 namespace Lifx.Api.Test.Unit;
 
 /// <summary>
-/// Phase 4: Model Validation & Serialization Tests
-/// Tests all model serialization/deserialization and validation
+/// Model validation and serialization tests.
 /// </summary>
 [Collection("Unit Tests")]
 public class ModelSerializationTests
 {
 	#region Hsbk Tests
 
+	/// <summary>
+	/// Performs Hsbk_Should_Serialize_All_Components operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_Should_Serialize_All_Components()
 	{
@@ -41,6 +43,9 @@ public class ModelSerializationTests
 		deserialized.Kelvin.Should().Be(3500);
 	}
 
+	/// <summary>
+	/// Performs Hsbk_Should_ToString_With_All_Components operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_Should_ToString_With_All_Components()
 	{
@@ -63,6 +68,9 @@ public class ModelSerializationTests
 		result.Should().Contain("kelvin:4000");
 	}
 
+	/// <summary>
+	/// Performs Hsbk_ToString_Should_Handle_Null_Hue operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_ToString_Should_Handle_Null_Hue()
 	{
@@ -83,6 +91,9 @@ public class ModelSerializationTests
 		result.Should().Contain("saturation:0.5");
 	}
 
+	/// <summary>
+	/// Performs Hsbk_Should_Deserialize_With_Null_Components operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_Should_Deserialize_With_Null_Components()
 	{
@@ -111,6 +122,9 @@ public class ModelSerializationTests
 
 	#region Selector Tests
 
+	/// <summary>
+	/// Performs Selector_Should_Parse_All_Selector operation.
+	/// </summary>
 	[Fact]
 	public void Selector_Should_Parse_All_Selector()
 	{
@@ -122,6 +136,9 @@ public class ModelSerializationTests
 		selector.Should().Be(Selector.All);
 	}
 
+	/// <summary>
+	/// Performs Selector_Should_Parse_All_Types operation.
+	/// </summary>
 	[Theory]
 	[InlineData("id:d073d5000001", "id:d073d5000001")]
 	[InlineData("group_id:abc123", "group_id:abc123")]
@@ -138,6 +155,9 @@ public class ModelSerializationTests
 		selector.ToString().Should().Be(expected);
 	}
 
+	/// <summary>
+	/// Performs Selector_LightId_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void Selector_LightId_Should_Format_Correctly()
 	{
@@ -148,6 +168,9 @@ public class ModelSerializationTests
 		selector.ToString().Should().Be("id:test123");
 	}
 
+	/// <summary>
+	/// Performs Selector_GroupId_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void Selector_GroupId_Should_Format_Correctly()
 	{
@@ -158,6 +181,9 @@ public class ModelSerializationTests
 		selector.ToString().Should().Be("group_id:group456");
 	}
 
+	/// <summary>
+	/// Performs Selector_LocationId_Should_Format_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void Selector_LocationId_Should_Format_Correctly()
 	{
@@ -172,6 +198,9 @@ public class ModelSerializationTests
 
 	#region CollectionSpec Tests
 
+	/// <summary>
+	/// Performs CollectionSpec_Should_Serialize_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void CollectionSpec_Should_Serialize_Correctly()
 	{
@@ -194,6 +223,9 @@ public class ModelSerializationTests
 		deserialized.Name.Should().Be("Test Name");
 	}
 
+	/// <summary>
+	/// Performs CollectionSpec_Equals_Should_Work_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void CollectionSpec_Equals_Should_Work_Correctly()
 	{
@@ -212,6 +244,9 @@ public class ModelSerializationTests
 
 	#region ApiResponse Models Tests
 
+	/// <summary>
+	/// Performs ErrorResponse_Should_Deserialize_With_Single_Error operation.
+	/// </summary>
 	[Fact]
 	public void ErrorResponse_Should_Deserialize_With_Single_Error()
 	{
@@ -230,6 +265,9 @@ public class ModelSerializationTests
 		response.Error.Should().Be("Invalid selector");
 	}
 
+	/// <summary>
+	/// Performs ErrorResponse_Should_Deserialize_With_Error_Array operation.
+	/// </summary>
 	[Fact]
 	public void ErrorResponse_Should_Deserialize_With_Error_Array()
 	{
@@ -255,6 +293,9 @@ public class ModelSerializationTests
 		response.Errors![0].Field.Should().Be("color");
 	}
 
+	/// <summary>
+	/// Performs Result_Should_Identify_Successful_Status operation.
+	/// </summary>
 	[Fact]
 	public void Result_Should_Identify_Successful_Status()
 	{
@@ -271,6 +312,9 @@ public class ModelSerializationTests
 		result.IsTimedOut.Should().BeFalse();
 	}
 
+	/// <summary>
+	/// Performs Result_Should_Identify_TimedOut_Status operation.
+	/// </summary>
 	[Fact]
 	public void Result_Should_Identify_TimedOut_Status()
 	{
@@ -291,6 +335,9 @@ public class ModelSerializationTests
 
 	#region Scene Models Tests
 
+	/// <summary>
+	/// Performs Scene_Should_Deserialize_Complete_Model operation.
+	/// </summary>
 	[Fact]
 	public void Scene_Should_Deserialize_Complete_Model()
 	{
@@ -332,6 +379,9 @@ public class ModelSerializationTests
 		scene.UpdatedAt.Should().Be(1234567900);
 	}
 
+	/// <summary>
+	/// Performs Scene_State_Should_Deserialize_Correctly operation.
+	/// </summary>
 	[Fact]
 	public void Scene_State_Should_Deserialize_Correctly()
 	{
@@ -364,6 +414,9 @@ public class ModelSerializationTests
 
 	#region ColorResult Tests
 
+	/// <summary>
+	/// Performs ColorResult_Should_Deserialize_All_Fields operation.
+	/// </summary>
 	[Fact]
 	public void ColorResult_Should_Deserialize_All_Fields()
 	{
@@ -388,6 +441,9 @@ public class ModelSerializationTests
 		result.Kelvin.Should().Be(3500f);
 	}
 
+	/// <summary>
+	/// Performs ColorResult_Should_Handle_Null_Values operation.
+	/// </summary>
 	[Fact]
 	public void ColorResult_Should_Handle_Null_Values()
 	{
@@ -416,6 +472,9 @@ public class ModelSerializationTests
 
 	#region Request Models Tests
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Serialize_All_Fields operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Serialize_All_Fields()
 	{
@@ -440,6 +499,9 @@ public class ModelSerializationTests
 		json.Should().Contain("\"infrared\":0.5");
 	}
 
+	/// <summary>
+	/// Performs SetStateRequest_Should_Omit_Null_Values operation.
+	/// </summary>
 	[Fact]
 	public void SetStateRequest_Should_Omit_Null_Values()
 	{
@@ -459,6 +521,9 @@ public class ModelSerializationTests
 		json.Should().NotContain("\"brightness\"");
 	}
 
+	/// <summary>
+	/// Performs TogglePowerRequest_Should_Serialize_Duration operation.
+	/// </summary>
 	[Fact]
 	public void TogglePowerRequest_Should_Serialize_Duration()
 	{
@@ -479,6 +544,9 @@ public class ModelSerializationTests
 
 	#region Enum Serialization Tests
 
+	/// <summary>
+	/// Performs PowerState_Should_Serialize_Consistently operation.
+	/// </summary>
 	[Fact]
 	public void PowerState_Should_Serialize_Consistently()
 	{
@@ -491,6 +559,9 @@ public class ModelSerializationTests
 		offJson.Should().Be("\"off\"");
 	}
 
+	/// <summary>
+	/// Performs PowerState_Should_Deserialize_Case_Insensitive operation.
+	/// </summary>
 	[Fact]
 	public void PowerState_Should_Deserialize_Case_Insensitive()
 	{
@@ -511,6 +582,9 @@ public class ModelSerializationTests
 
 	#region Null Handling Tests
 
+	/// <summary>
+	/// Performs Light_Should_Handle_Null_Color operation.
+	/// </summary>
 	[Fact]
 	public void Light_Should_Handle_Null_Color()
 	{
@@ -541,6 +615,9 @@ public class ModelSerializationTests
 		light.Color.Should().BeNull();
 	}
 
+	/// <summary>
+	/// Performs Light_Should_Handle_Missing_LastSeen operation.
+	/// </summary>
 	[Fact]
 	public void Light_Should_Handle_Missing_LastSeen()
 	{
@@ -569,6 +646,9 @@ public class ModelSerializationTests
 		light.LastSeen.Should().BeNull();
 	}
 
+	/// <summary>
+	/// Performs Light_Should_Handle_EmptyString_LastSeen operation.
+	/// </summary>
 	[Fact]
 	public void Light_Should_Handle_EmptyString_LastSeen()
 	{
@@ -603,6 +683,9 @@ public class ModelSerializationTests
 
 	#region Default Values Tests
 
+	/// <summary>
+	/// Performs CollectionSpec_Should_Have_Default_Empty_Strings operation.
+	/// </summary>
 	[Fact]
 	public void CollectionSpec_Should_Have_Default_Empty_Strings()
 	{
@@ -614,6 +697,9 @@ public class ModelSerializationTests
 		spec.Name.Should().Be(string.Empty);
 	}
 
+	/// <summary>
+	/// Performs Hsbk_Default_Values_Should_Be_Null operation.
+	/// </summary>
 	[Fact]
 	public void Hsbk_Default_Values_Should_Be_Null()
 	{

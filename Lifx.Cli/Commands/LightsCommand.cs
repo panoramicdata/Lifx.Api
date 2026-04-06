@@ -7,8 +7,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the LightsCommand type.
+/// </summary>
 public static class LightsCommand
 {
+    /// <summary>
+    /// Performs Create operation.
+    /// </summary>
     public static Command Create()
     {
         var command = new Command("lights", "Control LIFX lights")

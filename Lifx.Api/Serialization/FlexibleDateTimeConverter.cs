@@ -4,12 +4,15 @@ using System.Text.Json.Serialization;
 namespace Lifx.Api.Serialization;
 
 /// <summary>
-/// JSON converter that handles DateTime values that may be represented as ISO 8601 strings or Unix timestamps
+/// Represents the FlexibleDateTimeConverter type.
 /// </summary>
 public class FlexibleDateTimeConverter : JsonConverter<DateTime?>
 {
 	private static readonly DateTime UnixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+	/// <summary>
+	/// Performs Read operation.
+	/// </summary>
 	public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		return reader.TokenType switch
@@ -48,6 +51,9 @@ public class FlexibleDateTimeConverter : JsonConverter<DateTime?>
 		}
 	}
 
+	/// <summary>
+	/// Performs Write operation.
+	/// </summary>
 	public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
 	{
 		if (value.HasValue)

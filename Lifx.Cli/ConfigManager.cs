@@ -2,13 +2,28 @@ using System.Text.Json;
 
 namespace Lifx.Cli;
 
+/// <summary>
+/// Represents the CliConfiguration type.
+/// </summary>
 public class CliConfiguration
 {
+	/// <summary>
+	/// Gets or sets UseLan.
+	/// </summary>
 	public bool UseLan { get; set; } = true;
+	/// <summary>
+	/// Gets or sets DefaultDuration.
+	/// </summary>
 	public int DefaultDuration { get; set; } = 1000; // milliseconds
+	/// <summary>
+	/// Gets or sets DefaultSelector.
+	/// </summary>
 	public string DefaultSelector { get; set; } = "all";
 }
 
+/// <summary>
+/// Represents the ConfigManager type.
+/// </summary>
 public static class ConfigManager
 {
 	private static readonly JsonSerializerOptions jsonSerializerOptions = new()
@@ -22,6 +37,9 @@ public static class ConfigManager
 
 	private static readonly string ConfigFile = Path.Combine(ConfigDirectory, "config.json");
 
+	/// <summary>
+	/// Performs Load operation.
+	/// </summary>
 	public static CliConfiguration Load()
 	{
 		if (!File.Exists(ConfigFile))
@@ -40,6 +58,9 @@ public static class ConfigManager
 		}
 	}
 
+	/// <summary>
+	/// Performs Save operation.
+	/// </summary>
 	public static void Save(CliConfiguration config)
 	{
 		Directory.CreateDirectory(ConfigDirectory);
@@ -48,8 +69,7 @@ public static class ConfigManager
 	}
 
 	/// <summary>
-	/// Gets the API token with priority: override > environment > Windows Credential Store
-	/// Returns null if no token is found (for LAN-only usage)
+	/// Performs TryGetApiToken operation.
 	/// </summary>
 	public static string? TryGetApiToken(string? overrideToken = null)
 	{
@@ -77,7 +97,7 @@ public static class ConfigManager
 	}
 
 	/// <summary>
-	/// Gets the API token or throws an exception with helpful instructions
+	/// Performs GetApiToken operation.
 	/// </summary>
 	public static string GetApiToken(string? overrideToken = null)
 	{

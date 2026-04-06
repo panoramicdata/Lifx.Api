@@ -5,8 +5,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the EffectsCommand type.
+/// </summary>
 public static class EffectsCommand
 {
+    /// <summary>
+    /// Performs Create operation.
+    /// </summary>
     public static Command Create()
     {
         var command = new Command("effects", "Run visual effects on lights")

@@ -5,23 +5,16 @@ namespace Lifx.Api.Lan;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Lan;
 
+/// <summary>
+/// Represents the LifxLanClient type.
+/// </summary>
 public partial class LifxLanClient : IDisposable
 {
 	private readonly Dictionary<uint, Action<LifxResponse>> taskCompletions = [];
 
 	/// <summary>
-	/// Turns a bulb on or off using the provided transition time
+	/// Performs SetLightPowerAsync operation.
 	/// </summary>
-	/// <param name="bulb"></param>
-	/// <param name="transitionDuration"></param>
-	/// <param name="isOn">True to turn on, false to turn off</param>
-	/// <returns></returns>
-	/// <seealso cref="TurnBulbOffAsync(LightBulb, TimeSpan)"/>
-	/// <seealso cref="TurnBulbOnAsync(LightBulb, TimeSpan)"/>
-	/// <seealso cref="TurnDeviceOnAsync(Device)"/>
-	/// <seealso cref="TurnDeviceOffAsync(Device)"/>
-	/// <seealso cref="SetDevicePowerStateAsync(Device, bool)"/>
-	/// <seealso cref="GetLightPowerAsync(LightBulb)"/>
 	public async Task SetLightPowerAsync(
 		LightBulb bulb,
 		TimeSpan transitionDuration,
@@ -63,10 +56,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Gets the current power state for a light bulb
+	/// Performs GetLightPowerAsync operation.
 	/// </summary>
-	/// <param name="bulb"></param>
-	/// <returns></returns>
 	public async Task<bool> GetLightPowerAsync(
 		LightBulb bulb,
 		CancellationToken cancellationToken)
@@ -89,12 +80,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Sets color and temperature for a bulb
+	/// Performs SetColorAsync operation.
 	/// </summary>
-	/// <param name="bulb"></param>
-	/// <param name="color"></param>
-	/// <param name="kelvin"></param>
-	/// <returns></returns>
 	public Task SetColorAsync(
 		LightBulb bulb,
 		Color color,
@@ -108,13 +95,8 @@ public partial class LifxLanClient : IDisposable
 			cancellationToken);
 
 	/// <summary>
-	/// Sets color and temperature for a bulb and uses a transition time to the provided state
+	/// Performs SetColorAsync operation.
 	/// </summary>
-	/// <param name="bulb"></param>
-	/// <param name="color"></param>
-	/// <param name="kelvin"></param>
-	/// <param name="transitionDuration"></param>
-	/// <returns></returns>
 	public Task SetColorAsync(
 		LightBulb bulb,
 		Color color,
@@ -136,15 +118,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Sets color and temperature for a bulb and uses a transition time to the provided state
+	/// Performs SetColorAsync operation.
 	/// </summary>
-	/// <param name="bulb">Light bulb</param>
-	/// <param name="hue">0..65535</param>
-	/// <param name="saturation">0..65535</param>
-	/// <param name="brightness">0..65535</param>
-	/// <param name="kelvin">2700..9000</param>
-	/// <param name="transitionDuration"></param>
-	/// <returns></returns>
 	public async Task SetColorAsync(LightBulb bulb,
 		ushort hue,
 		ushort saturation,
@@ -191,10 +166,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Gets the current state of the bulb
+	/// Performs GetLightStateAsync operation.
 	/// </summary>
-	/// <param name="bulb"></param>
-	/// <returns></returns>
 	public async Task<LightStateResponse?> GetLightStateAsync(
 		LightBulb bulb,
 		CancellationToken cancellationToken)
@@ -214,10 +187,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Gets the current maximum power level of the Infrared channel
+	/// Performs GetInfraredAsync operation.
 	/// </summary>
-	/// <param name="bulb"></param>
-	/// <returns></returns>
 	public async Task<ushort> GetInfraredAsync(
 		LightBulb bulb,
 		CancellationToken cancellationToken)
@@ -238,11 +209,8 @@ public partial class LifxLanClient : IDisposable
 	}
 
 	/// <summary>
-	/// Sets the infrared brightness level
+	/// Performs SetInfraredAsync operation.
 	/// </summary>
-	/// <param name="device"></param>
-	/// <param name="brightness"></param>
-	/// <returns></returns>
 	public async Task SetInfraredAsync(
 		Device device,
 		ushort brightness,

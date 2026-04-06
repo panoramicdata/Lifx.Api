@@ -5,7 +5,7 @@ using Refit;
 namespace Lifx.Api.Interfaces;
 
 /// <summary>
-/// Refit interface for LIFX Scenes operations
+/// Defines the ILifxScenesApi contract.
 /// </summary>
 public interface ILifxScenesApi
 {

@@ -4,8 +4,14 @@ using System.CommandLine;
 
 namespace Lifx.Cli.Commands;
 
+/// <summary>
+/// Represents the ProductsCommand type.
+/// </summary>
 public static class ProductsCommand
 {
+	/// <summary>
+	/// Performs Create operation.
+	/// </summary>
 	public static Command Create()
 	{
 		var command = new Command("products", "View LIFX product catalog")

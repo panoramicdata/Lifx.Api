@@ -3,9 +3,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Lifx.Api.Test.Cloud;
 
+/// <summary>
+/// Represents the ScenesTests type.
+/// </summary>
 [Collection("Cloud API Tests")]
 public class ScenesTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper)
 {
+	/// <summary>
+	/// Performs ListScenesAsync_Should_Return_Scenes operation.
+	/// </summary>
 	[Fact]
 	public async Task ListScenesAsync_Should_Return_Scenes()
 	{
@@ -17,6 +23,9 @@ public class ScenesTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		Logger.LogInformation("Found {Count} scenes", scenes.Count);
 	}
 
+	/// <summary>
+	/// Performs ActivateScene_Should_Succeed_When_Scene_Exists operation.
+	/// </summary>
 	[Fact]
 	public async Task ActivateScene_Should_Succeed_When_Scene_Exists()
 	{
@@ -48,6 +57,9 @@ public class ScenesTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 		Logger.LogInformation("Activated scene: {Name}", firstScene.Name);
 	}
 
+	/// <summary>
+	/// Performs ActivateScene_Fast_Should_Succeed operation.
+	/// </summary>
 	[Fact]
 	public async Task ActivateScene_Fast_Should_Succeed()
 	{

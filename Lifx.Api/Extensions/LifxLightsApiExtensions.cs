@@ -5,12 +5,12 @@ using Lifx.Api.Models.Cloud.Responses;
 namespace Lifx.Api.Extensions;
 
 /// <summary>
-/// Extension methods for ILifxLightsApi
+/// Represents the LifxLightsApiExtensions type.
 /// </summary>
 public static class LifxLightsApiExtensions
 {
 	/// <summary>
-	/// Lists lights belonging to the authenticated account
+	/// Performs ListAsync operation.
 	/// </summary>
 	public static async Task<List<Light>> ListAsync(this ILifxLightsApi api, Selector selector, CancellationToken cancellationToken)
 	{
@@ -20,7 +20,7 @@ public static class LifxLightsApiExtensions
 	}
 
 	/// <summary>
-	/// Gets light groups belonging to the authenticated account
+	/// Performs ListGroupsAsync operation.
 	/// </summary>
 	public static async Task<List<Group>> ListGroupsAsync(this ILifxLightsApi api, Selector selector, CancellationToken cancellationToken)
 	{
@@ -43,7 +43,7 @@ public static class LifxLightsApiExtensions
 	}
 
 	/// <summary>
-	/// Gets locations belonging to the authenticated account
+	/// Performs ListLocationsAsync operation.
 	/// </summary>
 	public static async Task<List<Location>> ListLocationsAsync(this ILifxLightsApi api, Selector selector, CancellationToken cancellationToken)
 	{
