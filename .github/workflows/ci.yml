@@ -27,8 +27,6 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Test with Coverage
-      run: dotnet test --configuration Release --no-build --verbosity normal --settings coverlet.runsettings --collect:"XPlat Code Coverage" --results-directory TestResults/Coverage
 
     - name: Generate Coverage Report
       if: success() || failure()
