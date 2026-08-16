@@ -13,6 +13,8 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 {
 	private static readonly DateTime Epoch = new(1970, 01, 01);
 	private const int Port = 56700;
+
+	private static readonly TimeSpan ResponseTimeout = TimeSpan.FromSeconds(1);
 	private UdpClient? _socket;
 	private Task? _receiveLoopTask;
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -251,13 +253,14 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 		T? result = default;
 		if (tcs is not null)
 		{
-			var _ = Task.Delay(1000, cancellationToken).ContinueWith((t) =>
-			{
-				if (!t.IsCompleted)
-				{
-					tcs.TrySetException(new TimeoutException());
-				}
-			}, cancellationToken);
+			var timeout = Task.Delay(ResponseTimeout, cancellationToken)
+				.ContinueWith(
+					_ => tcs.TrySetException(new TimeoutException(
+						$"No response to message {header.Identifier} from {hostName} within {ResponseTimeout.TotalMilliseconds}ms.")),
+					CancellationToken.None,
+					TaskContinuationOptions.OnlyOnRanToCompletion,
+					TaskScheduler.Default);
+
 			try
 			{
 				result = await tcs.Task.ConfigureAwait(false);
