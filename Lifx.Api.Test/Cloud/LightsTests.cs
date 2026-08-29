@@ -8,6 +8,8 @@ namespace Lifx.Api.Test.Cloud;
 /// <summary>
 /// Represents the LightsTests type.
 /// </summary>
+// Requires a real LIFX cloud AppToken (user secrets / appsettings.json), so it cannot run on CI.
+[Trait("Category", "Integration")]
 [Collection("Cloud API Tests")]
 public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
 {

@@ -8,6 +8,8 @@ namespace Lifx.Api.Test.Cloud;
 /// <summary>
 /// Represents the EffectsTests type.
 /// </summary>
+// Requires a real LIFX cloud AppToken (user secrets / appsettings.json), so it cannot run on CI.
+[Trait("Category", "Integration")]
 [Collection("Cloud API Tests")]
 public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
 {

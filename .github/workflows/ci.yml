@@ -27,12 +27,23 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
+    # Tests tagged Category=Integration talk to the real LIFX cloud and need an AppToken that a
+    # runner does not have, so they are excluded here and run locally instead.
+    - name: Test
+      run: >-
+        dotnet test Lifx.Api.Test/Lifx.Api.Test.csproj
+        --configuration Release --no-build
+        --
+        --filter-not-trait "Category=Integration"
+        --coverage --coverage-output-format cobertura
+        --coverage-output coverage.cobertura.xml
+        --results-directory TestResults/Coverage
 
     - name: Generate Coverage Report
       if: success() || failure()
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: TestResults/Coverage/**/coverage.cobertura.xml
+        filename: TestResults/Coverage/coverage.cobertura.xml
         badge: true
         format: markdown
         output: both
