@@ -16,7 +16,6 @@ public class LifxClient : ILifxClient
 {
 	private readonly ILogger _logger;
 	private readonly HttpClient? _httpClient;
-	private readonly bool _cloudEnabled;
 
 	private const string BaseUrl = "https://api.lifx.com/v1";
 
@@ -67,10 +66,10 @@ public class LifxClient : ILifxClient
 	public LifxClient(LifxClientOptions options)
 	{
 		_logger = options.Logger;
-		_cloudEnabled = !string.IsNullOrEmpty(options.ApiToken);
 
 		// Initialize Cloud API clients if token is provided
-		if (_cloudEnabled)
+		var cloudEnabled = !string.IsNullOrEmpty(options.ApiToken);
+		if (cloudEnabled)
 		{
 			_httpClient = CreateHttpClient(options.ApiToken!);
 			Lights = CreateApiClient<ILifxLightsApi>(options.ApiToken!);

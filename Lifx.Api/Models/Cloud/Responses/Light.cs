@@ -12,11 +12,11 @@ public sealed class Light
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
-	public const string ColorCapability = "has_color";
+	public static string ColorCapability => "has_color";
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
-	public const string ColorTemperatureCapability = "has_variable_color_temp";
+	public static string ColorTemperatureCapability => "has_variable_color_temp";
 
 	/// <summary>
 	/// Serial number of the light
