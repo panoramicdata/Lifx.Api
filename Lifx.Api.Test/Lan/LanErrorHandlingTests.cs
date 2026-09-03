@@ -101,7 +101,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -121,7 +123,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -140,7 +144,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -160,7 +166,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -181,7 +189,9 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
 		var color = new Color { R = 255, G = 0, B = 0 };
 
@@ -208,9 +218,11 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
-		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var bulb = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -231,9 +243,11 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
-		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var bulb = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -254,9 +268,11 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
-		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var bulb = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -280,9 +296,11 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
-		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var bulb = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Act & Assert
 		await ((Func<Task>)(async () =>
@@ -306,9 +324,11 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Arrange
 		if (!fixture.IsLanStarted)
+		{
 			return;
+		}
 
-		var bulb = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var bulb = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 		var color = new Color { R = 255, G = 0, B = 0 };
 
 		// Act & Assert
@@ -370,7 +390,7 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	public void Device_MacAddress_Should_Be_Six_Bytes()
 	{
 		// Arrange & Act
-		var device = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var device = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Assert
 		device.MacAddress.Should().HaveCount(6);
@@ -384,7 +404,7 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 	{
 		// Note: This tests the null check in MacAddressName property
 		// We can't directly create a device with null MAC, but we test the property logic
-		var device = new LightBulb("192.168.1.100", [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+		var device = new LightBulb(LanTestDevice.HostName, [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
 
 		// Assert - Just verify it doesn't throw
 		device.MacAddressName.Should().NotBeNullOrEmpty();

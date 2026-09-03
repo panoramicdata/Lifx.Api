@@ -47,5 +47,9 @@ internal sealed class XunitLoggerProvider(ITestOutputHelper output) : ILoggerPro
 	/// <summary>
 	/// Performs Dispose operation.
 	/// </summary>
-	public void Dispose() { }
+	public void Dispose()
+	{
+		// Nothing to release: the loggers this provider hands out only write to the xUnit output
+		// helper, which the test framework owns and disposes itself.
+	}
 }

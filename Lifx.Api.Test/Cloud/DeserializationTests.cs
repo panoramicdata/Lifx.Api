@@ -11,13 +11,9 @@ namespace Lifx.Api.Test.Cloud;
 public class DeserializationTests
 {
 	/// <summary>
-	/// Performs Light_Should_Deserialize_From_Json operation.
+	/// A representative light payload as returned by the LIFX cloud API.
 	/// </summary>
-	[Fact]
-	public void Light_Should_Deserialize_From_Json()
-	{
-		// Arrange - Sample JSON from LIFX API
-		var json = """
+	private const string LightJson = """
 {
 	"id": "d073d5000001",
 	"uuid": "8fa5f072-af97-44ed-ae54-e70fd7bd9d20",
@@ -57,6 +53,15 @@ public class DeserializationTests
 	}
 }
 """;
+
+	/// <summary>
+	/// Performs Light_Should_Deserialize_From_Json operation.
+	/// </summary>
+	[Fact]
+	public void Light_Should_Deserialize_From_Json()
+	{
+		// Arrange - Sample JSON from LIFX API
+		var json = LightJson;
 
 		// Act
 		var light = JsonSerializer.Deserialize<Light>(json, LifxClient.JsonSerializerOptions);

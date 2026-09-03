@@ -56,7 +56,9 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 			{
 				// Only restore if the light is connected
 				if (!originalLight.IsConnected)
+				{
 					continue;
+				}
 
 				var restoreRequest = new SetStateRequest
 				{

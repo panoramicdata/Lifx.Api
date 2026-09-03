@@ -16,50 +16,7 @@ public static class Program
 	{
 		try
 		{
-			var rootCommand = new RootCommand("LIFX CLI - Control your LIFX smart lights from the command line")
-			{
-				CloudCommand.Create(),
-				LanCommand.Create(),
-				ConfigCommand.Create(),
-				ProductsCommand.Create(),
-				CreateVersionCommand()
-			};
-
-			rootCommand.Description =
-				"LIFX CLI - Control your LIFX smart lights from the command line" + Environment.NewLine +
-				Environment.NewLine +
-				"Features:" + Environment.NewLine +
-				"  - Cloud API: Control lights via internet (requires API token)" + Environment.NewLine +
-				"  - LAN Protocol: Control lights on local network (no API token needed)" + Environment.NewLine +
-				"  - Secure credential storage via Windows Credential Manager" + Environment.NewLine +
-				Environment.NewLine +
-				"Quick Start (Cloud):" + Environment.NewLine +
-				"  1. Get API token: https://cloud.lifx.com/settings" + Environment.NewLine +
-				"  2. Store token: lifx cloud key set <token>" + Environment.NewLine +
-				"  3. Control lights: lifx cloud lights on all" + Environment.NewLine +
-				Environment.NewLine +
-				"Quick Start (LAN - no token needed):" + Environment.NewLine +
-				"  lifx lan discover" + Environment.NewLine +
-				Environment.NewLine +
-				"Examples:" + Environment.NewLine +
-				"  lifx cloud key set <token>         # Store API token (do this first!)" + Environment.NewLine +
-				"  lifx cloud lights list             # List all lights" + Environment.NewLine +
-				"  lifx cloud lights on all           # Turn on all lights" + Environment.NewLine +
-				"  lifx cloud lights color all blue   # Set all lights to blue" + Environment.NewLine +
-				"  lifx cloud effects breathe all     # Start breathe effect" + Environment.NewLine +
-				"  lifx cloud scenes list             # List available scenes" + Environment.NewLine +
-				"  lifx lan discover                  # Discover local devices" + Environment.NewLine +
-				Environment.NewLine +
-				"Get help for any command:" + Environment.NewLine +
-				"  lifx cloud --help" + Environment.NewLine +
-				"  lifx lan --help" + Environment.NewLine +
-				"  lifx cloud lights --help";
-
-			// Add global options
-			rootCommand.Options.Add(GlobalOptions.Verbose);
-			rootCommand.Options.Add(GlobalOptions.Token);
-
-			return rootCommand.Parse(args).Invoke();
+			return CreateRootCommand().Parse(args).Invoke();
 		}
 		catch (InvalidOperationException ex) when (ex.Message.Contains("No LIFX Cloud API token"))
 		{
@@ -80,6 +37,58 @@ public static class Program
 			return 1;
 		}
 	}
+
+	private static RootCommand CreateRootCommand()
+	{
+		var rootCommand = new RootCommand("LIFX CLI - Control your LIFX smart lights from the command line")
+		{
+			CloudCommand.Create(),
+			LanCommand.Create(),
+			ConfigCommand.Create(),
+			ProductsCommand.Create(),
+			CreateVersionCommand()
+		};
+
+		rootCommand.Description = RootDescription;
+
+		// Add global options
+		rootCommand.Options.Add(GlobalOptions.Verbose);
+		rootCommand.Options.Add(GlobalOptions.Token);
+
+		return rootCommand;
+	}
+
+	private static string RootDescription => string.Join(Environment.NewLine,
+	[
+		"LIFX CLI - Control your LIFX smart lights from the command line",
+		"",
+		"Features:",
+		"  - Cloud API: Control lights via internet (requires API token)",
+		"  - LAN Protocol: Control lights on local network (no API token needed)",
+		"  - Secure credential storage via Windows Credential Manager",
+		"",
+		"Quick Start (Cloud):",
+		"  1. Get API token: https://cloud.lifx.com/settings",
+		"  2. Store token: lifx cloud key set <token>",
+		"  3. Control lights: lifx cloud lights on all",
+		"",
+		"Quick Start (LAN - no token needed):",
+		"  lifx lan discover",
+		"",
+		"Examples:",
+		"  lifx cloud key set <token>         # Store API token (do this first!)",
+		"  lifx cloud lights list             # List all lights",
+		"  lifx cloud lights on all           # Turn on all lights",
+		"  lifx cloud lights color all blue   # Set all lights to blue",
+		"  lifx cloud effects breathe all     # Start breathe effect",
+		"  lifx cloud scenes list             # List available scenes",
+		"  lifx lan discover                  # Discover local devices",
+		"",
+		"Get help for any command:",
+		"  lifx cloud --help",
+		"  lifx lan --help",
+		"  lifx cloud lights --help"
+	]);
 
 	private static Command CreateVersionCommand()
 	{

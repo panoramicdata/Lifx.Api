@@ -240,7 +240,7 @@ public static class LanCommand
 			}
 
 
-			var state = await client.Lan!.GetLightStateAsync(bulb, CancellationToken.None);
+			var state = await client.Lan!.GetLightStateAsync(bulb, cancellationToken);
 
 			if (state == null)
 			{
@@ -394,39 +394,49 @@ public static class LanCommand
 
 			if (devices.Count == 0)
 			{
-				AnsiConsole.MarkupLine("[yellow]No devices found[/]");
-				AnsiConsole.WriteLine();
-				AnsiConsole.MarkupLine("[dim]Make sure:[/]");
-				AnsiConsole.MarkupLine("[dim]  - LIFX devices are powered on[/]");
-				AnsiConsole.MarkupLine("[dim]  - Devices are on the same network[/]");
-				AnsiConsole.MarkupLine("[dim]  - Firewall allows UDP port 56700[/]");
+				WriteNoDevicesFoundHelp();
 				return;
 			}
 
-			var table = new Table
-			{
-				Border = TableBorder.Rounded
-			};
-			table.AddColumn("Type");
-			table.AddColumn("MAC Address");
-			table.AddColumn("IP Address");
-			table.AddColumn("Port");
-
-			foreach (var device in devices)
-			{
-				table.AddRow(
-					device.GetType().Name,
-					device.MacAddressName,
-					device.HostName,
-					device.Port.ToString()
-				);
-			}
-
-			AnsiConsole.Write(table);
+			AnsiConsole.Write(BuildDeviceTable(devices));
 			AnsiConsole.MarkupLine($"[green]✓[/] Found [cyan]{devices.Count}[/] device(s)");
 		});
 
 		return command;
+	}
+
+	private static void WriteNoDevicesFoundHelp()
+	{
+		AnsiConsole.MarkupLine("[yellow]No devices found[/]");
+		AnsiConsole.WriteLine();
+		AnsiConsole.MarkupLine("[dim]Make sure:[/]");
+		AnsiConsole.MarkupLine("[dim]  - LIFX devices are powered on[/]");
+		AnsiConsole.MarkupLine("[dim]  - Devices are on the same network[/]");
+		AnsiConsole.MarkupLine("[dim]  - Firewall allows UDP port 56700[/]");
+	}
+
+	private static Table BuildDeviceTable(IEnumerable<Device> devices)
+	{
+		var table = new Table
+		{
+			Border = TableBorder.Rounded
+		};
+		table.AddColumn("Type");
+		table.AddColumn("MAC Address");
+		table.AddColumn("IP Address");
+		table.AddColumn("Port");
+
+		foreach (var device in devices)
+		{
+			table.AddRow(
+				device.GetType().Name,
+				device.MacAddressName,
+				device.HostName,
+				device.Port.ToString()
+			);
+		}
+
+		return table;
 	}
 
 	private static Command CreateListCommand()

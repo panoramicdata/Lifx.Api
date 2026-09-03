@@ -52,7 +52,9 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 			{
 				// Only restore if the light is connected
 				if (!originalLight.IsConnected)
+				{
 					continue;
+				}
 
 				var restoreRequest = new SetStateRequest
 				{

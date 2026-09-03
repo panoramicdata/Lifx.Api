@@ -64,13 +64,13 @@ var selectorObj = SelectorParser.ParseSelector(selector);
 switch (type.ToLowerInvariant())
 {
 case "lights":
-await ListLights(client, selectorObj, verbose);
+await ListLights(client, selectorObj, verbose, cancellationToken);
 break;
 case "groups":
-await ListGroups(client, selectorObj);
+await ListGroups(client, selectorObj, cancellationToken);
 break;
 case "locations":
-await ListLocations(client, selectorObj);
+await ListLocations(client, selectorObj, cancellationToken);
 break;
 default:
 AnsiConsole.MarkupLine($"[red]Unknown type: {type}[/]");
@@ -81,9 +81,9 @@ break;
 return command;
 }
 
-private static async Task ListLights(ILifxClient client, Selector selector, bool verbose)
+private static async Task ListLights(ILifxClient client, Selector selector, bool verbose, CancellationToken cancellationToken)
 {
-var lights = await client.Lights.ListAsync(selector, CancellationToken.None);
+var lights = await client.Lights.ListAsync(selector, cancellationToken);
 
 var table = new Table();
 table.AddColumn("Label");
@@ -124,9 +124,9 @@ AnsiConsole.Write(table);
 AnsiConsole.MarkupLine($"[dim]Total: {lights.Count} lights[/]");
 }
 
-private static async Task ListGroups(ILifxClient client, Selector selector)
+private static async Task ListGroups(ILifxClient client, Selector selector, CancellationToken cancellationToken)
 {
-var groups = await client.Lights.ListGroupsAsync(selector, CancellationToken.None);
+var groups = await client.Lights.ListGroupsAsync(selector, cancellationToken);
 
 var table = new Table();
 table.AddColumn("Name");
@@ -142,9 +142,9 @@ AnsiConsole.Write(table);
 AnsiConsole.MarkupLine($"[dim]Total: {groups.Count} groups[/]");
 }
 
-private static async Task ListLocations(ILifxClient client, Selector selector)
+private static async Task ListLocations(ILifxClient client, Selector selector, CancellationToken cancellationToken)
 {
-var locations = await client.Lights.ListLocationsAsync(selector, CancellationToken.None);
+var locations = await client.Lights.ListLocationsAsync(selector, cancellationToken);
 
 var table = new Table();
 table.AddColumn("Name");

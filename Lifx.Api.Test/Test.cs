@@ -88,14 +88,18 @@ public abstract class Test(ITestOutputHelper testOutputHelper)
 		{
 			var lights = await Client.Lights.ListAsync(new Selector.LightId(Configuration.TestLightId!), CancellationToken);
 			if (lights.Count > 0)
+			{
 				return lights[0];
+			}
 		}
 
 		if (!string.IsNullOrEmpty(Configuration.TestLightLabel))
 		{
 			var lights = await Client.Lights.ListAsync(new Selector.LightLabel(Configuration.TestLightLabel!), CancellationToken);
 			if (lights.Count > 0)
+			{
 				return lights[0];
+			}
 		}
 
 		// Fall back to first available light
@@ -124,14 +128,18 @@ public abstract class Test(ITestOutputHelper testOutputHelper)
 		{
 			var group = groups.FirstOrDefault(g => g.Id == Configuration.TestGroupId);
 			if (group is not null)
+			{
 				return group;
+			}
 		}
 
 		if (!string.IsNullOrEmpty(Configuration.TestGroupLabel))
 		{
 			var group = groups.FirstOrDefault(g => g.Label == Configuration.TestGroupLabel);
 			if (group is not null)
+			{
 				return group;
+			}
 		}
 
 		return groups[0];

@@ -18,7 +18,7 @@ namespace Lifx.Api.Test.Lan;
 public class LanDeviceTests(LanTestFixture fixture) : IDisposable
 {
 	private readonly LightBulb _testDevice = new(
-			"192.168.1.100",
+			LanTestDevice.HostName,
 			[0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01],
 			service: 1,
 			port: 56700);

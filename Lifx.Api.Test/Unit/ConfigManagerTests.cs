@@ -32,8 +32,8 @@ public class ConfigManagerTests
 		{
 			Environment.SetEnvironmentVariable("LIFX_API_TOKEN", null);
 			var result = ConfigManager.TryGetApiToken("   ");
-			// Result depends on whether a stored credential exists;
-			// we just verify it doesn't return the whitespace string
+			// The result depends on whether a stored credential exists, so all this can check is
+			// that the whitespace override was not accepted as a token.
 			result.Should().NotBe("   ");
 		}
 		finally
