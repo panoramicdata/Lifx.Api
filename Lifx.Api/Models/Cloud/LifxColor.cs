@@ -10,15 +10,15 @@ public abstract class LifxColor
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
-	public const int TemperatureMin = 1500;
+	public static int TemperatureMin => 1500;
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
-	public const int TemperatureMax = 9000;
+	public static int TemperatureMax => 9000;
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
-	public const int TemperatureDefault = 3500;
+	public static int TemperatureDefault => 3500;
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
@@ -59,7 +59,7 @@ public abstract class LifxColor
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
-	public static string White = BuildHSBK(null, null, 1f, TemperatureDefault);
+	public static string White { get; } = BuildHSBK(null, null, 1f, TemperatureDefault);
 
 
 	/// <summary>
@@ -81,51 +81,8 @@ public abstract class LifxColor
 		}
 
 		StringBuilder colorString = new();
-
-		//check hue
-		if (hue is not null)
-		{
-			if (!IsBetween(hue.Value, 0, 360))
-			{
-				throw new InvalidConstraintException("Value for Hue is invalid, valid range[0-360]");
-			}
-
-			colorString.Append(FormatString("hue", hue));
-		}
-
-		//check saturation
-		if (saturation is not null)
-		{
-			if (!IsBetween(saturation.Value, 0.0, 1.0))
-			{
-				throw new InvalidConstraintException("Value for Saturation is invalid, valid range[0.0-1.0]");
-			}
-
-			colorString.Append(FormatString(" saturation", saturation));
-		}
-
-		//check brightness
-		if (brightness is not null)
-		{
-			if (!IsBetween(brightness.Value, 0.0, 1.0))
-			{
-				throw new InvalidConstraintException("Value for Brightness is invalid, valid range[0.0-1.0]");
-			}
-
-			colorString.Append(FormatString(" brightness", brightness.ToString()));
-		}
-
-		//check kelvin
-		if (kelvin is not null)
-		{
-			if (!IsBetween(kelvin.Value, TemperatureMin, TemperatureMax))
-			{
-				throw new InvalidConstraintException("Value for Kelvin is invalid, valid range[1500-9000]");
-			}
-
-			colorString.Append(FormatString(" kelvin", kelvin));
-		}
-
+		AppendHueSaturationBrightness(colorString, hue, saturation, brightness);
+		AppendComponent(colorString, " kelvin", kelvin, TemperatureMin, TemperatureMax, $"{TemperatureMin}-{TemperatureMax}");
 		return colorString.ToString();
 	}
 
@@ -143,41 +100,45 @@ public abstract class LifxColor
 		}
 
 		StringBuilder colorString = new();
-
-		//check hue
-		if (hue is not null)
-		{
-			if (!IsBetween(hue.Value, 0, 360))
-			{
-				throw new InvalidConstraintException("Value for Hue is invalid, valid range[0-360]");
-			}
-
-			colorString.Append(FormatString("hue", hue.ToString()));
-		}
-
-		//check saturation
-		if (saturation is not null)
-		{
-			if (!IsBetween(saturation.Value, 0.0, 1.0))
-			{
-				throw new InvalidConstraintException("Value for Saturation is invalid, valid range[0.0-1.0]");
-			}
-
-			colorString.Append(FormatString(" saturation", saturation.ToString()));
-		}
-
-		//check brightness
-		if (brightness is not null)
-		{
-			if (!IsBetween(brightness.Value, 0.0, 1.0))
-			{
-				throw new InvalidConstraintException("Value for Brightness is invalid, valid range[0.0-1.0]");
-			}
-
-			colorString.Append(FormatString(" brightness", brightness.ToString()));
-		}
-
+		AppendHueSaturationBrightness(colorString, hue, saturation, brightness);
 		return colorString.ToString();
+	}
+
+	private static void AppendHueSaturationBrightness(
+		StringBuilder colorString,
+		double? hue,
+		double? saturation,
+		double? brightness)
+	{
+		AppendComponent(colorString, "hue", hue, 0, 360, "0-360");
+		AppendComponent(colorString, " saturation", saturation, 0.0, 1.0, "0.0-1.0");
+		AppendComponent(colorString, " brightness", brightness, 0.0, 1.0, "0.0-1.0");
+	}
+
+	/// <summary>
+	/// Appends one optional component to the selector, rejecting it when it falls outside its range.
+	/// The element name carries its own separator, so an omitted component leaves no gap behind.
+	/// </summary>
+	private static void AppendComponent(
+		StringBuilder colorString,
+		string element,
+		double? value,
+		double min,
+		double max,
+		string validRange)
+	{
+		if (value is null)
+		{
+			return;
+		}
+
+		if (!IsBetween(value.Value, min, max))
+		{
+			var name = char.ToUpperInvariant(element.Trim()[0]) + element.Trim()[1..];
+			throw new InvalidConstraintException($"Value for {name} is invalid, valid range[{validRange}]");
+		}
+
+		colorString.Append(FormatString(element, value));
 	}
 
 	/// <summary>

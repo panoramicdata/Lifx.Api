@@ -14,39 +14,48 @@ internal static class Utilities
 	/// </summary>
 	public static ushort[] RgbToHsl(Color rgb)
 	{
+		// Which channel is the brightest is decided on the original bytes rather than on the
+		// normalised doubles, so the comparison is exact and no floating point equality is involved.
+		var maxByte = Math.Max(rgb.R, Math.Max(rgb.G, rgb.B));
+		var minByte = Math.Min(rgb.R, Math.Min(rgb.G, rgb.B));
+
 		// normalize red, green and blue values
-		double r = (rgb.R / 255.0);
-		double g = (rgb.G / 255.0);
-		double b = (rgb.B / 255.0);
+		var r = rgb.R / 255.0;
+		var g = rgb.G / 255.0;
+		var b = rgb.B / 255.0;
 
-		double max = Math.Max(r, Math.Max(g, b));
-		double min = Math.Min(r, Math.Min(g, b));
+		var max = maxByte / 255.0;
+		var min = minByte / 255.0;
+		var chroma = max - min;
 
-		double h = 0.0;
-		if (max == r && g >= b)
+		// A grey (every channel equal) has no chroma and so no meaningful hue; leaving it at zero
+		// also avoids the division by zero the general formulae would hit.
+		var h = 0.0;
+		if (maxByte != minByte)
 		{
-			h = 60 * (g - b) / (max - min);
-		}
-		else if (max == r && g < b)
-		{
-			h = 60 * (g - b) / (max - min) + 360;
-		}
-		else if (max == g)
-		{
-			h = 60 * (b - r) / (max - min) + 120;
-		}
-		else if (max == b)
-		{
-			h = 60 * (r - g) / (max - min) + 240;
+			if (maxByte == rgb.R)
+			{
+				h = 60 * (g - b) / chroma;
+				if (rgb.G < rgb.B)
+				{
+					h += 360;
+				}
+			}
+			else if (maxByte == rgb.G)
+			{
+				h = 60 * (b - r) / chroma + 120;
+			}
+			else
+			{
+				h = 60 * (r - g) / chroma + 240;
+			}
 		}
 
-		double s = (max == 0) ? 0.0 : (1.0 - (min / max));
+		var s = maxByte == 0 ? 0.0 : 1.0 - (min / max);
 		return [
 				(ushort)(h / 360 * 65535),
 				(ushort)(s * 65535),
 				(ushort)(max * 65535)
 			];
 	}
-
-
 }

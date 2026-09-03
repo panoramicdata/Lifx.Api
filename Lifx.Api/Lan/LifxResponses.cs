@@ -24,7 +24,7 @@ public abstract class LifxResponse
 			_ => new UnknownResponse(header, type, payload, source),
 		};
 
-	internal LifxResponse(FrameHeader header, MessageType type, byte[] payload, uint source)
+	private protected LifxResponse(FrameHeader header, MessageType type, byte[] payload, uint source)
 	{
 		Header = header;
 		Type = type;

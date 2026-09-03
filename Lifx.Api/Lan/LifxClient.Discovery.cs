@@ -115,7 +115,12 @@ public partial class LifxLanClient : IDisposable
 						MessageType.DeviceGetService,
 						cancellationToken);
 				}
-				catch { }
+				catch (Exception ex)
+				{
+					// A failed broadcast must not end discovery: the socket may be momentarily
+					// unavailable, and the next pass five seconds later usually succeeds.
+					logger.LogDebug(ex, "Discovery broadcast failed: {Message}", ex.Message);
+				}
 
 				await Task.Delay(5000, cancellationToken);
 				var lostDevices = devices.Where(d => (DateTime.UtcNow - d.LastSeen).TotalMinutes > 5).ToArray();

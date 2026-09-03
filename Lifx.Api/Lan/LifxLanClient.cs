@@ -18,13 +18,14 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 	private bool _disposed;
 	private readonly Lock _disposeLock = new();
+	private readonly Lock _startLock = new();
 
 	/// <summary>
 	/// Performs Start operation.
 	/// </summary>
 	public void Start(CancellationToken cancellationToken)
 	{
-		lock (this)
+		lock (_startLock)
 		{
 			if (_receiveLoopTask is not null)
 			{
@@ -108,65 +109,49 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 			_disposed = true;
 		}
 
-		// Stop device discovery first
-		try
-		{
-			if (_DiscoverCancellationSource is not null && !_DiscoverCancellationSource.IsCancellationRequested)
-			{
-				_DiscoverCancellationSource.Cancel();
-			}
-		}
-		catch (ObjectDisposedException)
-		{
-			// Already disposed, ignore
-		}
+		// Discovery is cancelled before the main token so its loop stops broadcasting before the
+		// socket goes away.
+		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Cancel());
+		IgnoringObjectDisposed(_cancellationTokenSource.Cancel);
 
-		// Cancel the main cancellation token source
-		try
-		{
-			_cancellationTokenSource.Cancel();
-		}
-		catch (ObjectDisposedException)
-		{
-			// Already disposed, ignore
-		}
+		WaitForReceiveLoop();
 
-		// Wait for receive loop to complete
-		if (_receiveLoopTask is not null)
-		{
-			try
-			{
-				_receiveLoopTask.Wait(TimeSpan.FromSeconds(5));
-			}
-			catch (AggregateException)
-			{
-				// Task was cancelled or faulted, ignore
-			}
-		}
-
-		// Dispose the socket
 		_socket?.Dispose();
 
-		// Dispose cancellation token sources
-		try
-		{
-			_DiscoverCancellationSource?.Dispose();
-		}
-		catch (ObjectDisposedException)
-		{
-			// Already disposed, ignore
-		}
-
-		try
-		{
-			_cancellationTokenSource.Dispose();
-		}
-		catch (ObjectDisposedException)
-		{
-			// Already disposed, ignore
-		}
+		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Dispose());
+		IgnoringObjectDisposed(_cancellationTokenSource.Dispose);
 
 		GC.SuppressFinalize(this);
+	}
+
+	private static void IgnoringObjectDisposed(Action action)
+	{
+		try
+		{
+			action();
+		}
+		catch (ObjectDisposedException)
+		{
+			// Teardown races the receive and discovery loops, so whatever this step touches may
+			// already have been disposed. That is the expected outcome here, not a failure.
+		}
+	}
+
+	private void WaitForReceiveLoop()
+	{
+		if (_receiveLoopTask is null)
+		{
+			return;
+		}
+
+		try
+		{
+			_receiveLoopTask.Wait(TimeSpan.FromSeconds(5));
+		}
+		catch (AggregateException)
+		{
+			// The loop was cancelled or faulted; either way there is nothing left to wait for.
+		}
 	}
 
 	private Task<T?> BroadcastMessageAsync<T>(
@@ -254,7 +239,7 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 		T? result = default;
 		if (tcs is not null)
 		{
-			var _ = Task.Delay(1000, cancellationToken).ContinueWith((t) =>
+			_ = Task.Delay(1000, cancellationToken).ContinueWith((t) =>
 			{
 				if (!t.IsCompleted)
 				{
@@ -288,14 +273,14 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 			throw new Exception("Invalid packet");
 		}
 
-		var a = binaryReader.ReadUInt16(); //origin:2, reserved:1, addressable:1, protocol:12
+		binaryReader.ReadUInt16(); //skip origin:2, reserved:1, addressable:1, protocol:12
 		var source = binaryReader.ReadUInt32();
 
 		//frame address
 		byte[] target = binaryReader.ReadBytes(8);
 		header.TargetMacAddress = target;
 		memoryStream.Seek(6, SeekOrigin.Current); //skip reserved
-		var b = binaryReader.ReadByte(); //reserved:6, ack_required:1, res_required:1,
+		binaryReader.ReadByte(); //skip reserved:6, ack_required:1, res_required:1
 		header.Sequence = binaryReader.ReadByte();
 
 		//protocol header
@@ -308,14 +293,13 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 
 	private static void WritePacketToStream(Stream outStream, FrameHeader header, ushort type, byte[] payload)
 	{
-		using var dw = new BinaryWriter(outStream) { /*ByteOrder = ByteOrder.LittleEndian*/ };
-		//BinaryWriter bw = new BinaryWriter(ms);
+		using var dw = new BinaryWriter(outStream);
 		#region Frame
 		//size uint16
 		dw.Write((ushort)((payload is not null ? payload.Length : 0) + 36)); //length
 																			 // origin (2 bits, must be 0), reserved (1 bit, must be 0), addressable (1 bit, must be 1), protocol 12 bits must be 0x400) = 0x1400
 		dw.Write((ushort)0x3400); //protocol
-		dw.Write((uint)header.Identifier); //source identifier - unique value set by the client, used by responses. If 0, responses are broadcasted instead
+		dw.Write(header.Identifier); //source identifier - unique value set by the client, used by responses. If 0, responses are broadcasted instead
 		#endregion Frame
 
 		#region Frame address
@@ -350,7 +334,7 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 		//device in any message that is sent in response to a message sent by the client. This allows the client
 		//to distinguish between different messages sent with the same source identifier in the Frame. See
 		//ack_required and res_required fields in the Frame Address.
-		dw.Write((byte)header.Sequence);
+		dw.Write(header.Sequence);
 		#endregion Frame address
 
 		#region Protocol Header

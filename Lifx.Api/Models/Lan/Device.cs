@@ -5,7 +5,7 @@ namespace Lifx.Api.Models.Lan;
 /// </summary>
 public abstract class Device
 {
-	internal Device(string hostname, byte[] macAddress, byte service, uint port)
+	private protected Device(string hostname, byte[] macAddress, byte service, uint port)
 	{
 		ArgumentNullException.ThrowIfNull(hostname);
 

@@ -23,7 +23,7 @@ public abstract class LightCollection : IEnumerable<Light>
 
 	private readonly List<Light> lights;
 
-	internal LightCollection(string id, string label, List<Light> lights)
+	private protected LightCollection(string id, string label, List<Light> lights)
 	{
 		Id = id;
 		Label = label;

@@ -21,5 +21,5 @@ public class LifxClientOptions
 	/// <summary>
 	/// Gets or sets IsLanEnabled.
 	/// </summary>
-	public bool IsLanEnabled { get; set; } = false;
+	public bool IsLanEnabled { get; set; }
 }
