@@ -87,7 +87,11 @@ public static class LanCommand
 			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
-			if (bulb == null) return;
+			if (bulb == null)
+			{
+				return;
+			}
+
 
 			await client.Lan!.SetLightPowerAsync(
 				bulb,
@@ -128,7 +132,11 @@ public static class LanCommand
 			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
-			if (bulb == null) return;
+			if (bulb == null)
+			{
+				return;
+			}
+
 
 			await client.Lan!.SetLightPowerAsync(
 				bulb,
@@ -186,7 +194,11 @@ public static class LanCommand
 			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
-			if (bulb == null) return;
+			if (bulb == null)
+			{
+				return;
+			}
+
 
 			await client.Lan!.SetColorAsync(
 				bulb,
@@ -222,7 +234,11 @@ public static class LanCommand
 			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
-			if (bulb == null) return;
+			if (bulb == null)
+			{
+				return;
+			}
+
 
 			var state = await client.Lan!.GetLightStateAsync(bulb, CancellationToken.None);
 
@@ -288,7 +304,11 @@ public static class LanCommand
 			using var client = factory.CreateLanClient();
 
 			var bulb = await DiscoverAndFindBulb(client, macAddress!);
-			if (bulb == null) return;
+			if (bulb == null)
+			{
+				return;
+			}
+
 
 			// Get current name first
 			var oldName = await client.Lan!.GetDeviceLabelAsync(bulb, cancellationToken);

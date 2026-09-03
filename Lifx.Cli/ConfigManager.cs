@@ -71,7 +71,12 @@ public static class ConfigManager
 	/// <summary>
 	/// Performs TryGetApiToken operation.
 	/// </summary>
-	public static string? TryGetApiToken(string? overrideToken = null)
+	public static string? TryGetApiToken() => TryGetApiToken(null);
+
+	/// <summary>
+	/// Performs TryGetApiToken operation.
+	/// </summary>
+	public static string? TryGetApiToken(string? overrideToken)
 	{
 		// Priority 1: Override token from command line
 		if (!string.IsNullOrWhiteSpace(overrideToken))
@@ -99,7 +104,12 @@ public static class ConfigManager
 	/// <summary>
 	/// Performs GetApiToken operation.
 	/// </summary>
-	public static string GetApiToken(string? overrideToken = null)
+	public static string GetApiToken() => GetApiToken(null);
+
+	/// <summary>
+	/// Performs GetApiToken operation.
+	/// </summary>
+	public static string GetApiToken(string? overrideToken)
 	{
 		var token = TryGetApiToken(overrideToken);
 

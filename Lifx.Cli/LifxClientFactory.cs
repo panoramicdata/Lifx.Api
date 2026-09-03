@@ -10,9 +10,15 @@ public class LifxClientFactory
 	/// <summary>
 	/// Creates a Cloud API client using the resolved API token.
 	/// </summary>
-	/// <param name="tokenOverride">Optional token override from the command line.</param>
 	/// <returns>A configured LIFX client.</returns>
-	public virtual ILifxClient CreateCloudClient(string? tokenOverride = null)
+	public virtual ILifxClient CreateCloudClient() => CreateCloudClient(null);
+
+	/// <summary>
+	/// Creates a Cloud API client using the resolved API token.
+	/// </summary>
+	/// <param name="tokenOverride">Token override from the command line, or null to resolve one.</param>
+	/// <returns>A configured LIFX client.</returns>
+	public virtual ILifxClient CreateCloudClient(string? tokenOverride)
 	{
 		var apiToken = ConfigManager.GetApiToken(tokenOverride);
 		return new LifxClient(new LifxClientOptions { ApiToken = apiToken });
