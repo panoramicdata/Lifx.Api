@@ -60,94 +60,155 @@ public static class LanCommand
 		return command;
 	}
 
-	private static Command CreateLanOnCommand()
+	/// <summary>
+	/// Runs one operation against a bulb that has already been discovered.
+	/// </summary>
+	private delegate Task BulbAction(
+		ILifxClient client,
+		LightBulb bulb,
+		ParseResult parseResult,
+		CancellationToken cancellationToken);
+
+	/// <summary>
+	/// Rejects bad input before discovery starts. Returns false once a message has been shown.
+	/// </summary>
+	private delegate bool BulbPrecondition(ParseResult parseResult);
+
+	/// <summary>
+	/// Builds one subcommand that acts on a single light identified by MAC address, with nothing
+	/// to check before discovery.
+	/// </summary>
+	private static Command CreateBulbCommand(
+		string name,
+		string description,
+		Argument<string> macArgument,
+		Argument[] extraArguments,
+		Option[] options,
+		BulbAction action)
+		=> CreateBulbCommand(
+			name,
+			description,
+			macArgument,
+			extraArguments,
+			options,
+			_ => true,
+			action);
+
+	/// <summary>
+	/// Builds one subcommand that acts on a single light identified by MAC address.
+	/// </summary>
+	/// <remarks>
+	/// Each of these commands took a MAC address, opened a LAN client, discovered the bulb and gave
+	/// up quietly if it was not found. Only what happens after that differs, so that is all a
+	/// caller supplies here.
+	/// </remarks>
+	private static Command CreateBulbCommand(
+		string name,
+		string description,
+		Argument<string> macArgument,
+		Argument[] extraArguments,
+		Option[] options,
+		BulbPrecondition precondition,
+		BulbAction action)
 	{
-		var command = new Command("on", "Turn light on via LAN");
+		var command = new Command(name, description);
 
-		var macArg = new Argument<string>("mac-address")
+		command.Arguments.Add(macArgument);
+		foreach (var argument in extraArguments)
 		{
-			Description = "MAC address of the light (e.g., D0:73:D5:12:34:56)"
-		};
+			command.Arguments.Add(argument);
+		}
 
-		var durationOption = new Option<double>("--duration", "-d")
+		foreach (var option in options)
 		{
-			Description = "Transition duration in seconds",
-			DefaultValueFactory = _ => 1.0
-		};
-
-		command.Arguments.Add(macArg);
-		command.Options.Add(durationOption);
+			command.Options.Add(option);
+		}
 
 		command.SetAction(async (parseResult, cancellationToken) =>
 		{
-			var macAddress = parseResult.GetValue(macArg);
-			var duration = parseResult.GetValue(durationOption);
-
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateLanClient();
-
-			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
-			if (bulb == null)
+			if (!precondition(parseResult))
 			{
 				return;
 			}
 
+			var macAddress = parseResult.GetValue(macArgument)!;
 
-			await client.Lan!.SetLightPowerAsync(
-				bulb,
-				TimeSpan.FromSeconds(duration),
-				PowerState.On,
-				cancellationToken);
+			var factory = new LifxClientFactory();
+			using var client = factory.CreateLanClient();
 
-			AnsiConsole.MarkupLine($"[green]✓[/] Turned on light: {bulb.MacAddressName}");
+			var bulb = await DiscoverAndFindBulb(client, macAddress, cancellationToken);
+			if (bulb is null)
+			{
+				return;
+			}
+
+			await action(client, bulb, parseResult, cancellationToken);
 		});
 
 		return command;
 	}
 
-	private static Command CreateLanOffCommand()
-	{
-		var command = new Command("off", "Turn light off via LAN");
+	private static Argument<string> CreateMacArgument(string description)
+		=> new("mac-address") { Description = description };
 
-		var macArg = new Argument<string>("mac-address")
-		{
-			Description = "MAC address of the light"
-		};
-
-		var durationOption = new Option<double>("--duration", "-d")
+	private static Option<double> CreateDurationOption()
+		=> new("--duration", "-d")
 		{
 			Description = "Transition duration in seconds",
 			DefaultValueFactory = _ => 1.0
 		};
 
-		command.Arguments.Add(macArg);
-		command.Options.Add(durationOption);
+	private static Command CreateLanOnCommand()
+	{
+		var durationOption = CreateDurationOption();
 
-		command.SetAction(async (parseResult, cancellationToken) =>
-		{
-			var macAddress = parseResult.GetValue(macArg);
-			var duration = parseResult.GetValue(durationOption);
-
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateLanClient();
-
-			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
-			if (bulb == null)
-			{
-				return;
-			}
-
-
-			await client.Lan!.SetLightPowerAsync(
+		return CreateBulbCommand(
+			"on",
+			"Turn light on via LAN",
+			CreateMacArgument("MAC address of the light (e.g., D0:73:D5:12:34:56)"),
+			[],
+			[durationOption],
+			(client, bulb, parseResult, cancellationToken) => SetLanPowerAsync(
+				client,
 				bulb,
-				TimeSpan.FromSeconds(duration),
+				PowerState.On,
+				parseResult.GetValue(durationOption),
+				cancellationToken));
+	}
+
+	private static Command CreateLanOffCommand()
+	{
+		var durationOption = CreateDurationOption();
+
+		return CreateBulbCommand(
+			"off",
+			"Turn light off via LAN",
+			CreateMacArgument("MAC address of the light"),
+			[],
+			[durationOption],
+			(client, bulb, parseResult, cancellationToken) => SetLanPowerAsync(
+				client,
+				bulb,
 				PowerState.Off,
-				cancellationToken);
+				parseResult.GetValue(durationOption),
+				cancellationToken));
+	}
 
-			AnsiConsole.MarkupLine($"[green]✓[/] Turned off light: {bulb.MacAddressName}");
-		});
+	private static async Task SetLanPowerAsync(
+		ILifxClient client,
+		LightBulb bulb,
+		PowerState powerState,
+		double duration,
+		CancellationToken cancellationToken)
+	{
+		await client.Lan!.SetLightPowerAsync(
+			bulb,
+			TimeSpan.FromSeconds(duration),
+			powerState,
+			cancellationToken);
 
-		return command;
+		var verb = powerState == PowerState.On ? "on" : "off";
+		AnsiConsole.MarkupLine($"[green]✓[/] Turned {verb} light: {bulb.MacAddressName}");
 	}
 
 	/// <summary>
@@ -170,57 +231,34 @@ public static class LanCommand
 
 	private static Command CreateLanColorCommand()
 	{
-		var command = new Command("color", "Set light color via LAN");
-
-		var macArg = new Argument<string>("mac-address")
-		{
-			Description = "MAC address of the light"
-		};
-
-		var kelvinArg = new Argument<int>("kelvin")
+		var kelvinArgument = new Argument<int>("kelvin")
 		{
 			Description = "Color temperature in Kelvin (2500-9000, e.g., 2700 for warm white)"
 		};
+		var durationOption = CreateDurationOption();
 
-		var durationOption = new Option<double>("--duration", "-d")
-		{
-			Description = "Transition duration in seconds",
-			DefaultValueFactory = _ => 1.0
-		};
-
-		command.Arguments.Add(macArg);
-		command.Arguments.Add(kelvinArg);
-		command.Options.Add(durationOption);
-
-		command.SetAction(async (parseResult, cancellationToken) => await SetLanColorAsync(
-			parseResult.GetValue(macArg)!,
-			parseResult.GetValue(kelvinArg),
-			parseResult.GetValue(durationOption),
-			cancellationToken));
-
-		return command;
+		return CreateBulbCommand(
+			"color",
+			"Set light color via LAN",
+			CreateMacArgument("MAC address of the light"),
+			[kelvinArgument],
+			[durationOption],
+			parseResult => TryValidateKelvin(parseResult.GetValue(kelvinArgument)),
+			(client, bulb, parseResult, cancellationToken) => SetLanColorAsync(
+				client,
+				bulb,
+				parseResult.GetValue(kelvinArgument),
+				parseResult.GetValue(durationOption),
+				cancellationToken));
 	}
 
 	private static async Task SetLanColorAsync(
-		string macAddress,
+		ILifxClient client,
+		LightBulb bulb,
 		int kelvin,
 		double duration,
 		CancellationToken cancellationToken)
 	{
-		if (!TryValidateKelvin(kelvin))
-		{
-			return;
-		}
-
-		var factory = new LifxClientFactory();
-		using var client = factory.CreateLanClient();
-
-		var bulb = await DiscoverAndFindBulb(client, macAddress, cancellationToken);
-		if (bulb == null)
-		{
-			return;
-		}
-
 		await client.Lan!.SetColorAsync(
 			bulb,
 			hue: 0,
@@ -234,111 +272,97 @@ public static class LanCommand
 	}
 
 	private static Command CreateLanStateCommand()
+		=> CreateBulbCommand(
+			"state",
+			"Get light state via LAN",
+			CreateMacArgument("MAC address of the light"),
+			[],
+			[],
+			ShowLanStateAsync);
+
+	private static async Task ShowLanStateAsync(
+		ILifxClient client,
+		LightBulb bulb,
+		ParseResult parseResult,
+		CancellationToken cancellationToken)
 	{
-		var command = new Command("state", "Get light state via LAN");
+		var state = await client.Lan!.GetLightStateAsync(bulb, cancellationToken);
 
-		var macArg = new Argument<string>("mac-address")
+		if (state == null)
 		{
-			Description = "MAC address of the light"
+			AnsiConsole.MarkupLine("[yellow]Could not get light state[/]");
+			return;
+		}
+
+		var table = new Table
+		{
+			Border = TableBorder.Rounded
 		};
+		table.AddColumn("Property");
+		table.AddColumn("Value");
 
-		command.Arguments.Add(macArg);
+		table.AddRow("Label", state.Label);
+		table.AddRow("Power", state.IsOn ? "[green]On[/]" : "[dim]Off[/]");
+		table.AddRow("Hue", state.Hue.ToString());
+		table.AddRow("Saturation", state.Saturation.ToString());
+		table.AddRow("Brightness", state.Brightness.ToString());
+		table.AddRow("Kelvin", state.Kelvin.ToString());
 
-		command.SetAction(async (parseResult, cancellationToken) =>
-		{
-			var macAddress = parseResult.GetValue(macArg);
-
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateLanClient();
-
-			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
-			if (bulb == null)
-			{
-				return;
-			}
-
-
-			var state = await client.Lan!.GetLightStateAsync(bulb, cancellationToken);
-
-			if (state == null)
-			{
-				AnsiConsole.MarkupLine("[yellow]Could not get light state[/]");
-				return;
-			}
-
-			var table = new Table
-			{
-				Border = TableBorder.Rounded
-			};
-			table.AddColumn("Property");
-			table.AddColumn("Value");
-
-			table.AddRow("Label", state.Label);
-			table.AddRow("Power", state.IsOn ? "[green]On[/]" : "[dim]Off[/]");
-			table.AddRow("Hue", state.Hue.ToString());
-			table.AddRow("Saturation", state.Saturation.ToString());
-			table.AddRow("Brightness", state.Brightness.ToString());
-			table.AddRow("Kelvin", state.Kelvin.ToString());
-
-			AnsiConsole.Write(table);
-		});
-
-		return command;
+		AnsiConsole.Write(table);
 	}
 
 	private static Command CreateLanRenameCommand()
 	{
-		var command = new Command("rename", "Rename a light via LAN");
-
-		var macArg = new Argument<string>("mac-address")
-		{
-			Description = "MAC address of the light"
-		};
-
-		var nameArg = new Argument<string>("new-name")
+		var nameArgument = new Argument<string>("new-name")
 		{
 			Description = "New name for the light (max 32 characters)"
 		};
 
-		command.Arguments.Add(macArg);
-		command.Arguments.Add(nameArg);
+		return CreateBulbCommand(
+			"rename",
+			"Rename a light via LAN",
+			CreateMacArgument("MAC address of the light"),
+			[nameArgument],
+			[],
+			parseResult => TryValidateLightName(parseResult.GetValue(nameArgument)!),
+			(client, bulb, parseResult, cancellationToken) => RenameLanLightAsync(
+				client,
+				bulb,
+				parseResult.GetValue(nameArgument)!,
+				cancellationToken));
+	}
 
-		command.SetAction(async (parseResult, cancellationToken) =>
+	/// <summary>
+	/// Reports an unusable light name to the console and returns false.
+	/// </summary>
+	private static bool TryValidateLightName(string newName)
+	{
+		try
 		{
-			var macAddress = parseResult.GetValue(macArg);
-			var newName = parseResult.GetValue(nameArg);
+			LanHandler.ValidateLightName(newName);
+			return true;
+		}
+		catch (ArgumentException ex)
+		{
+			AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
+			return false;
+		}
+	}
 
-			try
-			{
-				LanHandler.ValidateLightName(newName!);
-			}
-			catch (ArgumentException ex)
-			{
-				AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
-				return;
-			}
+	private static async Task RenameLanLightAsync(
+		ILifxClient client,
+		LightBulb bulb,
+		string newName,
+		CancellationToken cancellationToken)
+	{
+		// Get current name first
+		var oldName = await client.Lan!.GetDeviceLabelAsync(bulb, cancellationToken);
 
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateLanClient();
+		// Set new name
+		await client.Lan!.SetDeviceLabelAsync(bulb, newName, cancellationToken);
 
-			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
-			if (bulb == null)
-			{
-				return;
-			}
-
-
-			// Get current name first
-			var oldName = await client.Lan!.GetDeviceLabelAsync(bulb, cancellationToken);
-
-			// Set new name
-			await client.Lan!.SetDeviceLabelAsync(bulb, newName!, cancellationToken);
-
-			AnsiConsole.MarkupLine($"[green]✓[/] Renamed light from '[cyan]{oldName}[/]' to '[cyan]{newName}[/]'");
-			AnsiConsole.MarkupLine($"[dim]MAC: {bulb.MacAddressName}[/]");
-		});
-
-		return command;
+		AnsiConsole.MarkupLine($"[green]✓[/] Renamed light from '[cyan]{oldName}[/]' to '[cyan]{newName}[/]'");
+		AnsiConsole.MarkupLine($"[dim]MAC: {bulb.MacAddressName}[/]");
 	}
 
 	private static async Task<LightBulb?> DiscoverAndFindBulb(
