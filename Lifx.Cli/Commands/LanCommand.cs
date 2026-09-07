@@ -86,7 +86,7 @@ public static class LanCommand
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();
 
-			var bulb = await DiscoverAndFindBulb(client, macAddress!);
+			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
 			if (bulb == null)
 			{
 				return;
@@ -131,7 +131,7 @@ public static class LanCommand
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();
 
-			var bulb = await DiscoverAndFindBulb(client, macAddress!);
+			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
 			if (bulb == null)
 			{
 				return;
@@ -148,6 +148,24 @@ public static class LanCommand
 		});
 
 		return command;
+	}
+
+	/// <summary>
+	/// Reports an out-of-range colour temperature to the console and returns false, so the caller
+	/// can bail out without repeating the try/catch at every call site.
+	/// </summary>
+	private static bool TryValidateKelvin(int kelvin)
+	{
+		try
+		{
+			LanHandler.ValidateKelvin(kelvin);
+			return true;
+		}
+		catch (ArgumentOutOfRangeException ex)
+		{
+			AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
+			return false;
+		}
 	}
 
 	private static Command CreateLanColorCommand()
@@ -174,45 +192,45 @@ public static class LanCommand
 		command.Arguments.Add(kelvinArg);
 		command.Options.Add(durationOption);
 
-		command.SetAction(async (parseResult, cancellationToken) =>
-		{
-			var macAddress = parseResult.GetValue(macArg);
-			var kelvin = parseResult.GetValue(kelvinArg);
-			var duration = parseResult.GetValue(durationOption);
-
-			try
-			{
-				LanHandler.ValidateKelvin(kelvin);
-			}
-			catch (ArgumentOutOfRangeException ex)
-			{
-				AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
-				return;
-			}
-
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateLanClient();
-
-			var bulb = await DiscoverAndFindBulb(client, macAddress!);
-			if (bulb == null)
-			{
-				return;
-			}
-
-
-			await client.Lan!.SetColorAsync(
-				bulb,
-				hue: 0,
-				saturation: 0,
-				brightness: 65535,
-				kelvin: (ushort)kelvin,
-				transitionDuration: TimeSpan.FromSeconds(duration),
-				cancellationToken);
-
-			AnsiConsole.MarkupLine($"[green]✓[/] Set color to {kelvin}K: {bulb.MacAddressName}");
-		});
+		command.SetAction(async (parseResult, cancellationToken) => await SetLanColorAsync(
+			parseResult.GetValue(macArg)!,
+			parseResult.GetValue(kelvinArg),
+			parseResult.GetValue(durationOption),
+			cancellationToken));
 
 		return command;
+	}
+
+	private static async Task SetLanColorAsync(
+		string macAddress,
+		int kelvin,
+		double duration,
+		CancellationToken cancellationToken)
+	{
+		if (!TryValidateKelvin(kelvin))
+		{
+			return;
+		}
+
+		var factory = new LifxClientFactory();
+		using var client = factory.CreateLanClient();
+
+		var bulb = await DiscoverAndFindBulb(client, macAddress, cancellationToken);
+		if (bulb == null)
+		{
+			return;
+		}
+
+		await client.Lan!.SetColorAsync(
+			bulb,
+			hue: 0,
+			saturation: 0,
+			brightness: 65535,
+			kelvin: (ushort)kelvin,
+			transitionDuration: TimeSpan.FromSeconds(duration),
+			cancellationToken);
+
+		AnsiConsole.MarkupLine($"[green]✓[/] Set color to {kelvin}K: {bulb.MacAddressName}");
 	}
 
 	private static Command CreateLanStateCommand()
@@ -233,7 +251,7 @@ public static class LanCommand
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();
 
-			var bulb = await DiscoverAndFindBulb(client, macAddress!);
+			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
 			if (bulb == null)
 			{
 				return;
@@ -303,7 +321,7 @@ public static class LanCommand
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();
 
-			var bulb = await DiscoverAndFindBulb(client, macAddress!);
+			var bulb = await DiscoverAndFindBulb(client, macAddress!, cancellationToken);
 			if (bulb == null)
 			{
 				return;
@@ -323,7 +341,10 @@ public static class LanCommand
 		return command;
 	}
 
-	private static async Task<LightBulb?> DiscoverAndFindBulb(ILifxClient client, string macAddress)
+	private static async Task<LightBulb?> DiscoverAndFindBulb(
+		ILifxClient client,
+		string macAddress,
+		CancellationToken cancellationToken)
 	{
 		// Normalize MAC address
 		macAddress = LanHandler.NormalizeMacAddress(macAddress);
@@ -331,8 +352,8 @@ public static class LanCommand
 		AnsiConsole.Status()
 			.Start("Discovering devices...", ctx =>
 			{
-				client.StartLan(CancellationToken.None);
-				client.StartDeviceDiscovery(CancellationToken.None);
+				client.StartLan(cancellationToken);
+				client.StartDeviceDiscovery(cancellationToken);
 				Thread.Sleep(5000);
 				client.StopDeviceDiscovery();
 			});
@@ -381,8 +402,8 @@ public static class LanCommand
 			AnsiConsole.Status()
 				.Start("Discovering devices...", ctx =>
 				{
-					client.StartLan(CancellationToken.None);
-					client.StartDeviceDiscovery(CancellationToken.None);
+					client.StartLan(cancellationToken);
+					client.StartDeviceDiscovery(cancellationToken);
 
 					// Wait for devices to respond
 					Thread.Sleep(timeout * 1000);
@@ -451,8 +472,8 @@ public static class LanCommand
 			AnsiConsole.Status()
 				.Start("Discovering devices...", ctx =>
 				{
-					client.StartLan(CancellationToken.None);
-					client.StartDeviceDiscovery(CancellationToken.None);
+					client.StartLan(cancellationToken);
+					client.StartDeviceDiscovery(cancellationToken);
 					Thread.Sleep(5000);
 					client.StopDeviceDiscovery();
 				});
