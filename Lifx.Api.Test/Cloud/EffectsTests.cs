@@ -11,78 +11,17 @@ namespace Lifx.Api.Test.Cloud;
 // Requires a real LIFX cloud AppToken (user secrets / appsettings.json), so it cannot run on CI.
 [Trait("Category", "Integration")]
 [Collection("Cloud API Tests")]
-public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
+public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateTest(testOutputHelper)
 {
-	private List<Light>? _originalLightStates;
-	private Light? _testLight;
-
-	async ValueTask IAsyncLifetime.InitializeAsync()
-	{
-		// Capture the original state of all lights before tests run
-		try
-		{
-			_originalLightStates = await Client.Lights.ListAsync(Selector.All, CancellationToken);
-			Logger.LogInformation("Captured original state of {Count} lights", _originalLightStates.Count);
-
-			_testLight = await GetTestLightAsync();
-		}
-		catch (Exception ex)
-		{
-			Logger.LogWarning(ex, "Could not capture original light states");
-			_originalLightStates = null;
-		}
-	}
-
-	async ValueTask IAsyncDisposable.DisposeAsync()
-	{
-		// Restore lights to their original state after all tests in this class complete
-		if (_originalLightStates is null || _originalLightStates.Count == 0)
-		{
-			Logger.LogInformation("No original state to restore");
-			return;
-		}
-
-		try
-		{
-			// First, stop any running effects
-			await Client.Effects.OffAsync(
-				Selector.All,
-				new EffectsOffRequest { PowerOff = false },
-				CancellationToken);
-
-			Logger.LogInformation("Restoring original state for {Count} lights", _originalLightStates.Count);
-
-			foreach (var originalLight in _originalLightStates)
-			{
-				// Only restore if the light is connected
-				if (!originalLight.IsConnected)
-				{
-					continue;
-				}
-
-				var restoreRequest = new SetStateRequest
-				{
-					Power = originalLight.PowerState,
-					Color = originalLight.Color?.ToString() ?? "white",
-					Brightness = (double)originalLight.Brightness,
-					Duration = 1.0 // 1 second transition
-				};
-
-				await Client.Lights.SetStateAsync(
-					new Selector.LightId(originalLight.Id),
-					restoreRequest,
-					CancellationToken);
-			}
-
-			Logger.LogInformation("Successfully restored original light states");
-		}
-		catch (Exception ex)
-		{
-			Logger.LogError(ex, "Failed to restore original light states");
-		}
-
-		GC.SuppressFinalize(this);
-	}
+	/// <summary>
+	/// Stops any effect still running before the lights are restored, so a restored state is not
+	/// immediately overwritten by an effect that is still animating.
+	/// </summary>
+	protected override async Task OnDisposingAsync()
+		=> await Client.Effects.OffAsync(
+			Selector.All,
+			new EffectsOffRequest { PowerOff = false },
+			CancellationToken);
 
 	#region Single Light Effects
 
@@ -104,14 +43,14 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.BreatheAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
 		result.Should().NotBeNull();
-		Logger.LogInformation("BreatheEffect executed on {Label}", _testLight.Label);
+		Logger.LogInformation("BreatheEffect executed on {Label}", TestLight.Label);
 	}
 
 	/// <summary>
@@ -132,7 +71,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.PulseAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -157,7 +96,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.MorphAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -182,7 +121,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.FlameAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -266,7 +205,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.SunriseAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -290,7 +229,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.SunsetAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -311,7 +250,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 	{
 		// Arrange - Start an effect first
 		await Client.Effects.BreatheAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			new BreatheEffectRequest { Color = "blue", Period = 2.0, Cycles = 10.0 },
 			CancellationToken);
 
@@ -325,7 +264,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.OffAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			request,
 			CancellationToken);
 
@@ -348,7 +287,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Effects.OffAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -376,7 +315,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Lights.CleanAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -400,7 +339,7 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : Test(testOutputH
 
 		// Act
 		var result = await Client.Lights.CleanAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 

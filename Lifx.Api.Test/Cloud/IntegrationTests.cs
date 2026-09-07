@@ -11,57 +11,15 @@ namespace Lifx.Api.Test.Cloud;
 // Requires a real LIFX cloud AppToken (user secrets / appsettings.json), so it cannot run on CI.
 [Trait("Category", "Integration")]
 [Collection("Cloud API Tests")]
-public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
+public class IntegrationTests(ITestOutputHelper testOutputHelper) : CloudLightStateTest(testOutputHelper)
 {
-	private List<Light>? _originalLightStates;
-	private Light? _testLight;
 	private Group? _testGroup;
 
-	async ValueTask IAsyncLifetime.InitializeAsync()
-	{
-		try
-		{
-			_originalLightStates = await Client.Lights.ListAsync(Selector.All, CancellationToken);
-			Logger.LogInformation("Captured original state of {Count} lights", _originalLightStates.Count);
-
-			_testLight = await GetTestLightAsync();
-			_testGroup = await GetTestGroupAsync();
-		}
-		catch (Exception ex)
-		{
-			Logger.LogWarning(ex, "Could not initialize integration tests");
-		}
-	}
-
-	async ValueTask IAsyncDisposable.DisposeAsync()
-	{
-		// Restore original state
-		if (_originalLightStates is not null)
-		{
-			try
-			{
-				foreach (var light in _originalLightStates.Where(l => l.IsConnected))
-				{
-					await Client.Lights.SetStateAsync(
-						new Selector.LightId(light.Id),
-						new SetStateRequest
-						{
-							Power = light.PowerState,
-							Color = light.Color?.ToString() ?? "white",
-							Brightness = (double)light.Brightness,
-							Duration = 1.0
-						},
-						CancellationToken);
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.LogError(ex, "Failed to restore state");
-			}
-		}
-
-		GC.SuppressFinalize(this);
-	}
+	/// <summary>
+	/// Resolves the group used by the multi-light workflow tests.
+	/// </summary>
+	protected override async Task OnInitializedAsync()
+		=> _testGroup = await GetTestGroupAsync();
 
 	#region Complete Workflow Tests
 
@@ -80,7 +38,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		var targetColor = "blue";
 		var targetBrightness = 0.8;
 		await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			new SetStateRequest
 			{
 				Power = PowerState.On,
@@ -93,7 +51,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		// Phase 3: Verify state
 		await Task.Delay(1500, CancellationToken); // Wait for transition
 		var updatedLights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			CancellationToken);
 
 		updatedLights.Should().ContainSingle();
@@ -151,7 +109,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		};
 
 		await Client.Effects.BreatheAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			breatheRequest,
 			CancellationToken);
 
@@ -162,7 +120,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Phase 3: Stop effect
 		await Client.Effects.OffAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			new EffectsOffRequest { PowerOff = false },
 			CancellationToken);
 
@@ -170,7 +128,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Phase 4: Verify light is still on
 		var lights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			CancellationToken);
 
 		lights[0].IsOn.Should().BeTrue();
@@ -272,7 +230,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 	{
 		// Phase 1: Capture initial state
 		var initialLights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			CancellationToken);
 		var initialLight = initialLights[0];
 		var initialPower = initialLight.PowerState;
@@ -280,7 +238,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Phase 2: Make changes
 		await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			new SetStateRequest
 			{
 				Power = PowerState.On,
@@ -294,7 +252,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Phase 3: Restore original state
 		await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			new SetStateRequest
 			{
 				Power = initialPower,
@@ -307,7 +265,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Phase 4: Verify restoration
 		var restoredLights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			CancellationToken);
 
 		restoredLights[0].PowerState.Should().Be(initialPower);
@@ -319,7 +277,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 	[Fact]
 	public async Task Rapid_State_Changes_Should_Not_Fail()
 	{
-		if (_testLight is null)
+		if (TestLight is null)
 		{
 			Logger.LogWarning("No test light available, skipping test");
 			return;
@@ -331,7 +289,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		foreach (var color in colors)
 		{
 			await Client.Lights.SetStateAsync(
-				new Selector.LightId(_testLight.Id),
+				new Selector.LightId(TestLight.Id),
 				new SetStateRequest
 				{
 					Color = color,
@@ -346,7 +304,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Verify light is still responsive
 		var finalLights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			CancellationToken);
 
 		finalLights.Should().ContainSingle();
@@ -419,7 +377,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		const double baselineBrightness = 0.4;
 
 		await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			new SetStateRequest
 			{
 				Power = PowerState.On,
@@ -432,7 +390,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Increase brightness by 10%
 		await Client.Lights.StateDeltaAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			new StateDeltaRequest
 			{
 				Brightness = 0.1,
@@ -444,7 +402,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Verify brightness increased
 		var updatedLights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			CancellationToken);
 
 		updatedLights[0].Brightness.Should().BeGreaterThan((float)baselineBrightness);
@@ -468,7 +426,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 
 		// Use validated color
 		await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			new SetStateRequest
 			{
 				Color = "rgb:128,0,128",
@@ -479,7 +437,7 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		// Verify
 		await Task.Delay(1500, CancellationToken);
 		var lights = await Client.Lights.ListAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			CancellationToken);
 
 		lights[0].Color.Should().NotBeNull();
@@ -526,21 +484,21 @@ public class IntegrationTests(ITestOutputHelper testOutputHelper) : Test(testOut
 		var locations = await Client.Lights.ListLocationsAsync(Selector.All, CancellationToken);
 		locations.Should().NotBeNull();
 
-		if (_testLight is null)
+		if (TestLight is null)
 		{
 			Logger.LogWarning("No test light available, skipping remainder of test");
 			return;
 		}
 
 		await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			new SetStateRequest { Power = PowerState.On, Duration = 0.5 },
 			CancellationToken);
 
 		await Task.Delay(1000, CancellationToken);
 
 		await Client.Lights.TogglePowerAsync(
-			new Selector.LightId(_testLight.Id),
+			new Selector.LightId(TestLight.Id),
 			new TogglePowerRequest { Duration = 0.5 },
 			CancellationToken);
 

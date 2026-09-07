@@ -11,75 +11,8 @@ namespace Lifx.Api.Test.Cloud;
 // Requires a real LIFX cloud AppToken (user secrets / appsettings.json), so it cannot run on CI.
 [Trait("Category", "Integration")]
 [Collection("Cloud API Tests")]
-public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHelper), IAsyncLifetime
+public class LightsTests(ITestOutputHelper testOutputHelper) : CloudLightStateTest(testOutputHelper)
 {
-	private List<Light>? _originalLightStates;
-	private Light? _testLight;
-
-	async ValueTask IAsyncLifetime.InitializeAsync()
-	{
-		// Capture the original state of all lights before tests run
-		try
-		{
-			_originalLightStates = await Client.Lights.ListAsync(Selector.All, CancellationToken);
-			Logger.LogInformation("Captured original state of {Count} lights", _originalLightStates.Count);
-
-			// Get test light for single-light tests
-			_testLight = await GetTestLightAsync();
-			Logger.LogInformation("Using test light: {Label} ({Id})", _testLight.Label, _testLight.Id);
-		}
-		catch (Exception ex)
-		{
-			Logger.LogWarning(ex, "Could not capture original light states");
-			_originalLightStates = null;
-		}
-	}
-
-	async ValueTask IAsyncDisposable.DisposeAsync()
-	{
-		// Restore lights to their original state after all tests in this class complete
-		if (_originalLightStates is null || _originalLightStates.Count == 0)
-		{
-			Logger.LogInformation("No original state to restore");
-			return;
-		}
-
-		try
-		{
-			Logger.LogInformation("Restoring original state for {Count} lights", _originalLightStates.Count);
-
-			foreach (var originalLight in _originalLightStates)
-			{
-				// Only restore if the light is connected
-				if (!originalLight.IsConnected)
-				{
-					continue;
-				}
-
-				var restoreRequest = new SetStateRequest
-				{
-					Power = originalLight.PowerState,
-					Color = originalLight.Color?.ToString() ?? "white",
-					Brightness = (double)originalLight.Brightness,
-					Duration = 1.0 // 1 second transition
-				};
-
-				await Client.Lights.SetStateAsync(
-					new Selector.LightId(originalLight.Id),
-					restoreRequest,
-					CancellationToken);
-			}
-
-			Logger.LogInformation("Successfully restored original light states");
-		}
-		catch (Exception ex)
-		{
-			Logger.LogError(ex, "Failed to restore original light states");
-		}
-
-		GC.SuppressFinalize(this);
-	}
-
 	#region List Operations
 
 	/// <summary>
@@ -104,7 +37,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 	public async Task ListAsync_ByLightId_Should_Return_Single_Light()
 	{
 		// Arrange
-		var lightId = _testLight!.Id;
+		var lightId = TestLight!.Id;
 
 		// Act
 		var lights = await Client.Lights.ListAsync(new Selector.LightId(lightId), CancellationToken);
@@ -122,7 +55,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 	public async Task ListAsync_ByLabel_Should_Return_Matching_Light()
 	{
 		// Arrange
-		var label = _testLight!.Label;
+		var label = TestLight!.Label;
 
 		// Act
 		var lights = await Client
@@ -178,14 +111,14 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
 		result.Should().NotBeNull();
-		Logger.LogInformation("Turned on light: {Label}", _testLight.Label);
+		Logger.LogInformation("Turned on light: {Label}", TestLight.Label);
 	}
 
 	/// <summary>
@@ -199,7 +132,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -219,7 +152,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.TogglePowerAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -248,7 +181,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -273,7 +206,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -297,7 +230,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -322,7 +255,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.SetStateAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
@@ -400,7 +333,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 			[
 				new StateUpdate
 				{
-					Selector = $"id:{_testLight!.Id}",
+					Selector = $"id:{TestLight!.Id}",
 					Color = "red",
 					Brightness = 0.7
 				}
@@ -435,7 +368,7 @@ public class LightsTests(ITestOutputHelper testOutputHelper) : Test(testOutputHe
 
 		// Act
 		var result = await Client.Lights.StateDeltaAsync(
-			new Selector.LightId(_testLight!.Id),
+			new Selector.LightId(TestLight!.Id),
 			request,
 			CancellationToken);
 
