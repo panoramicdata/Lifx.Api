@@ -41,7 +41,7 @@ public class LanMessageTests
 		// Arrange
 		var header = new FrameHeader
 		{
-			TargetMacAddress = [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01, 0x00, 0x00]
+			TargetMacAddress = LanTestDevice.TargetMacAddress
 		};
 
 		// Act
@@ -134,7 +134,7 @@ public class LanMessageTests
 			Sequence = 1,
 			AcknowledgeRequired = true,
 			ResponseRequired = true,
-			TargetMacAddress = [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01, 0x00, 0x00],
+			TargetMacAddress = LanTestDevice.TargetMacAddress,
 			AtTime = DateTime.MinValue
 		};
 		var payload = new byte[] { 1, 2, 3, 4 };

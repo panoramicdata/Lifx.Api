@@ -145,7 +145,7 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		// Arrange & Act
 		var bulb = new LightBulb(
 			LanTestDevice.HostName,
-			[0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01],
+			LanTestDevice.MacAddress,
 			service: 1,
 			port: 56700);
 
@@ -167,7 +167,7 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		// Arrange & Act
 		var bulb = new LightBulb(
 			LanTestDevice.HostName,
-			[0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+			LanTestDevice.MacAddress);
 
 		// Assert
 		bulb.Should().BeOfType<LightBulb>();
@@ -184,7 +184,7 @@ public class LanDiscoveryTests(LanTestFixture fixture) : IDisposable
 		// Arrange & Act
 		var bulb = new LightBulb(
 			LanTestDevice.HostName,
-			[0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01]);
+			LanTestDevice.MacAddress);
 
 		// Assert
 		bulb.MacAddressName.Should().Be("D0:73:D5:00:00:01");

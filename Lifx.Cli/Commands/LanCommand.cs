@@ -278,12 +278,11 @@ public static class LanCommand
 			CreateMacArgument("MAC address of the light"),
 			[],
 			[],
-			ShowLanStateAsync);
+			(client, bulb, _, cancellationToken) => ShowLanStateAsync(client, bulb, cancellationToken));
 
 	private static async Task ShowLanStateAsync(
 		ILifxClient client,
 		LightBulb bulb,
-		ParseResult parseResult,
 		CancellationToken cancellationToken)
 	{
 		var state = await client.Lan!.GetLightStateAsync(bulb, cancellationToken);
@@ -488,7 +487,7 @@ public static class LanCommand
 	{
 		var command = new Command("list", "List cached discovered devices");
 
-		command.SetAction(async (parseResult, cancellationToken) =>
+		command.SetAction(async (_, cancellationToken) =>
 		{
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();

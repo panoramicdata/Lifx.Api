@@ -20,4 +20,10 @@ internal static class LanTestDevice
 	/// Gets a well-formed six byte MAC address for test devices.
 	/// </summary>
 	public static byte[] MacAddress => [0xD0, 0x73, 0xD5, 0x00, 0x00, 0x01];
+
+	/// <summary>
+	/// Gets the same address in the eight byte form a frame header carries: the six byte MAC
+	/// left-justified and zero-filled.
+	/// </summary>
+	public static byte[] TargetMacAddress => [.. MacAddress, 0x00, 0x00];
 }
