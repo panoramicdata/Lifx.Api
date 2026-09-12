@@ -1,6 +1,8 @@
 using AwesomeAssertions;
 using Lifx.Api.Lan;
 using Lifx.Api.Models.Lan;
+using System.Reflection;
+using System.Text;
 
 namespace Lifx.Api.Test.Lan;
 
@@ -13,6 +15,46 @@ namespace Lifx.Api.Test.Lan;
 [Collection("LAN Tests")]
 public class LanMessageTests
 {
+	/// <summary>
+	/// Invokes one of the private static packet helpers on <see cref="LifxLanClient"/>.
+	/// </summary>
+	/// <remarks>
+	/// ParseMessage and WritePacketToStream have no public surface to reach them through, so these
+	/// tests go in by reflection. Each test used to repeat the GetMethod/Invoke pair itself, which
+	/// was the bulk of this file's duplication.
+	/// </remarks>
+	private static object? InvokePrivateStatic(string name, object?[] arguments)
+	{
+		var method = typeof(LifxLanClient).GetMethod(
+			name,
+			BindingFlags.NonPublic | BindingFlags.Static);
+
+		return method!.Invoke(null, arguments);
+	}
+
+	/// <summary>
+	/// Writes a packet through WritePacketToStream and returns the bytes it produced.
+	/// </summary>
+	private static byte[] WritePacket(FrameHeader header, ushort messageType, byte[] payload)
+	{
+		using var stream = new MemoryStream();
+		InvokePrivateStatic("WritePacketToStream", [stream, header, messageType, payload]);
+		return stream.ToArray();
+	}
+
+	/// <summary>
+	/// Asserts that ParseMessage rejects a packet as invalid.
+	/// </summary>
+	private static void ParseMessageShouldRejectPacket(byte[] packet)
+	{
+		var exception = Assert.Throws<TargetInvocationException>(
+			() => InvokePrivateStatic("ParseMessage", [packet]));
+
+		// Verify the inner exception is the expected type
+		exception.InnerException.Should().BeOfType<Exception>();
+		exception.InnerException!.Message.Should().Contain("Invalid packet");
+	}
+
 	/// <summary>
 	/// Performs FrameHeader_Should_Initialize_With_Defaults operation.
 	/// </summary>
@@ -80,16 +122,7 @@ public class LanMessageTests
 		var tooSmallPacket = new byte[35]; // Minimum is 36 bytes
 
 		// Act & Assert
-		var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() =>
-		{
-			var method = typeof(LifxLanClient).GetMethod("ParseMessage",
-				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-			method!.Invoke(null, [tooSmallPacket]);
-		});
-		
-		// Verify the inner exception is the expected type
-		exception.InnerException.Should().BeOfType<Exception>();
-		exception.InnerException!.Message.Should().Contain("Invalid packet");
+		ParseMessageShouldRejectPacket(tooSmallPacket);
 	}
 
 	/// <summary>
@@ -109,16 +142,7 @@ public class LanMessageTests
 		}
 
 		// Act & Assert
-		var exception = Assert.Throws<System.Reflection.TargetInvocationException>(() =>
-		{
-			var method = typeof(LifxLanClient).GetMethod("ParseMessage",
-				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-			method!.Invoke(null, [packet]);
-		});
-		
-		// Verify the inner exception is the expected type
-		exception.InnerException.Should().BeOfType<Exception>();
-		exception.InnerException!.Message.Should().Contain("Invalid packet");
+		ParseMessageShouldRejectPacket(packet);
 	}
 
 	/// <summary>
@@ -138,15 +162,9 @@ public class LanMessageTests
 			AtTime = DateTime.MinValue
 		};
 		var payload = new byte[] { 1, 2, 3, 4 };
-		var messageType = (ushort)MessageType.DeviceGetLabel;
 
 		// Act
-		using var stream = new MemoryStream();
-		var method = typeof(LifxLanClient).GetMethod("WritePacketToStream",
-			System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-		method!.Invoke(null, [stream, header, messageType, payload]);
-
-		var packet = stream.ToArray();
+		var packet = WritePacket(header, (ushort)MessageType.DeviceGetLabel, payload);
 
 		// Assert
 		packet.Should().NotBeNull();
@@ -188,12 +206,7 @@ public class LanMessageTests
 		};
 
 		// Act
-		using var stream = new MemoryStream();
-		var method = typeof(LifxLanClient).GetMethod("WritePacketToStream",
-			System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-		method!.Invoke(null, [stream, header, (ushort)48, Array.Empty<byte>()]);
-
-		var packet = stream.ToArray();
+		var packet = WritePacket(header, 48, []);
 
 		// Assert
 		// Byte 22 contains the flags (ack_required | res_required)
@@ -217,19 +230,14 @@ public class LanMessageTests
 		};
 		var testLabel = "Test Light";
 		var paddedLabel = testLabel.PadRight(32)[..32];
-		var payload = System.Text.Encoding.UTF8.GetBytes(paddedLabel);
+		var payload = Encoding.UTF8.GetBytes(paddedLabel);
 
 		// Act
-		using var stream = new MemoryStream();
-		var method = typeof(LifxLanClient).GetMethod("WritePacketToStream",
-			System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-		method!.Invoke(null, [stream, header, (ushort)24, payload]);
-
-		var packet = stream.ToArray();
+		var packet = WritePacket(header, 24, payload);
 
 		// Assert
 		packet.Should().HaveCount(68); // 36 header + 32 payload
-		var extractedLabel = System.Text.Encoding.UTF8.GetString(packet, 36, 32).TrimEnd('\0', ' ');
+		var extractedLabel = Encoding.UTF8.GetString(packet, 36, 32).TrimEnd('\0', ' ');
 		extractedLabel.Should().Be(testLabel);
 	}
 
