@@ -298,4 +298,30 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 		blue.G.Should().Be(0);
 		blue.B.Should().Be(255);
 	}
+
+	/// <summary>
+	/// The HSBK overload assembles its packet payload from a params object array. A
+	/// CancellationToken that leaks into that array is rejected as an unsupported payload
+	/// type before the socket is ever touched, which broke the call for every caller.
+	/// </summary>
+	[Fact]
+	public async Task SetColorAsync_HSBK_Should_Not_Reject_Its_Own_Arguments()
+	{
+		// Arrange - LAN is enabled but never started, so a correctly assembled call must
+		// fail on the missing socket rather than on the payload it built.
+		using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
+
+		// Act & Assert
+		await ((Func<Task>)(async () =>
+			await client.Lan!.SetColorAsync(
+				_testBulb,
+				hue: 0,
+				saturation: 0,
+				brightness: 65535,
+				kelvin: 3500,
+				transitionDuration: TimeSpan.Zero,
+				CancellationToken.None)))
+			.Should()
+			.ThrowExactlyAsync<InvalidOperationException>();
+	}
 }
