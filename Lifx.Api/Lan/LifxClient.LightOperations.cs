@@ -185,6 +185,24 @@ public partial class LifxLanClient : IDisposable
 			cancellationToken);
 	}
 
+	public async Task<LightGroupResponse?> GetGroupAsync(
+		LightBulb bulb,
+		CancellationToken cancellationToken)
+	{
+		ArgumentNullException.ThrowIfNull(bulb);
+
+		FrameHeader header = new()
+		{
+			Identifier = GetNextIdentifier(),
+			AcknowledgeRequired = false
+		};
+		return await BroadcastMessageAsync<LightGroupResponse>(
+			bulb.HostName,
+			header,
+			MessageType.DeviceGetGroup,
+			cancellationToken);
+	}
+
 	/// <summary>
 	/// Performs GetInfraredAsync operation.
 	/// </summary>
