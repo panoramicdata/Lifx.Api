@@ -17,183 +17,49 @@ public class UtilitiesTests
 	#region RGB to HSL Conversion Tests
 
 	/// <summary>
-	/// Performs RgbToHsl_Should_Convert_Red_Correctly operation.
+	/// Reference colours and the HSL triple each must convert to. Hue is given in degrees and
+	/// scaled the way the conversion does, so each expectation reads as a colour wheel value
+	/// rather than a magic number.
 	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Convert_Red_Correctly()
+	public static TheoryData<byte, byte, byte, double, ushort, ushort> RgbToHslCases => new()
+	{
+		// r,   g,    b,   hue degrees, saturation, value
+		{ 255, 0, 0, 0, 65535, 65535 },       // red
+		{ 0, 255, 0, 120, 65535, 65535 },     // green
+		{ 0, 0, 255, 240, 65535, 65535 },     // blue
+		{ 0, 255, 255, 180, 65535, 65535 },   // cyan
+		{ 255, 0, 255, 300, 65535, 65535 },   // magenta
+		{ 255, 255, 0, 60, 65535, 65535 },    // yellow
+		{ 255, 255, 255, 0, 0, 65535 },       // white - hue undefined, algorithm returns 0
+		{ 0, 0, 0, 0, 0, 0 },                 // black - hue and saturation undefined
+		{ 128, 128, 128, 0, 0, 32896 }        // grey - hue and saturation undefined
+	};
+
+	/// <summary>
+	/// Performs RgbToHsl_Should_Convert_Correctly operation.
+	/// </summary>
+	[Theory]
+	[MemberData(nameof(RgbToHslCases))]
+	public void RgbToHsl_Should_Convert_Correctly(
+		byte r,
+		byte g,
+		byte b,
+		double expectedHueDegrees,
+		ushort expectedSaturation,
+		ushort expectedValue)
 	{
 		// Arrange
-		var red = new Color { R = 255, G = 0, B = 0 };
+		var color = new Color { R = r, G = g, B = b };
 
 		// Act
-		var hsl = Utilities.RgbToHsl(red);
+		var hsl = Utilities.RgbToHsl(color);
 
 		// Assert
 		hsl.Should().NotBeNull();
 		hsl.Should().HaveCount(3);
-		// Red should have hue of 0 degrees
-		hsl[0].Should().Be(0); // Hue
-		hsl[1].Should().Be(65535); // Saturation (full)
-		hsl[2].Should().Be(65535); // Lightness/Value (full)
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Convert_Green_Correctly operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Convert_Green_Correctly()
-	{
-		// Arrange
-		var green = new Color { R = 0, G = 255, B = 0 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(green);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl.Should().HaveCount(3);
-		// Green should have hue of 120 degrees
-		hsl[0].Should().Be((ushort)(120.0 / 360.0 * 65535)); // Hue ~21845
-		hsl[1].Should().Be(65535); // Saturation (full)
-		hsl[2].Should().Be(65535); // Lightness/Value (full)
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Convert_Blue_Correctly operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Convert_Blue_Correctly()
-	{
-		// Arrange
-		var blue = new Color { R = 0, G = 0, B = 255 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(blue);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl.Should().HaveCount(3);
-		// Blue should have hue of 240 degrees
-		hsl[0].Should().Be((ushort)(240.0 / 360.0 * 65535)); // Hue ~43690
-		hsl[1].Should().Be(65535); // Saturation (full)
-		hsl[2].Should().Be(65535); // Lightness/Value (full)
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Convert_White_Correctly operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Convert_White_Correctly()
-	{
-		// Arrange
-		var white = new Color { R = 255, G = 255, B = 255 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(white);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl.Should().HaveCount(3);
-		hsl[0].Should().Be(0); // Hue (undefined for white, but algorithm returns 0)
-		hsl[1].Should().Be(0); // Saturation (none)
-		hsl[2].Should().Be(65535); // Lightness/Value (full)
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Convert_Black_Correctly operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Convert_Black_Correctly()
-	{
-		// Arrange
-		var black = new Color { R = 0, G = 0, B = 0 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(black);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl.Should().HaveCount(3);
-		hsl[0].Should().Be(0); // Hue (undefined for black)
-		hsl[1].Should().Be(0); // Saturation (none)
-		hsl[2].Should().Be(0); // Lightness/Value (none)
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Convert_Gray_Correctly operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Convert_Gray_Correctly()
-	{
-		// Arrange
-		var gray = new Color { R = 128, G = 128, B = 128 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(gray);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl.Should().HaveCount(3);
-		hsl[0].Should().Be(0); // Hue (undefined for gray)
-		hsl[1].Should().Be(0); // Saturation (none)
-		hsl[2].Should().Be(32896); // Lightness/Value (~50%)
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Handle_Cyan operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Handle_Cyan()
-	{
-		// Arrange
-		var cyan = new Color { R = 0, G = 255, B = 255 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(cyan);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl[0].Should().Be((ushort)(180.0 / 360.0 * 65535)); // Hue 180 degrees
-		hsl[1].Should().Be(65535); // Full saturation
-		hsl[2].Should().Be(65535); // Full value
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Handle_Magenta operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Handle_Magenta()
-	{
-		// Arrange
-		var magenta = new Color { R = 255, G = 0, B = 255 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(magenta);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl[0].Should().Be((ushort)(300.0 / 360.0 * 65535)); // Hue 300 degrees
-		hsl[1].Should().Be(65535); // Full saturation
-		hsl[2].Should().Be(65535); // Full value
-	}
-
-	/// <summary>
-	/// Performs RgbToHsl_Should_Handle_Yellow operation.
-	/// </summary>
-	[Fact]
-	public void RgbToHsl_Should_Handle_Yellow()
-	{
-		// Arrange
-		var yellow = new Color { R = 255, G = 255, B = 0 };
-
-		// Act
-		var hsl = Utilities.RgbToHsl(yellow);
-
-		// Assert
-		hsl.Should().NotBeNull();
-		hsl[0].Should().Be((ushort)(60.0 / 360.0 * 65535)); // Hue 60 degrees
-		hsl[1].Should().Be(65535); // Full saturation
-		hsl[2].Should().Be(65535); // Full value
+		hsl[0].Should().Be((ushort)(expectedHueDegrees / 360.0 * 65535)); // Hue
+		hsl[1].Should().Be(expectedSaturation); // Saturation
+		hsl[2].Should().Be(expectedValue); // Lightness/Value
 	}
 
 	#endregion
@@ -276,53 +142,28 @@ public class UtilitiesTests
 		color.Should().Be("rgb:255,255,255");
 	}
 
-	/// <summary>
-	/// Performs BuildRGB_Should_Throw_On_Red_Too_High operation.
-	/// </summary>
-	[Fact]
-	public void BuildRGB_Should_Throw_On_Red_Too_High()
-	{
-		// Act & Assert
-		((Func<string>)(() => LifxColor.BuildRGB(256, 0, 0)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
 
 	/// <summary>
-	/// Performs BuildRGB_Should_Throw_On_Red_Too_Low operation.
+	/// Channel values outside 0-255, one per channel and at each end of the range.
 	/// </summary>
-	[Fact]
-	public void BuildRGB_Should_Throw_On_Red_Too_Low()
+	public static TheoryData<int, int, int> OutOfRangeRgbCases => new()
 	{
-		// Act & Assert
-		((Func<string>)(() => LifxColor.BuildRGB(-1, 0, 0)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
+		{ 256, 0, 0 },  // red too high
+		{ -1, 0, 0 },   // red too low
+		{ 0, 256, 0 },  // green too high
+		{ 0, 0, 256 }   // blue too high
+	};
 
 	/// <summary>
-	/// Performs BuildRGB_Should_Throw_On_Green_Too_High operation.
+	/// Performs BuildRGB_Should_Throw_On_Out_Of_Range_Channel operation.
 	/// </summary>
-	[Fact]
-	public void BuildRGB_Should_Throw_On_Green_Too_High()
-	{
+	[Theory]
+	[MemberData(nameof(OutOfRangeRgbCases))]
+	public void BuildRGB_Should_Throw_On_Out_Of_Range_Channel(int red, int green, int blue)
 		// Act & Assert
-		((Func<string>)(() => LifxColor.BuildRGB(0, 256, 0)))
+		=> ((Func<string>)(() => LifxColor.BuildRGB(red, green, blue)))
 			.Should()
 			.ThrowExactly<InvalidConstraintException>();
-	}
-
-	/// <summary>
-	/// Performs BuildRGB_Should_Throw_On_Blue_Too_High operation.
-	/// </summary>
-	[Fact]
-	public void BuildRGB_Should_Throw_On_Blue_Too_High()
-	{
-		// Act & Assert
-		((Func<string>)(() => LifxColor.BuildRGB(0, 0, 256)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
 
 	#endregion
 
@@ -373,72 +214,35 @@ public class UtilitiesTests
 	}
 
 	/// <summary>
-	/// Performs BuildHSBK_Should_Validate_Hue_Range operation.
+	/// One component out of range per case, at each end of its own range, with the other three
+	/// left at values the builder accepts.
 	/// </summary>
-	[Fact]
-	public void BuildHSBK_Should_Validate_Hue_Range()
+	public static TheoryData<double?, double?, double?, int?> OutOfRangeHsbkCases => new()
 	{
-		// Act & Assert - Too low
-		((Func<string>)(() => LifxColor.BuildHSBK(-1, 0.5, 0.5, 3500)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-
-		// Too high
-		((Func<string>)(() => LifxColor.BuildHSBK(361, 0.5, 0.5, 3500)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
+		{ -1, 0.5, 0.5, 3500 },    // hue too low
+		{ 361, 0.5, 0.5, 3500 },   // hue too high
+		{ 120, -0.1, 0.5, 3500 },  // saturation too low
+		{ 120, 1.1, 0.5, 3500 },   // saturation too high
+		{ 120, 0.5, -0.1, 3500 },  // brightness too low
+		{ 120, 0.5, 1.1, 3500 },   // brightness too high
+		{ 120, 0.5, 0.5, 1499 },   // kelvin below minimum
+		{ 120, 0.5, 0.5, 9001 }    // kelvin above maximum
+	};
 
 	/// <summary>
-	/// Performs BuildHSBK_Should_Validate_Saturation_Range operation.
+	/// Performs BuildHSBK_Should_Validate_Component_Ranges operation.
 	/// </summary>
-	[Fact]
-	public void BuildHSBK_Should_Validate_Saturation_Range()
-	{
-		// Act & Assert - Too low
-		((Func<string>)(() => LifxColor.BuildHSBK(120, -0.1, 0.5, 3500)))
+	[Theory]
+	[MemberData(nameof(OutOfRangeHsbkCases))]
+	public void BuildHSBK_Should_Validate_Component_Ranges(
+		double? hue,
+		double? saturation,
+		double? brightness,
+		int? kelvin)
+		// Act & Assert
+		=> ((Func<string>)(() => LifxColor.BuildHSBK(hue, saturation, brightness, kelvin)))
 			.Should()
 			.ThrowExactly<InvalidConstraintException>();
-
-		// Too high
-		((Func<string>)(() => LifxColor.BuildHSBK(120, 1.1, 0.5, 3500)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
-
-	/// <summary>
-	/// Performs BuildHSBK_Should_Validate_Brightness_Range operation.
-	/// </summary>
-	[Fact]
-	public void BuildHSBK_Should_Validate_Brightness_Range()
-	{
-		// Act & Assert - Too low
-		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, -0.1, 3500)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-
-		// Too high
-		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, 1.1, 3500)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
-
-	/// <summary>
-	/// Performs BuildHSBK_Should_Validate_Kelvin_Range operation.
-	/// </summary>
-	[Fact]
-	public void BuildHSBK_Should_Validate_Kelvin_Range()
-	{
-		// Act & Assert - Too low
-		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, 0.5, 1499)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-
-		// Too high
-		((Func<string>)(() => LifxColor.BuildHSBK(120, 0.5, 0.5, 9001)))
-			.Should()
-			.ThrowExactly<InvalidConstraintException>();
-	}
 
 	/// <summary>
 	/// Performs BuildHSBK_Should_Allow_Min_Kelvin operation.

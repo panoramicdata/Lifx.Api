@@ -364,6 +364,38 @@ public static class LanCommand
 		AnsiConsole.MarkupLine($"[dim]MAC: {bulb.MacAddressName}[/]");
 	}
 
+	/// <summary>
+	/// How long to listen for device replies when the caller has no say in it.
+	/// </summary>
+	private static readonly TimeSpan DefaultDiscoveryWindow = TimeSpan.FromSeconds(5);
+
+	/// <summary>
+	/// Runs LAN discovery for the given window and returns whatever answered.
+	/// </summary>
+	/// <remarks>
+	/// Discovery is always start, wait, stop against the same client; only the wait differs. Three
+	/// copies of this block were what drove the duplication in this file.
+	/// </remarks>
+	private static List<Device> DiscoverDevices(
+		ILifxClient client,
+		TimeSpan window,
+		CancellationToken cancellationToken)
+	{
+		AnsiConsole.Status()
+			.Start("Discovering devices...", ctx =>
+			{
+				client.StartLan(cancellationToken);
+				client.StartDeviceDiscovery(cancellationToken);
+
+				// Wait for devices to respond
+				Thread.Sleep(window);
+
+				client.StopDeviceDiscovery();
+			});
+
+		return client.Lan?.Devices.ToList() ?? [];
+	}
+
 	private static async Task<LightBulb?> DiscoverAndFindBulb(
 		ILifxClient client,
 		string macAddress,
@@ -372,16 +404,9 @@ public static class LanCommand
 		// Normalize MAC address
 		macAddress = LanHandler.NormalizeMacAddress(macAddress);
 
-		AnsiConsole.Status()
-			.Start("Discovering devices...", ctx =>
-			{
-				client.StartLan(cancellationToken);
-				client.StartDeviceDiscovery(cancellationToken);
-				Thread.Sleep(5000);
-				client.StopDeviceDiscovery();
-			});
+		var devices = DiscoverDevices(client, DefaultDiscoveryWindow, cancellationToken);
 
-		var bulb = client.Lan?.Devices
+		var bulb = devices
 			.OfType<LightBulb>()
 			.FirstOrDefault(d => d.MacAddressName.Equals(macAddress, StringComparison.OrdinalIgnoreCase));
 
@@ -391,7 +416,6 @@ public static class LanCommand
 			AnsiConsole.WriteLine();
 			AnsiConsole.MarkupLine("Available devices:");
 
-			var devices = client.Lan?.Devices.ToList() ?? [];
 			foreach (var device in devices)
 			{
 				AnsiConsole.MarkupLine($"  [cyan]{device.MacAddressName}[/] at {device.HostName}");
@@ -422,19 +446,7 @@ public static class LanCommand
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();
 
-			AnsiConsole.Status()
-				.Start("Discovering devices...", ctx =>
-				{
-					client.StartLan(cancellationToken);
-					client.StartDeviceDiscovery(cancellationToken);
-
-					// Wait for devices to respond
-					Thread.Sleep(timeout * 1000);
-
-					client.StopDeviceDiscovery();
-				});
-
-			var devices = client.Lan?.Devices.ToList() ?? [];
+			var devices = DiscoverDevices(client, TimeSpan.FromSeconds(timeout), cancellationToken);
 
 			if (devices.Count == 0)
 			{
@@ -442,7 +454,7 @@ public static class LanCommand
 				return;
 			}
 
-			AnsiConsole.Write(BuildDeviceTable(devices));
+			AnsiConsole.Write(BuildDeviceTable(devices, includePort: true));
 			AnsiConsole.MarkupLine($"[green]✓[/] Found [cyan]{devices.Count}[/] device(s)");
 		});
 
@@ -459,7 +471,11 @@ public static class LanCommand
 		AnsiConsole.MarkupLine("[dim]  - Firewall allows UDP port 56700[/]");
 	}
 
-	private static Table BuildDeviceTable(IEnumerable<Device> devices)
+	/// <summary>
+	/// Builds the device table. Only 'discover' shows the port column, which is the single
+	/// difference between the two tables this file used to build separately.
+	/// </summary>
+	private static Table BuildDeviceTable(IEnumerable<Device> devices, bool includePort)
 	{
 		var table = new Table
 		{
@@ -468,16 +484,26 @@ public static class LanCommand
 		table.AddColumn("Type");
 		table.AddColumn("MAC Address");
 		table.AddColumn("IP Address");
-		table.AddColumn("Port");
+		if (includePort)
+		{
+			table.AddColumn("Port");
+		}
 
 		foreach (var device in devices)
 		{
-			table.AddRow(
+			var row = new List<string>
+			{
 				device.GetType().Name,
 				device.MacAddressName,
-				device.HostName,
-				device.Port.ToString()
-			);
+				device.HostName
+			};
+
+			if (includePort)
+			{
+				row.Add(device.Port.ToString());
+			}
+
+			table.AddRow([.. row]);
 		}
 
 		return table;
@@ -492,16 +518,7 @@ public static class LanCommand
 			var factory = new LifxClientFactory();
 			using var client = factory.CreateLanClient();
 
-			AnsiConsole.Status()
-				.Start("Discovering devices...", ctx =>
-				{
-					client.StartLan(cancellationToken);
-					client.StartDeviceDiscovery(cancellationToken);
-					Thread.Sleep(5000);
-					client.StopDeviceDiscovery();
-				});
-
-			var devices = client.Lan?.Devices.ToList() ?? [];
+			var devices = DiscoverDevices(client, DefaultDiscoveryWindow, cancellationToken);
 
 			if (devices.Count == 0)
 			{
@@ -509,24 +526,7 @@ public static class LanCommand
 				return;
 			}
 
-			var table = new Table
-			{
-				Border = TableBorder.Rounded
-			};
-			table.AddColumn("Type");
-			table.AddColumn("MAC Address");
-			table.AddColumn("IP Address");
-
-			foreach (var device in devices)
-			{
-				table.AddRow(
-					device.GetType().Name,
-					device.MacAddressName,
-					device.HostName
-				);
-			}
-
-			AnsiConsole.Write(table);
+			AnsiConsole.Write(BuildDeviceTable(devices, includePort: false));
 			AnsiConsole.MarkupLine($"[dim]Total: {devices.Count} devices[/]");
 		});
 
