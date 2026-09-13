@@ -47,6 +47,21 @@ public abstract class Test(ITestOutputHelper testOutputHelper)
 	}
 
 	private static TestConfiguration GetTestConfiguration()
+		=> TryGetTestConfiguration()
+			?? throw new InvalidOperationException(
+				"AppToken not found. Please either:\n" +
+				"1. Set it in User Secrets using: dotnet user-secrets set \"AppToken\" \"your-token-here\"\n" +
+				"2. Copy appsettings.example.json to appsettings.json and set the AppToken value\n" +
+				"Get your token from https://cloud.lifx.com/settings");
+
+	/// <summary>
+	/// Reads the test configuration, or returns null when no AppToken is configured.
+	/// </summary>
+	/// <remarks>
+	/// Used by anything that must cope with the token being absent - on CI, for instance - rather
+	/// than failing the way a cloud test should.
+	/// </remarks>
+	internal static TestConfiguration? TryGetTestConfiguration()
 	{
 		var configuration = new ConfigurationBuilder()
 			.AddJsonFile("../../../appsettings.json", optional: true)
@@ -57,11 +72,7 @@ public abstract class Test(ITestOutputHelper testOutputHelper)
 
 		if (string.IsNullOrEmpty(appToken))
 		{
-			throw new InvalidOperationException(
-				"AppToken not found. Please either:\n" +
-				"1. Set it in User Secrets using: dotnet user-secrets set \"AppToken\" \"your-token-here\"\n" +
-				"2. Copy appsettings.example.json to appsettings.json and set the AppToken value\n" +
-				"Get your token from https://cloud.lifx.com/settings");
+			return null;
 		}
 
 		return new TestConfiguration
