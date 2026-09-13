@@ -17,7 +17,7 @@
     <PackageVersion Include="System.CommandLine" Version="2.0.12" />
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="10.0.12" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
-    <PackageVersion Include="xunit.v3" Version="4.0.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.1" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.2" />
   </ItemGroup>
 </Project>
