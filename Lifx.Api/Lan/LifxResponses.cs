@@ -21,6 +21,7 @@ public abstract class LifxResponse
 			MessageType.DeviceStateVersion => new StateVersionResponse(header, type, payload, source),
 			MessageType.DeviceStateHostFirmware => new StateHostFirmwareResponse(header, type, payload, source),
 			MessageType.DeviceStateService => new StateServiceResponse(header, type, payload, source),
+			MessageType.DeviceStateGroup => new StateGroupResponse(header, type, payload, source),
 			_ => new UnknownResponse(header, type, payload, source),
 		};
 
@@ -162,6 +163,49 @@ public class StateVersionResponse : LifxResponse
 	/// </summary>
 	public uint Version { get; private set; }
 }
+/// <summary>
+/// The group a device belongs to, as reported by a StateGroup message.
+/// </summary>
+public class StateGroupResponse : LifxResponse
+{
+	/// <summary>
+	/// Payload layout: group GUID (16), label (32), updated_at as nanoseconds (8).
+	/// </summary>
+	private const int PayloadLength = 56;
+
+	internal StateGroupResponse(FrameHeader header, MessageType type, byte[] payload, uint source) : base(header, type, payload, source)
+	{
+		// A short payload would otherwise fault the receive loop rather than this call.
+		if (payload.Length < PayloadLength)
+		{
+			throw new ArgumentException(
+				$"A StateGroup payload must be at least {PayloadLength} bytes, but was {payload.Length}.",
+				nameof(payload));
+		}
+
+		Group = new Guid(payload.AsSpan(0, 16));
+		Label = Encoding.UTF8.GetString(payload, 16, 32).TrimEnd('\0');
+
+		var nanoseconds = BitConverter.ToUInt64(payload, 48);
+		UpdatedAt = Utilities.Epoch.AddMilliseconds(nanoseconds * 0.000001);
+	}
+
+	/// <summary>
+	/// Gets the identifier shared by every device in the group.
+	/// </summary>
+	public Guid Group { get; private set; }
+
+	/// <summary>
+	/// Gets the group's label.
+	/// </summary>
+	public string Label { get; private set; }
+
+	/// <summary>
+	/// Gets the time the group was last changed.
+	/// </summary>
+	public DateTime UpdatedAt { get; private set; }
+}
+
 /// <summary>
 /// Represents the StateHostFirmwareResponse type.
 /// </summary>

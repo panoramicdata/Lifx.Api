@@ -125,4 +125,29 @@ public partial class LifxLanClient : IDisposable
 			MessageType.DeviceGetHostFirmware,
 			cancellationToken);
 	}
+
+	/// <summary>
+	/// Gets the group the device belongs to.
+	/// </summary>
+	/// <param name="device">The device to ask.</param>
+	/// <param name="cancellationToken">Cancels the request.</param>
+	/// <returns>The device's group, or null if it did not answer.</returns>
+	public async Task<StateGroupResponse?> GetDeviceGroupAsync(
+		Device device,
+		CancellationToken cancellationToken)
+	{
+		ArgumentNullException.ThrowIfNull(device);
+
+		FrameHeader header = new()
+		{
+			Identifier = GetNextIdentifier(),
+			AcknowledgeRequired = false
+		};
+
+		return await BroadcastMessageAsync<StateGroupResponse>(
+			device.HostName,
+			header,
+			MessageType.DeviceGetGroup,
+			cancellationToken);
+	}
 }
