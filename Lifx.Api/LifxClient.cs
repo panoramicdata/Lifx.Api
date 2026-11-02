@@ -71,11 +71,11 @@ public class LifxClient : ILifxClient
 		var cloudEnabled = !string.IsNullOrEmpty(options.ApiToken);
 		if (cloudEnabled)
 		{
-			_httpClient = CreateHttpClient(options.ApiToken!);
-			Lights = CreateApiClient<ILifxLightsApi>(options.ApiToken!);
-			Effects = CreateApiClient<ILifxEffectsApi>(options.ApiToken!);
-			Scenes = CreateApiClient<ILifxScenesApi>(options.ApiToken!);
-			Color = CreateApiClient<ILifxColorApi>(options.ApiToken!);
+			_httpClient = CreateHttpClient(options.ApiToken!, options);
+			Lights = CreateApiClient<ILifxLightsApi>(options.ApiToken!, options);
+			Effects = CreateApiClient<ILifxEffectsApi>(options.ApiToken!, options);
+			Scenes = CreateApiClient<ILifxScenesApi>(options.ApiToken!, options);
+			Color = CreateApiClient<ILifxColorApi>(options.ApiToken!, options);
 		}
 		else
 		{
@@ -87,7 +87,7 @@ public class LifxClient : ILifxClient
 		}
 
 		// Initialize Products API (no token required, uses GitHub raw URL)
-		Products = CreateProductsApiClient();
+		Products = CreateProductsApiClient(options);
 
 		// Initialize LAN client if enabled
 		if (options.IsLanEnabled)
@@ -127,18 +127,18 @@ public class LifxClient : ILifxClient
 	/// </summary>
 	public void StopDeviceDiscovery() => Lan?.StopDeviceDiscovery();
 
-	private static T CreateApiClient<T>(string apiToken)
+	private static T CreateApiClient<T>(string apiToken, LifxClientOptions options)
 	{
-		var httpClient = CreateHttpClient(apiToken);
+		var httpClient = CreateHttpClient(apiToken, options);
 		return RestService.For<T>(httpClient, new RefitSettings
 		{
 			ContentSerializer = new SystemTextJsonContentSerializer(JsonSerializerOptions)
 		});
 	}
 
-	private static HttpClient CreateHttpClient(string apiToken)
+	private static HttpClient CreateHttpClient(string apiToken, LifxClientOptions options)
 	{
-		var httpClient = new HttpClient
+		var httpClient = new HttpClient(new ReadOnlyGuardHandler(options, new HttpClientHandler()))
 		{
 			BaseAddress = new Uri(BaseUrl)
 		};
@@ -146,9 +146,9 @@ public class LifxClient : ILifxClient
 		return httpClient;
 	}
 
-	private static ILifxProductsApi CreateProductsApiClient()
+	private static ILifxProductsApi CreateProductsApiClient(LifxClientOptions options)
 	{
-		var httpClient = new HttpClient
+		var httpClient = new HttpClient(new ReadOnlyGuardHandler(options, new HttpClientHandler()))
 		{
 			BaseAddress = new Uri("https://raw.githubusercontent.com")
 		};

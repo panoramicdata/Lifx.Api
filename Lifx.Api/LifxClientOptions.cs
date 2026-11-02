@@ -22,4 +22,9 @@ public class LifxClientOptions
 	/// Gets or sets IsLanEnabled.
 	/// </summary>
 	public bool IsLanEnabled { get; set; }
+
+	/// <summary>
+	/// Gets or sets whether the client refuses every request that is not a read (GET, HEAD or OPTIONS).
+	/// </summary>
+	public bool IsReadOnly { get; set; }
 }
