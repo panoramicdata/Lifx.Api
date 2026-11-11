@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 
@@ -13,6 +14,7 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 {
 	private static readonly DateTime Epoch = new(1970, 01, 01);
 	private const int Port = 56700;
+	[SuppressMessage("SonarAnalyzer", "S2931", Justification = "LifxLanClient implements IDisposable and disposes _socket in Dispose().")]
 	private UdpClient? _socket;
 	private Task? _receiveLoopTask;
 	private readonly CancellationTokenSource _cancellationTokenSource = new();

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace Lifx.Api.Lan;
@@ -27,11 +28,13 @@ public partial class LifxLanClient : IDisposable
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
+	[SuppressMessage("SonarAnalyzer", "S3264", Justification = "Public API surface; invoked by ProcessDeviceDiscoveryMessage.")]
 	public event EventHandler<DeviceDiscoveryEventArgs>? DeviceDiscovered;
 
 	/// <summary>
 	/// Represents a public API member.
 	/// </summary>
+	[SuppressMessage("SonarAnalyzer", "S3264", Justification = "Public API surface; invoked by the discovery loop.")]
 	public event EventHandler<DeviceDiscoveryEventArgs>? DeviceLost;
 
 	private readonly IList<Device> devices = [];
