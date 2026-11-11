@@ -1,8 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Lifx.Api.Models.Lan;
 
 /// <summary>
 /// Represents the Color value type.
 /// </summary>
+[SuppressMessage("SonarAnalyzer", "S3898", Justification = "Color already implements IEquatable<Color>.")]
 public struct Color : IEquatable<Color>
 {
 	/// <summary>
