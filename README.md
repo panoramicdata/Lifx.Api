@@ -31,6 +31,7 @@ Lifx.Api is a comprehensive .NET library that provides a unified interface for c
 - Power control with smooth transitions
 - Color and temperature control
 - Infrared support for compatible bulbs
+- Read a device's group (`GetDeviceGroupAsync`: group id, label and last-updated time)
 - Can be used independently or alongside Cloud API
 - Lower latency than Cloud API
 
@@ -398,6 +399,10 @@ foreach (var device in devices)
         
         // Get state
         var state = await client.Lan.GetLightStateAsync(bulb, cancellationToken);
+        
+        // Get the group the device belongs to (null if it does not answer)
+        var group = await client.Lan.GetDeviceGroupAsync(bulb, cancellationToken);
+        Console.WriteLine($"{group?.Label} ({group?.Group})");
         
         // Set infrared (for supported bulbs)
         await client.Lan.SetInfraredAsync(bulb, brightness: 32768, cancellationToken);

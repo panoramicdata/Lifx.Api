@@ -137,6 +137,14 @@ public class LanErrorHandlingTests(LanTestFixture fixture) : IDisposable
 			lan => lan.GetDeviceLabelAsync(null!, CancellationToken.None));
 
 	/// <summary>
+	/// Performs GetDeviceGroup_Should_Throw_On_Null_Device operation.
+	/// </summary>
+	[Fact]
+	public Task GetDeviceGroup_Should_Throw_On_Null_Device()
+		=> AssertLanRejectsAsync<ArgumentNullException>(
+			lan => lan.GetDeviceGroupAsync(null!, CancellationToken.None));
+
+	/// <summary>
 	/// Performs SetDeviceLabel_Should_Throw_On_Null_Device operation.
 	/// </summary>
 	[Fact]
