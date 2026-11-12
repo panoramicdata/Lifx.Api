@@ -1,11 +1,12 @@
+using Lifx.Api.Models.Lan;
 
 namespace Lifx.Api.Lan;
 
-using Lifx.Api.Models.Lan;
-
-public partial class LifxLanClient
+internal static class LifxPacketCodec
 {
-	private static LifxResponse ParseMessage(byte[] packet)
+	private static readonly DateTime Epoch = new(1970, 01, 01);
+
+	internal static LifxResponse ParseMessage(byte[] packet)
 	{
 		using var memoryStream = new MemoryStream(packet);
 
@@ -37,7 +38,7 @@ public partial class LifxLanClient
 		return LifxResponse.Create(header, type, source, size > 36 ? binaryReader.ReadBytes(size - 36) : []);
 	}
 
-	private static void WritePacketToStream(Stream outStream, FrameHeader header, ushort type, byte[] payload)
+	internal static void WritePacketToStream(Stream outStream, FrameHeader header, ushort type, byte[] payload)
 	{
 		using var dw = new BinaryWriter(outStream);
 		#region Frame

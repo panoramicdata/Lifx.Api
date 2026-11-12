@@ -8,12 +8,10 @@ using Lifx.Api.Models.Lan;
 /// <summary>
 /// Represents the LifxLanClient type.
 /// </summary>
-public partial class LifxLanClient : IDisposable
+public partial class LifxLanClient
 {
 	private static uint identifier = 2;
 	private static readonly Lock identifierLock = new();
-	private uint discoverSourceID;
-	private CancellationTokenSource? _DiscoverCancellationSource;
 	private readonly Dictionary<string, Device> _discoveredBulbs = [];
 
 	private static uint GetNextIdentifier()

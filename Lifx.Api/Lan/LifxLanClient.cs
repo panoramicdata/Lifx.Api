@@ -12,7 +12,6 @@ using Lifx.Api.Models.Lan;
 public partial class LifxLanClient : IDisposable
 {
 	private readonly ILogger logger;
-	private static readonly DateTime Epoch = new(1970, 01, 01);
 	private const int Port = 56700;
 	private UdpClient? _socket;
 	private Task? _receiveLoopTask;
@@ -77,7 +76,7 @@ public partial class LifxLanClient : IDisposable
 	private void HandleIncomingMessages(byte[] data, IPEndPoint endpoint)
 	{
 		var remote = endpoint;
-		var msg = ParseMessage(data);
+		var msg = LifxPacketCodec.ParseMessage(data);
 		if (msg.Type == MessageType.DeviceStateService)
 		{
 			ProcessDeviceDiscoveryMessage(remote.Address, msg);
@@ -98,5 +97,80 @@ public partial class LifxLanClient : IDisposable
 			"Received from {Remote}:{Bytes}",
 			remote.ToString(),
 			string.Join(",", (from a in data select a.ToString("X2")).ToArray()));
+	}
+
+	/// <summary>
+	/// Performs Dispose operation.
+	/// </summary>
+	public void Dispose()
+	{
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+	/// <summary>
+	/// Releases the socket and cancellation sources.
+	/// </summary>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposing)
+		{
+			return;
+		}
+
+		lock (_disposeLock)
+		{
+			if (_disposed)
+			{
+				return;
+			}
+
+			_disposed = true;
+		}
+
+		// Discovery is cancelled before the main token so its loop stops broadcasting before the
+		// socket goes away.
+		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Cancel());
+		IgnoringObjectDisposed(_cancellationTokenSource.Cancel);
+
+		WaitForReceiveLoop();
+
+		if (_socket is not null)
+		{
+			_socket.Dispose();
+		}
+
+		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Dispose());
+		IgnoringObjectDisposed(_cancellationTokenSource.Dispose);
+	}
+
+	private static void IgnoringObjectDisposed(Action action)
+	{
+		try
+		{
+			action();
+		}
+		catch (ObjectDisposedException)
+		{
+			// Teardown races the receive and discovery loops, so whatever this step touches may
+			// already have been disposed. That is the expected outcome here, not a failure.
+		}
+	}
+
+	private void WaitForReceiveLoop()
+	{
+		if (_receiveLoopTask is null)
+		{
+			return;
+		}
+
+		try
+		{
+			_receiveLoopTask.Wait(TimeSpan.FromSeconds(5));
+		}
+		catch (AggregateException)
+		{
+			// The loop was cancelled or faulted; either way there is nothing left to wait for.
+		}
 	}
 }

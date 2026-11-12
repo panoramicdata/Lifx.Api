@@ -6,6 +6,9 @@ using Lifx.Api.Models.Lan;
 
 public partial class LifxLanClient
 {
+	private uint discoverSourceID;
+	private CancellationTokenSource? _DiscoverCancellationSource;
+
 	/// <summary>
 	/// Performs StartDeviceDiscovery operation.
 	/// </summary>

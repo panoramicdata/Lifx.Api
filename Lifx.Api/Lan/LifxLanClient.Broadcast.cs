@@ -82,7 +82,7 @@ public partial class LifxLanClient
 
 		using (var stream = new MemoryStream())
 		{
-			WritePacketToStream(stream, header, (ushort)type, payload);
+			LifxPacketCodec.WritePacketToStream(stream, header, (ushort)type, payload);
 			var msg = stream.ToArray();
 			await _socket.SendAsync(msg, msg.Length, hostName, Port);
 		}
