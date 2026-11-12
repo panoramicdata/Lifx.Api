@@ -8,7 +8,7 @@ using Lifx.Api.Models.Lan;
 /// <summary>
 /// Represents the LifxLanClient type.
 /// </summary>
-public partial class LifxLanClient : IDisposable
+public partial class LifxLanClient
 {
 	/// <summary>
 	/// Performs SetDevicePowerStateAsync operation.

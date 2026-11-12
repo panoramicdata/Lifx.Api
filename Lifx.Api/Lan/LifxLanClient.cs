@@ -39,12 +39,26 @@ public partial class LifxLanClient : IDisposable
 
 			logger.LogTrace("Initializing...");
 			var end = new IPEndPoint(IPAddress.Any, Port);
-			_socket = new UdpClient(end);
-			_socket.Client.Blocking = false;
-			_socket.DontFragment = true;
-			_socket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+			_socket = CreateSocket(end);
 			_receiveLoopTask = ReceiveLoopAsync(cancellationToken);
 			logger.LogTrace("Initialization complete.");
+		}
+	}
+
+	private static UdpClient CreateSocket(IPEndPoint end)
+	{
+		var socket = new UdpClient(end);
+		try
+		{
+			socket.Client.Blocking = false;
+			socket.DontFragment = true;
+			socket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+			return socket;
+		}
+		catch
+		{
+			socket.Dispose();
+			throw;
 		}
 	}
 
