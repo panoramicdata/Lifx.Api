@@ -108,39 +108,24 @@ public class UtilitiesTests
 	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Format_Correctly()
-	{
-		// Act
-		var color = LifxColor.BuildRGB(255, 0, 0);
+		=> AssertRgbFormat(255, 0, 0, "rgb:255,0,0");
 
-		// Assert
-		color.Should().Be("rgb:255,0,0");
-	}
+	private static void AssertRgbFormat(int r, int g, int b, string expected)
+		=> LifxColor.BuildRGB(r, g, b).Should().Be(expected);
 
 	/// <summary>
 	/// Performs BuildRGB_Should_Handle_All_Zeros operation.
 	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Handle_All_Zeros()
-	{
-		// Act
-		var color = LifxColor.BuildRGB(0, 0, 0);
-
-		// Assert
-		color.Should().Be("rgb:0,0,0");
-	}
+		=> AssertRgbFormat(0, 0, 0, "rgb:0,0,0");
 
 	/// <summary>
 	/// Performs BuildRGB_Should_Handle_All_Max_Values operation.
 	/// </summary>
 	[Fact]
 	public void BuildRGB_Should_Handle_All_Max_Values()
-	{
-		// Act
-		var color = LifxColor.BuildRGB(255, 255, 255);
-
-		// Assert
-		color.Should().Be("rgb:255,255,255");
-	}
+		=> AssertRgbFormat(255, 255, 255, "rgb:255,255,255");
 
 
 	/// <summary>
@@ -180,6 +165,11 @@ public class UtilitiesTests
 
 		// Assert
 		color.Should().Contain("hue:120");
+		AssertHsbkTail(color);
+	}
+
+	private static void AssertHsbkTail(string color)
+	{
 		color.Should().Contain("saturation:0.5");
 		color.Should().Contain("brightness:0.8");
 		color.Should().Contain("kelvin:3500");
@@ -196,9 +186,7 @@ public class UtilitiesTests
 
 		// Assert
 		color.Should().NotContain("hue:");
-		color.Should().Contain("saturation:0.5");
-		color.Should().Contain("brightness:0.8");
-		color.Should().Contain("kelvin:3500");
+		AssertHsbkTail(color);
 	}
 
 	/// <summary>
@@ -249,26 +237,14 @@ public class UtilitiesTests
 	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Allow_Min_Kelvin()
-	{
-		// Act
-		var color = LifxColor.BuildHSBK(null, null, 0.5, 1500);
-
-		// Assert
-		color.Should().Contain("kelvin:1500");
-	}
+		=> LifxColor.BuildHSBK(null, null, 0.5, 1500).Should().Contain("kelvin:1500");
 
 	/// <summary>
 	/// Performs BuildHSBK_Should_Allow_Max_Kelvin operation.
 	/// </summary>
 	[Fact]
 	public void BuildHSBK_Should_Allow_Max_Kelvin()
-	{
-		// Act
-		var color = LifxColor.BuildHSBK(null, null, 0.5, 9000);
-
-		// Assert
-		color.Should().Contain("kelvin:9000");
-	}
+		=> LifxColor.BuildHSBK(null, null, 0.5, 9000).Should().Contain("kelvin:9000");
 
 	#endregion
 

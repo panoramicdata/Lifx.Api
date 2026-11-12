@@ -1,6 +1,8 @@
 using Lifx.Api;
 using Lifx.Api.Extensions;
 using Lifx.Api.Models.Cloud;
+using Lifx.Api.Models.Cloud.Requests;
+using Lifx.Api.Models.Cloud.Responses;
 using Lifx.Cli.Handlers;
 using Spectre.Console;
 using System.CommandLine;
@@ -224,76 +226,61 @@ public static class LightsCommand
 	private static async Task ListGroups(ILifxClient client, Selector selector, CancellationToken cancellationToken)
 	{
 		var groups = await client.Lights.ListGroupsAsync(selector, cancellationToken);
+		WriteCollectionTable(groups, "groups");
+	}
 
+	private static void WriteCollectionTable<T>(List<T> collections, string noun)
+		where T : LightCollection
+	{
 		var table = new Table();
 		table.AddColumn("Name");
 		table.AddColumn("ID");
 		table.AddColumn("Lights");
 
-		foreach (var group in groups)
+		foreach (var collection in collections)
 		{
-			table.AddRow(group.Label, group.Id, group.Count().ToString());
+			table.AddRow(collection.Label, collection.Id, collection.Count().ToString());
 		}
 
 		AnsiConsole.Write(table);
-		AnsiConsole.MarkupLine($"[dim]Total: {groups.Count} groups[/]");
+		AnsiConsole.MarkupLine($"[dim]Total: {collections.Count} {noun}[/]");
 	}
 
 	private static async Task ListLocations(ILifxClient client, Selector selector, CancellationToken cancellationToken)
 	{
 		var locations = await client.Lights.ListLocationsAsync(selector, cancellationToken);
+		WriteCollectionTable(locations, "locations");
+	}
 
-		var table = new Table();
-		table.AddColumn("Name");
-		table.AddColumn("ID");
-		table.AddColumn("Lights");
+	private static Command CreatePowerCommand(
+		string name,
+		string description,
+		string selectorDescription,
+		string verb,
+		Func<double, SetStateRequest> buildRequest)
+	{
+		var selectorArgument = CreateSelectorArgument(selectorDescription);
+		var durationOption = CreateDurationOption();
 
-		foreach (var location in locations)
-		{
-			table.AddRow(location.Label, location.Id, location.Count().ToString());
-		}
-
-		AnsiConsole.Write(table);
-		AnsiConsole.MarkupLine($"[dim]Total: {locations.Count} locations[/]");
+		return CreateSelectionCommand(
+			name,
+			description,
+			selectorArgument,
+			[],
+			[durationOption],
+			async (client, selector, parseResult, cancellationToken) =>
+			{
+				var request = buildRequest(parseResult.GetValue(durationOption));
+				await client.Lights.SetStateAsync(selector, request, cancellationToken);
+				AnsiConsole.MarkupLine($"[green]✓[/] Turned {verb} lights: {parseResult.GetValue(selectorArgument)}");
+			});
 	}
 
 	private static Command CreateOnCommand()
-	{
-		var selectorArgument = CreateSelectorArgument("Which lights to turn on");
-		var durationOption = CreateDurationOption();
-
-		return CreateSelectionCommand(
-			"on",
-			"Turn lights on",
-			selectorArgument,
-			[],
-			[durationOption],
-			async (client, selector, parseResult, cancellationToken) =>
-			{
-				var request = LightsHandler.BuildOnRequest(parseResult.GetValue(durationOption));
-				await client.Lights.SetStateAsync(selector, request, cancellationToken);
-				AnsiConsole.MarkupLine($"[green]✓[/] Turned on lights: {parseResult.GetValue(selectorArgument)}");
-			});
-	}
+		=> CreatePowerCommand("on", "Turn lights on", "Which lights to turn on", "on", LightsHandler.BuildOnRequest);
 
 	private static Command CreateOffCommand()
-	{
-		var selectorArgument = CreateSelectorArgument("Which lights to turn off");
-		var durationOption = CreateDurationOption();
-
-		return CreateSelectionCommand(
-			"off",
-			"Turn lights off",
-			selectorArgument,
-			[],
-			[durationOption],
-			async (client, selector, parseResult, cancellationToken) =>
-			{
-				var request = LightsHandler.BuildOffRequest(parseResult.GetValue(durationOption));
-				await client.Lights.SetStateAsync(selector, request, cancellationToken);
-				AnsiConsole.MarkupLine($"[green]✓[/] Turned off lights: {parseResult.GetValue(selectorArgument)}");
-			});
-	}
+		=> CreatePowerCommand("off", "Turn lights off", "Which lights to turn off", "off", LightsHandler.BuildOffRequest);
 
 	private static Command CreateToggleCommand()
 	{

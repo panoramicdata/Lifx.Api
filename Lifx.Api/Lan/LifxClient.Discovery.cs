@@ -78,8 +78,14 @@ public partial class LifxLanClient : IDisposable
 		};
 		_discoveredBulbs[id] = device;
 		devices.Add(device);
-		DeviceDiscovered?.Invoke(this, new DeviceDiscoveryEventArgs(device));
+		OnDeviceDiscovered(device);
 	}
+
+	private void OnDeviceDiscovered(Device device)
+		=> DeviceDiscovered?.Invoke(this, new DeviceDiscoveryEventArgs(device));
+
+	private void OnDeviceLost(Device device)
+		=> DeviceLost?.Invoke(this, new DeviceDiscoveryEventArgs(device));
 
 	/// <summary>
 	/// Performs StartDeviceDiscovery operation.
@@ -130,7 +136,7 @@ public partial class LifxLanClient : IDisposable
 					{
 						devices.Remove(device);
 						_discoveredBulbs.Remove(device.MacAddressName);
-						DeviceLost?.Invoke(this, new DeviceDiscoveryEventArgs(device));
+						OnDeviceLost(device);
 					}
 				}
 			}

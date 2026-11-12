@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Lifx.Api.Lan;
 using Lifx.Api.Models.Lan;
 
 namespace Lifx.Api.Test.Lan;
@@ -13,6 +14,8 @@ namespace Lifx.Api.Test.Lan;
 [Collection("LAN Tests")]
 public class LanLightTests(LanTestFixture fixture) : IDisposable
 {
+	private static readonly Color RedColor = new() { R = 255, G = 0, B = 0 };
+
 	private readonly LightBulb _testBulb = new(
 			LanTestDevice.HostName,
 			LanTestDevice.MacAddress,
@@ -29,117 +32,75 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 	}
 
 	/// <summary>
-	/// Performs SetLightPower_Should_Require_Valid_Bulb operation.
+	/// Runs the call against the shared LAN client and asserts the exact exception type.
+	/// Does nothing when the LAN client was not started.
 	/// </summary>
-	[Fact]
-	public async Task SetLightPower_Should_Require_Valid_Bulb()
+	private async Task AssertThrowsAsync<TException>(Func<LifxLanClient, Task> call)
+		where TException : Exception
 	{
-		// Arrange
 		if (!fixture.IsLanStarted)
 		{
 			return;
 		}
 
-		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetLightPowerAsync(
-				null!,
-				TimeSpan.Zero,
-				PowerState.On,
-				CancellationToken.None)))
+		await ((Func<Task>)(() => call(fixture.SharedClient!.Lan!)))
 			.Should()
-			.ThrowExactlyAsync<ArgumentNullException>();
+			.ThrowExactlyAsync<TException>();
 	}
+
+	private Task SetHsbkAsync(LifxLanClient lan, ushort kelvin)
+		=> lan.SetColorAsync(
+			_testBulb,
+			hue: 0,
+			saturation: 65535,
+			brightness: 65535,
+			kelvin: kelvin,
+			transitionDuration: TimeSpan.Zero,
+			CancellationToken.None);
+
+	/// <summary>
+	/// Performs SetLightPower_Should_Require_Valid_Bulb operation.
+	/// </summary>
+	[Fact]
+	public Task SetLightPower_Should_Require_Valid_Bulb()
+		=> AssertThrowsAsync<ArgumentNullException>(lan =>
+			lan.SetLightPowerAsync(null!, TimeSpan.Zero, PowerState.On, CancellationToken.None));
 
 	/// <summary>
 	/// Performs SetLightPower_Should_Validate_Transition_Duration operation.
 	/// </summary>
 	[Fact]
-	public async Task SetLightPower_Should_Validate_Transition_Duration()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		// Act & Assert - Negative duration
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetLightPowerAsync(
-				_testBulb,
-				TimeSpan.FromMilliseconds(-1),
-				PowerState.On,
-				CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
-	}
+	public Task SetLightPower_Should_Validate_Transition_Duration()
+		=> AssertThrowsAsync<ArgumentOutOfRangeException>(lan =>
+			lan.SetLightPowerAsync(_testBulb, TimeSpan.FromMilliseconds(-1), PowerState.On, CancellationToken.None));
 
 	/// <summary>
 	/// Performs SetLightPower_Should_Validate_Max_Duration operation.
 	/// </summary>
 	[Fact]
-	public async Task SetLightPower_Should_Validate_Max_Duration()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		// Act & Assert - Duration too large
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetLightPowerAsync(
+	public Task SetLightPower_Should_Validate_Max_Duration()
+		=> AssertThrowsAsync<ArgumentOutOfRangeException>(lan =>
+			lan.SetLightPowerAsync(
 				_testBulb,
 				TimeSpan.FromMilliseconds((double)uint.MaxValue + 1),
 				PowerState.On,
-				CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
-	}
+				CancellationToken.None));
 
 	/// <summary>
 	/// Performs GetLightPower_Should_Require_Valid_Bulb operation.
 	/// </summary>
 	[Fact]
-	public async Task GetLightPower_Should_Require_Valid_Bulb()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.GetLightPowerAsync(null!, CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentNullException>();
-	}
+	public Task GetLightPower_Should_Require_Valid_Bulb()
+		=> AssertThrowsAsync<ArgumentNullException>(lan =>
+			lan.GetLightPowerAsync(null!, CancellationToken.None));
 
 	/// <summary>
 	/// Performs SetColor_Should_Require_Valid_Bulb operation.
 	/// </summary>
 	[Fact]
-	public async Task SetColor_Should_Require_Valid_Bulb()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		var redColor = new Color { R = 255, G = 0, B = 0 };
-
-		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetColorAsync(
-				null!,
-				redColor,
-				3500,
-				CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentNullException>();
-	}
+	public Task SetColor_Should_Require_Valid_Bulb()
+		=> AssertThrowsAsync<ArgumentNullException>(lan =>
+			lan.SetColorAsync(null!, RedColor, 3500, CancellationToken.None));
 
 	/// <summary>
 	/// Performs SetColor_HSBK_Should_Validate_Kelvin_Range operation.
@@ -147,121 +108,49 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 	[Fact]
 	public async Task SetColor_HSBK_Should_Validate_Kelvin_Range()
 	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
+		// Kelvin too low (min is 2500)
+		await AssertThrowsAsync<ArgumentOutOfRangeException>(lan => SetHsbkAsync(lan, 2000));
 
-		// Act & Assert - Kelvin too low
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetColorAsync(
-				_testBulb,
-				hue: 0,
-				saturation: 65535,
-				brightness: 65535,
-				kelvin: 2000, // Too low (min is 2500)
-				transitionDuration: TimeSpan.Zero,
-				CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
-
-		// Act & Assert - Kelvin too high
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetColorAsync(
-				_testBulb,
-				hue: 0,
-				saturation: 65535,
-				brightness: 65535,
-				kelvin: 10000, // Too high (max is 9000)
-				transitionDuration: TimeSpan.Zero,
-				CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
+		// Kelvin too high (max is 9000)
+		await AssertThrowsAsync<ArgumentOutOfRangeException>(lan => SetHsbkAsync(lan, 10000));
 	}
 
 	/// <summary>
 	/// Performs SetColor_Should_Validate_Transition_Duration operation.
 	/// </summary>
 	[Fact]
-	public async Task SetColor_Should_Validate_Transition_Duration()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		var redColor = new Color { R = 255, G = 0, B = 0 };
-
-		// Act & Assert - Negative duration
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetColorAsync(
+	public Task SetColor_Should_Validate_Transition_Duration()
+		=> AssertThrowsAsync<ArgumentOutOfRangeException>(lan =>
+			lan.SetColorAsync(
 				_testBulb,
-				redColor,
+				RedColor,
 				3500,
 				TimeSpan.FromMilliseconds(-1),
-				CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentOutOfRangeException>();
-	}
+				CancellationToken.None));
 
 	/// <summary>
 	/// Performs GetLightState_Should_Require_Valid_Bulb operation.
 	/// </summary>
 	[Fact]
-	public async Task GetLightState_Should_Require_Valid_Bulb()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.GetLightStateAsync(null!, CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentNullException>();
-	}
+	public Task GetLightState_Should_Require_Valid_Bulb()
+		=> AssertThrowsAsync<ArgumentNullException>(lan =>
+			lan.GetLightStateAsync(null!, CancellationToken.None));
 
 	/// <summary>
 	/// Performs GetInfrared_Should_Require_Valid_Bulb operation.
 	/// </summary>
 	[Fact]
-	public async Task GetInfrared_Should_Require_Valid_Bulb()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.GetInfraredAsync(null!, CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentNullException>();
-	}
+	public Task GetInfrared_Should_Require_Valid_Bulb()
+		=> AssertThrowsAsync<ArgumentNullException>(lan =>
+			lan.GetInfraredAsync(null!, CancellationToken.None));
 
 	/// <summary>
 	/// Performs SetInfrared_Should_Require_Valid_Device operation.
 	/// </summary>
 	[Fact]
-	public async Task SetInfrared_Should_Require_Valid_Device()
-	{
-		// Arrange
-		if (!fixture.IsLanStarted)
-		{
-			return;
-		}
-
-		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await fixture.SharedClient!.Lan!.SetInfraredAsync(null!, 32768, CancellationToken.None)))
-			.Should()
-			.ThrowExactlyAsync<ArgumentNullException>();
-	}
+	public Task SetInfrared_Should_Require_Valid_Device()
+		=> AssertThrowsAsync<ArgumentNullException>(lan =>
+			lan.SetInfraredAsync(null!, 32768, CancellationToken.None));
 
 	/// <summary>
 	/// Performs LightBulb_Should_Be_Device operation.
@@ -281,22 +170,20 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 	public void Color_RGB_Values_Should_Be_In_Range()
 	{
 		// Arrange
-		var red = new Color { R = 255, G = 0, B = 0 };
 		var green = new Color { R = 0, G = 255, B = 0 };
 		var blue = new Color { R = 0, G = 0, B = 255 };
 
 		// Assert
-		red.R.Should().Be(255);
-		red.G.Should().Be(0);
-		red.B.Should().Be(0);
+		AssertRgb(RedColor, 255, 0, 0);
+		AssertRgb(green, 0, 255, 0);
+		AssertRgb(blue, 0, 0, 255);
+	}
 
-		green.R.Should().Be(0);
-		green.G.Should().Be(255);
-		green.B.Should().Be(0);
-
-		blue.R.Should().Be(0);
-		blue.G.Should().Be(0);
-		blue.B.Should().Be(255);
+	private static void AssertRgb(Color color, byte r, byte g, byte b)
+	{
+		color.R.Should().Be(r);
+		color.G.Should().Be(g);
+		color.B.Should().Be(b);
 	}
 
 	/// <summary>
@@ -312,8 +199,7 @@ public class LanLightTests(LanTestFixture fixture) : IDisposable
 		using var client = new LifxClient(new LifxClientOptions { IsLanEnabled = true });
 
 		// Act & Assert
-		await ((Func<Task>)(async () =>
-			await client.Lan!.SetColorAsync(
+		await ((Func<Task>)(() => client.Lan!.SetColorAsync(
 				_testBulb,
 				hue: 0,
 				saturation: 0,

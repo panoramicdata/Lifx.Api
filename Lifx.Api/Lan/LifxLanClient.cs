@@ -99,6 +99,20 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	/// </summary>
 	public void Dispose()
 	{
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+	/// <summary>
+	/// Releases the socket and cancellation sources.
+	/// </summary>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!disposing)
+		{
+			return;
+		}
+
 		lock (_disposeLock)
 		{
 			if (_disposed)
@@ -120,8 +134,6 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 
 		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Dispose());
 		IgnoringObjectDisposed(_cancellationTokenSource.Dispose);
-
-		GC.SuppressFinalize(this);
 	}
 
 	private static void IgnoringObjectDisposed(Action action)

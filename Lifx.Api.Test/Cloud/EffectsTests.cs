@@ -23,6 +23,10 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 			new EffectsOffRequest { PowerOff = false },
 			CancellationToken);
 
+	private Selector.LightId SingleLight => new(TestLight!.Id);
+
+	private static void AssertAccepted(object? result) => result.Should().NotBeNull();
+
 	#region Single Light Effects
 
 	/// <summary>
@@ -31,26 +35,20 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	[Fact]
 	public async Task BreatheEffect_Single_Light_Should_Execute()
 	{
-		// Arrange
-		var request = new BreatheEffectRequest
-		{
-			Color = "blue",
-			Period = 2.0,
-			Cycles = 3.0,
-			Persist = false,
-			PowerOn = true
-		};
-
-		// Act
 		var result = await Client.Effects.BreatheAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
+			SingleLight,
+			new BreatheEffectRequest
+			{
+				Color = "blue",
+				Period = 2.0,
+				Cycles = 3.0,
+				Persist = false,
+				PowerOn = true
+			},
 			CancellationToken);
 
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-		Logger.LogInformation("BreatheEffect executed on {Label}", TestLight.Label);
+		AssertAccepted(result);
+		Logger.LogInformation("BreatheEffect executed on {Label}", TestLight!.Label);
 	}
 
 	/// <summary>
@@ -58,77 +56,37 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	/// </summary>
 	[Fact]
 	public async Task PulseEffect_Single_Light_Should_Execute()
-	{
-		// Arrange
-		var request = new PulseEffectRequest
-		{
-			Color = "red",
-			Period = 1.0,
-			Cycles = 5.0,
-			Persist = false,
-			PowerOn = true
-		};
-
-		// Act
-		var result = await Client.Effects.PulseAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-	}
+		=> AssertAccepted(await Client.Effects.PulseAsync(
+			SingleLight,
+			new PulseEffectRequest
+			{
+				Color = "red",
+				Period = 1.0,
+				Cycles = 5.0,
+				Persist = false,
+				PowerOn = true
+			},
+			CancellationToken));
 
 	/// <summary>
 	/// Performs MorphEffect_Single_Light_Should_Execute operation.
 	/// </summary>
 	[Fact]
 	public async Task MorphEffect_Single_Light_Should_Execute()
-	{
-		// Arrange
-		var request = new MorphEffectRequest
-		{
-			Period = 3.0,
-			Duration = 10.0,
-			PowerOn = true
-		};
-
-		// Act
-		var result = await Client.Effects.MorphAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-	}
+		=> AssertAccepted(await Client.Effects.MorphAsync(
+			SingleLight,
+			new MorphEffectRequest { Period = 3.0, Duration = 10.0, PowerOn = true },
+			CancellationToken));
 
 	/// <summary>
 	/// Performs FlameEffect_Single_Light_Should_Execute operation.
 	/// </summary>
 	[Fact]
 	public async Task FlameEffect_Single_Light_Should_Execute()
-	{
-		// Arrange
-		var request = new FlameEffectRequest
-		{
-			Period = 5.0,
-			Duration = 10.0,
-			PowerOn = true
-		};
-
-		// Act
-		var result = await Client.Effects.FlameAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-	}
+		=> AssertAccepted(await Client.Effects.FlameAsync(
+			SingleLight,
+			new FlameEffectRequest { Period = 5.0, Duration = 10.0, PowerOn = true },
+			CancellationToken));
 
 	#endregion
 
@@ -140,23 +98,14 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	[Fact]
 	public async Task CloudsEffect_Group_Should_Execute()
 	{
-		// Arrange
 		var group = await GetTestGroupAsync();
-		var request = new CloudsEffectRequest
-		{
-			Duration = 10,
-			PowerOn = true
-		};
 
-		// Act
 		var result = await Client.Effects.CloudsAsync(
 			new Selector.GroupId(group.Id),
-			request,
+			new CloudsEffectRequest { Duration = 10, PowerOn = true },
 			CancellationToken);
 
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
+		AssertAccepted(result);
 		Logger.LogInformation("CloudsEffect executed on group {Name}", group.Label);
 	}
 
@@ -166,24 +115,12 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	[Fact]
 	public async Task MoveEffect_Group_Should_Execute()
 	{
-		// Arrange
 		var group = await GetTestGroupAsync();
-		var request = new MoveEffectRequest
-		{
-			Direction = "forward",
-			Period = 2.0,
-			PowerOn = true
-		};
 
-		// Act
-		var result = await Client.Effects.MoveAsync(
+		AssertAccepted(await Client.Effects.MoveAsync(
 			new Selector.GroupId(group.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
+			new MoveEffectRequest { Direction = "forward", Period = 2.0, PowerOn = true },
+			CancellationToken));
 	}
 
 	#endregion
@@ -195,48 +132,20 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	/// </summary>
 	[Fact]
 	public async Task SunriseEffect_Should_Execute()
-	{
-		// Arrange
-		var request = new SunriseEffectRequest
-		{
-			Duration = 60,
-			PowerOn = true
-		};
-
-		// Act
-		var result = await Client.Effects.SunriseAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-	}
+		=> AssertAccepted(await Client.Effects.SunriseAsync(
+			SingleLight,
+			new SunriseEffectRequest { Duration = 60, PowerOn = true },
+			CancellationToken));
 
 	/// <summary>
 	/// Performs SunsetEffect_Should_Execute operation.
 	/// </summary>
 	[Fact]
 	public async Task SunsetEffect_Should_Execute()
-	{
-		// Arrange
-		var request = new SunsetEffectRequest
-		{
-			Duration = 60,
-			PowerOn = true
-		};
-
-		// Act
-		var result = await Client.Effects.SunsetAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-	}
+		=> AssertAccepted(await Client.Effects.SunsetAsync(
+			SingleLight,
+			new SunsetEffectRequest { Duration = 60, PowerOn = true },
+			CancellationToken));
 
 	#endregion
 
@@ -248,29 +157,19 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	[Fact]
 	public async Task EffectsOff_Should_Stop_Running_Effects()
 	{
-		// Arrange - Start an effect first
+		// Start an effect first
 		await Client.Effects.BreatheAsync(
-			new Selector.LightId(TestLight!.Id),
+			SingleLight,
 			new BreatheEffectRequest { Color = "blue", Period = 2.0, Cycles = 10.0 },
 			CancellationToken);
 
 		// Wait a moment for effect to start
 		await Task.Delay(500, TestContext.Current.CancellationToken);
 
-		var request = new EffectsOffRequest
-		{
-			PowerOff = false
-		};
-
-		// Act
-		var result = await Client.Effects.OffAsync(
-			new Selector.LightId(TestLight.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
+		AssertAccepted(await Client.Effects.OffAsync(
+			SingleLight,
+			new EffectsOffRequest { PowerOff = false },
+			CancellationToken));
 	}
 
 	/// <summary>
@@ -278,23 +177,10 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	/// </summary>
 	[Fact]
 	public async Task EffectsOff_WithPowerOff_Should_Turn_Off_Light()
-	{
-		// Arrange
-		var request = new EffectsOffRequest
-		{
-			PowerOff = true
-		};
-
-		// Act
-		var result = await Client.Effects.OffAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
-	}
+		=> AssertAccepted(await Client.Effects.OffAsync(
+			SingleLight,
+			new EffectsOffRequest { PowerOff = true },
+			CancellationToken));
 
 	#endregion
 
@@ -306,22 +192,10 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	[Fact]
 	public async Task Clean_Start_Should_Execute()
 	{
-		// Arrange
-		var request = new CleanRequest
-		{
-			Stop = false,
-			Duration = 3600
-		};
-
-		// Act
-		var result = await Client.Lights.CleanAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
+		AssertAccepted(await Client.Lights.CleanAsync(
+			SingleLight,
+			new CleanRequest { Stop = false, Duration = 3600 },
+			CancellationToken));
 		Logger.LogInformation("Clean cycle started");
 	}
 
@@ -331,21 +205,10 @@ public class EffectsTests(ITestOutputHelper testOutputHelper) : CloudLightStateT
 	[Fact]
 	public async Task Clean_Stop_Should_Execute()
 	{
-		// Arrange
-		var request = new CleanRequest
-		{
-			Stop = true
-		};
-
-		// Act
-		var result = await Client.Lights.CleanAsync(
-			new Selector.LightId(TestLight!.Id),
-			request,
-			CancellationToken);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Should().NotBeNull();
+		AssertAccepted(await Client.Lights.CleanAsync(
+			SingleLight,
+			new CleanRequest { Stop = true },
+			CancellationToken));
 		Logger.LogInformation("Clean cycle stopped");
 	}
 

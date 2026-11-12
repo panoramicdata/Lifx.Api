@@ -158,41 +158,41 @@ public static class LanCommand
 			DefaultValueFactory = _ => 1.0
 		};
 
-	private static Command CreateLanOnCommand()
+	private static Command CreateLanPowerCommand(
+		string name,
+		string description,
+		string macDescription,
+		PowerState powerState)
 	{
 		var durationOption = CreateDurationOption();
 
 		return CreateBulbCommand(
+			name,
+			description,
+			CreateMacArgument(macDescription),
+			[],
+			[durationOption],
+			(client, bulb, parseResult, cancellationToken) => SetLanPowerAsync(
+				client,
+				bulb,
+				powerState,
+				parseResult.GetValue(durationOption),
+				cancellationToken));
+	}
+
+	private static Command CreateLanOnCommand()
+		=> CreateLanPowerCommand(
 			"on",
 			"Turn light on via LAN",
-			CreateMacArgument("MAC address of the light (e.g., D0:73:D5:12:34:56)"),
-			[],
-			[durationOption],
-			(client, bulb, parseResult, cancellationToken) => SetLanPowerAsync(
-				client,
-				bulb,
-				PowerState.On,
-				parseResult.GetValue(durationOption),
-				cancellationToken));
-	}
+			"MAC address of the light (e.g., D0:73:D5:12:34:56)",
+			PowerState.On);
 
 	private static Command CreateLanOffCommand()
-	{
-		var durationOption = CreateDurationOption();
-
-		return CreateBulbCommand(
+		=> CreateLanPowerCommand(
 			"off",
 			"Turn light off via LAN",
-			CreateMacArgument("MAC address of the light"),
-			[],
-			[durationOption],
-			(client, bulb, parseResult, cancellationToken) => SetLanPowerAsync(
-				client,
-				bulb,
-				PowerState.Off,
-				parseResult.GetValue(durationOption),
-				cancellationToken));
-	}
+			"MAC address of the light",
+			PowerState.Off);
 
 	private static async Task SetLanPowerAsync(
 		ILifxClient client,
@@ -216,13 +216,17 @@ public static class LanCommand
 	/// can bail out without repeating the try/catch at every call site.
 	/// </summary>
 	private static bool TryValidateKelvin(int kelvin)
+		=> TryValidate<ArgumentOutOfRangeException>(() => LanHandler.ValidateKelvin(kelvin));
+
+	private static bool TryValidate<TException>(Action validate)
+		where TException : ArgumentException
 	{
 		try
 		{
-			LanHandler.ValidateKelvin(kelvin);
+			validate();
 			return true;
 		}
-		catch (ArgumentOutOfRangeException ex)
+		catch (TException ex)
 		{
 			AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
 			return false;
@@ -335,18 +339,7 @@ public static class LanCommand
 	/// Reports an unusable light name to the console and returns false.
 	/// </summary>
 	private static bool TryValidateLightName(string newName)
-	{
-		try
-		{
-			LanHandler.ValidateLightName(newName);
-			return true;
-		}
-		catch (ArgumentException ex)
-		{
-			AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
-			return false;
-		}
-	}
+		=> TryValidate<ArgumentException>(() => LanHandler.ValidateLightName(newName));
 
 	private static async Task RenameLanLightAsync(
 		ILifxClient client,
