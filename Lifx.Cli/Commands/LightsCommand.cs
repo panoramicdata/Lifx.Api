@@ -2,7 +2,6 @@ using Lifx.Api;
 using Lifx.Api.Extensions;
 using Lifx.Api.Models.Cloud;
 using Lifx.Api.Models.Cloud.Requests;
-using Lifx.Api.Models.Cloud.Responses;
 using Lifx.Cli.Handlers;
 using Spectre.Console;
 using System.CommandLine;
@@ -12,7 +11,7 @@ namespace Lifx.Cli.Commands;
 /// <summary>
 /// Represents the LightsCommand type.
 /// </summary>
-public static class LightsCommand
+public static partial class LightsCommand
 {
 	/// <summary>
 	/// Applies one operation to the selected lights.
@@ -47,33 +46,10 @@ public static class LightsCommand
 	}
 
 	/// <summary>
-	/// Builds one subcommand that acts on a selection of lights, with nothing to check first.
+	/// Builds one subcommand that acts on a selection of lights: it resolves a cloud client from
+	/// the global token and runs the action. The precondition runs before the client is resolved,
+	/// so bad input is reported as such rather than as a missing API token.
 	/// </summary>
-	private static Command CreateSelectionCommand(
-		string name,
-		string description,
-		Argument<string> selectorArgument,
-		Argument[] extraArguments,
-		Option[] options,
-		LightsAction action)
-		=> CreateSelectionCommand(
-			name,
-			description,
-			selectorArgument,
-			extraArguments,
-			options,
-			_ => true,
-			action);
-
-	/// <summary>
-	/// Builds one subcommand that acts on a selection of lights.
-	/// </summary>
-	/// <remarks>
-	/// Every one of these takes a selector, resolves a cloud client from the global token and
-	/// reports the same way; only its arguments and the call it makes differ. The precondition runs
-	/// before the client is resolved, so bad input is reported as such rather than as a missing
-	/// API token.
-	/// </remarks>
 	private static Command CreateSelectionCommand(
 		string name,
 		string description,
@@ -82,38 +58,22 @@ public static class LightsCommand
 		Option[] options,
 		LightsPrecondition precondition,
 		LightsAction action)
-	{
-		var command = new Command(name, description);
-
-		command.Arguments.Add(selectorArgument);
-		foreach (var argument in extraArguments)
-		{
-			command.Arguments.Add(argument);
-		}
-
-		foreach (var option in options)
-		{
-			command.Options.Add(option);
-		}
-
-		command.SetAction(async (parseResult, cancellationToken) =>
-		{
-			if (!precondition(parseResult))
+		=> TargetCommandBuilder.Build(
+			name,
+			description,
+			selectorArgument,
+			extraArguments,
+			options,
+			precondition.Invoke,
+			async (parseResult, selector, cancellationToken) =>
 			{
-				return;
-			}
+				var token = parseResult.GetValue(GlobalOptions.Token);
 
-			var token = parseResult.GetValue(GlobalOptions.Token);
-			var selector = parseResult.GetValue(selectorArgument)!;
+				var factory = new LifxClientFactory();
+				using var client = factory.CreateCloudClient(token);
 
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateCloudClient(token);
-
-			await action(client, SelectorParser.ParseSelector(selector), parseResult, cancellationToken);
-		});
-
-		return command;
-	}
+				await action(client, SelectorParser.ParseSelector(selector), parseResult, cancellationToken);
+			});
 
 	private static Argument<string> CreateSelectorArgument(string description)
 		=> new("selector")
@@ -122,252 +82,95 @@ public static class LightsCommand
 			DefaultValueFactory = _ => "all"
 		};
 
-	private static Option<double> CreateDurationOption()
-		=> new("--duration", "-d")
-		{
-			Description = "Transition duration in seconds",
-			DefaultValueFactory = _ => 1.0
-		};
-
-	private static Command CreateListCommand()
+	/// <summary>
+	/// Builds a light-state subcommand: one selector, optional extra arguments and a transition
+	/// duration, differing only in how the request is built and sent and what is reported.
+	/// </summary>
+	private static Command CreateStateCommand(
+		(string Name, string Description, string SelectorDescription) identity,
+		Argument[] extraArguments,
+		Func<ParseResult, double, bool> precondition,
+		Func<ParseResult, double, object> buildRequest,
+		Func<ILifxClient, Selector, object, CancellationToken, Task> send,
+		Func<ParseResult, string, string> confirmation)
 	{
-		var command = new Command("list", "List all lights, groups, or locations");
-
-		var typeOption = new Option<string>("--type", "-t")
-		{
-			Description = "Type to list (lights, groups, locations)",
-			DefaultValueFactory = _ => "lights"
-		};
-
-		var selectorOption = new Option<string>("--selector", "-s")
-		{
-			Description = "Selector for filtering",
-			DefaultValueFactory = _ => "all"
-		};
-
-		command.Options.Add(typeOption);
-		command.Options.Add(selectorOption);
-
-		command.SetAction(async (parseResult, cancellationToken) =>
-		{
-			var token = parseResult.GetValue(GlobalOptions.Token);
-			var verbose = parseResult.GetValue(GlobalOptions.Verbose);
-			var type = parseResult.GetValue(typeOption)!;
-			var selector = parseResult.GetValue(selectorOption)!;
-
-			var factory = new LifxClientFactory();
-			using var client = factory.CreateCloudClient(token);
-
-			var selectorObj = SelectorParser.ParseSelector(selector);
-
-			switch (type.ToLowerInvariant())
-			{
-				case "lights":
-					await ListLights(client, selectorObj, verbose, cancellationToken);
-					break;
-				case "groups":
-					await ListGroups(client, selectorObj, cancellationToken);
-					break;
-				case "locations":
-					await ListLocations(client, selectorObj, cancellationToken);
-					break;
-				default:
-					AnsiConsole.MarkupLine($"[red]Unknown type: {type}[/]");
-					break;
-			}
-		});
-
-		return command;
-	}
-
-	private static async Task ListLights(ILifxClient client, Selector selector, bool verbose, CancellationToken cancellationToken)
-	{
-		var lights = await client.Lights.ListAsync(selector, cancellationToken);
-
-		var table = new Table();
-		table.AddColumn("Label");
-		table.AddColumn("ID");
-		table.AddColumn("Power");
-		table.AddColumn("Brightness");
-		table.AddColumn("Color");
-		table.AddColumn("Connected");
-
-		if (verbose)
-		{
-			table.AddColumn("Group");
-			table.AddColumn("Location");
-		}
-
-		foreach (var light in lights)
-		{
-			var row = new List<string>
-			{
-				light.Label,
-				light.Id,
-				light.IsOn ? "[green]On[/]" : "[dim]Off[/]",
-				$"{light.Brightness:P0}",
-				light.Color?.ToString() ?? "N/A",
-				light.IsConnected ? "[green]Yes[/]" : "[red]No[/]"
-			};
-
-			if (verbose)
-			{
-				row.Add(light.GroupName);
-				row.Add(light.LocationName);
-			}
-
-			table.AddRow([.. row]);
-		}
-
-		AnsiConsole.Write(table);
-		AnsiConsole.MarkupLine($"[dim]Total: {lights.Count} lights[/]");
-	}
-
-	private static async Task ListGroups(ILifxClient client, Selector selector, CancellationToken cancellationToken)
-	{
-		var groups = await client.Lights.ListGroupsAsync(selector, cancellationToken);
-		WriteCollectionTable(groups, "groups");
-	}
-
-	private static void WriteCollectionTable<T>(List<T> collections, string noun)
-		where T : LightCollection
-	{
-		var table = new Table();
-		table.AddColumn("Name");
-		table.AddColumn("ID");
-		table.AddColumn("Lights");
-
-		foreach (var collection in collections)
-		{
-			table.AddRow(collection.Label, collection.Id, collection.Count().ToString());
-		}
-
-		AnsiConsole.Write(table);
-		AnsiConsole.MarkupLine($"[dim]Total: {collections.Count} {noun}[/]");
-	}
-
-	private static async Task ListLocations(ILifxClient client, Selector selector, CancellationToken cancellationToken)
-	{
-		var locations = await client.Lights.ListLocationsAsync(selector, cancellationToken);
-		WriteCollectionTable(locations, "locations");
-	}
-
-	private static Command CreatePowerCommand(
-		string name,
-		string description,
-		string selectorDescription,
-		string verb,
-		Func<double, SetStateRequest> buildRequest)
-	{
-		var selectorArgument = CreateSelectorArgument(selectorDescription);
-		var durationOption = CreateDurationOption();
+		var selectorArgument = CreateSelectorArgument(identity.SelectorDescription);
+		var durationOption = TargetCommandBuilder.CreateDurationOption();
 
 		return CreateSelectionCommand(
-			name,
-			description,
+			identity.Name,
+			identity.Description,
 			selectorArgument,
-			[],
+			extraArguments,
 			[durationOption],
+			parseResult => precondition(parseResult, parseResult.GetValue(durationOption)),
 			async (client, selector, parseResult, cancellationToken) =>
 			{
-				var request = buildRequest(parseResult.GetValue(durationOption));
-				await client.Lights.SetStateAsync(selector, request, cancellationToken);
-				AnsiConsole.MarkupLine($"[green]✓[/] Turned {verb} lights: {parseResult.GetValue(selectorArgument)}");
+				var request = buildRequest(parseResult, parseResult.GetValue(durationOption));
+				await send(client, selector, request, cancellationToken);
+				AnsiConsole.MarkupLine($"[green]✓[/] {confirmation(parseResult, parseResult.GetValue(selectorArgument)!)}");
 			});
 	}
+
+	private static Task SetState(ILifxClient client, Selector selector, object request, CancellationToken cancellationToken)
+		=> client.Lights.SetStateAsync(selector, (SetStateRequest)request, cancellationToken);
+
+	private static Command CreatePowerCommand(string verb, Func<double, SetStateRequest> build)
+		=> CreateStateCommand(
+			(verb, $"Turn lights {verb}", $"Which lights to turn {verb}"),
+			[],
+			(_, _) => true,
+			(_, duration) => build(duration),
+			SetState,
+			(_, selector) => $"Turned {verb} lights: {selector}");
 
 	private static Command CreateOnCommand()
-		=> CreatePowerCommand("on", "Turn lights on", "Which lights to turn on", "on", LightsHandler.BuildOnRequest);
+		=> CreatePowerCommand("on", LightsHandler.BuildOnRequest);
 
 	private static Command CreateOffCommand()
-		=> CreatePowerCommand("off", "Turn lights off", "Which lights to turn off", "off", LightsHandler.BuildOffRequest);
+		=> CreatePowerCommand("off", LightsHandler.BuildOffRequest);
 
 	private static Command CreateToggleCommand()
-	{
-		var selectorArgument = CreateSelectorArgument("Which lights to toggle");
-		var durationOption = CreateDurationOption();
-
-		return CreateSelectionCommand(
-			"toggle",
-			"Toggle lights power",
-			selectorArgument,
+		=> CreateStateCommand(
+			("toggle", "Toggle lights power", "Which lights to toggle"),
 			[],
-			[durationOption],
-			async (client, selector, parseResult, cancellationToken) =>
-			{
-				var request = LightsHandler.BuildToggleRequest(parseResult.GetValue(durationOption));
-				await client.Lights.TogglePowerAsync(selector, request, cancellationToken);
-				AnsiConsole.MarkupLine($"[green]✓[/] Toggled power: {parseResult.GetValue(selectorArgument)}");
-			});
-	}
+			(_, _) => true,
+			(_, duration) => LightsHandler.BuildToggleRequest(duration),
+			(client, selector, request, cancellationToken)
+				=> client.Lights.TogglePowerAsync(selector, (TogglePowerRequest)request, cancellationToken),
+			(_, selector) => $"Toggled power: {selector}");
 
 	private static Command CreateColorCommand()
 	{
-		var selectorArgument = CreateSelectorArgument("Which lights to change");
 		var colorArgument = new Argument<string>("color")
 		{
 			Description = "Color (name, rgb:R,G,B, or hue:H saturation:S brightness:B)"
 		};
-		var durationOption = CreateDurationOption();
 
-		return CreateSelectionCommand(
-			"color",
-			"Set light color",
-			selectorArgument,
+		return CreateStateCommand(
+			("color", "Set light color", "Which lights to change"),
 			[colorArgument],
-			[durationOption],
-			async (client, selector, parseResult, cancellationToken) =>
-			{
-				var color = parseResult.GetValue(colorArgument)!;
-				var request = LightsHandler.BuildColorRequest(color, parseResult.GetValue(durationOption));
-				await client.Lights.SetStateAsync(selector, request, cancellationToken);
-				AnsiConsole.MarkupLine($"[green]✓[/] Set color to '{color}': {parseResult.GetValue(selectorArgument)}");
-			});
+			(_, _) => true,
+			(parseResult, duration) => LightsHandler.BuildColorRequest(parseResult.GetValue(colorArgument)!, duration),
+			SetState,
+			(parseResult, selector) => $"Set color to '{parseResult.GetValue(colorArgument)}': {selector}");
 	}
 
 	private static Command CreateBrightnessCommand()
 	{
-		var selectorArgument = CreateSelectorArgument("Which lights to change");
 		var brightnessArgument = new Argument<double>("brightness")
 		{
 			Description = "Brightness level (0.0 to 1.0)"
 		};
-		var durationOption = CreateDurationOption();
 
-		return CreateSelectionCommand(
-			"brightness",
-			"Set light brightness",
-			selectorArgument,
+		// Checked before a client is resolved: an out-of-range brightness must report itself
+		// rather than a missing API token.
+		return CreateStateCommand(
+			("brightness", "Set light brightness", "Which lights to change"),
 			[brightnessArgument],
-			[durationOption],
-			// Checked before a client is resolved, as it was originally: an out-of-range brightness
-			// must report itself rather than a missing API token.
-			parseResult => TryValidateBrightness(
-				parseResult.GetValue(brightnessArgument),
-				parseResult.GetValue(durationOption)),
-			async (client, selector, parseResult, cancellationToken) =>
-			{
-				var brightness = parseResult.GetValue(brightnessArgument);
-				var request = LightsHandler.BuildBrightnessRequest(brightness, parseResult.GetValue(durationOption));
-				await client.Lights.SetStateAsync(selector, request, cancellationToken);
-				AnsiConsole.MarkupLine($"[green]✓[/] Set brightness to {brightness:P0}: {parseResult.GetValue(selectorArgument)}");
-			});
-	}
-
-	/// <summary>
-	/// Reports an out-of-range brightness to the console and returns false.
-	/// </summary>
-	private static bool TryValidateBrightness(double brightness, double duration)
-	{
-		try
-		{
-			LightsHandler.BuildBrightnessRequest(brightness, duration);
-			return true;
-		}
-		catch (ArgumentOutOfRangeException ex)
-		{
-			AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
-			return false;
-		}
+			(parseResult, duration) => TryValidateBrightness(parseResult.GetValue(brightnessArgument), duration),
+			(parseResult, duration) => LightsHandler.BuildBrightnessRequest(parseResult.GetValue(brightnessArgument), duration),
+			SetState,
+			(parseResult, selector) => $"Set brightness to {parseResult.GetValue(brightnessArgument):P0}: {selector}");
 	}
 }
