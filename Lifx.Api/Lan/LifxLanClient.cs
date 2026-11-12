@@ -113,35 +113,44 @@ public partial class LifxLanClient : IDisposable
 	/// </summary>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!disposing)
+		if (disposing && MarkDisposed())
 		{
-			return;
-		}
+			// Discovery is cancelled before the main token so its loop stops broadcasting before the
+			// socket goes away.
+			IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Cancel());
+			IgnoringObjectDisposed(_cancellationTokenSource.Cancel);
 
+			WaitForReceiveLoop();
+
+			if (_socket is not null)
+			{
+				_socket.Dispose();
+			}
+
+			IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Dispose());
+			try
+			{
+				_cancellationTokenSource.Dispose();
+			}
+			catch (ObjectDisposedException)
+			{
+				// Already disposed by a racing teardown step; nothing left to release.
+			}
+		}
+	}
+
+	private bool MarkDisposed()
+	{
 		lock (_disposeLock)
 		{
 			if (_disposed)
 			{
-				return;
+				return false;
 			}
 
 			_disposed = true;
+			return true;
 		}
-
-		// Discovery is cancelled before the main token so its loop stops broadcasting before the
-		// socket goes away.
-		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Cancel());
-		IgnoringObjectDisposed(_cancellationTokenSource.Cancel);
-
-		WaitForReceiveLoop();
-
-		if (_socket is not null)
-		{
-			_socket.Dispose();
-		}
-
-		IgnoringObjectDisposed(() => _DiscoverCancellationSource?.Dispose());
-		IgnoringObjectDisposed(_cancellationTokenSource.Dispose);
 	}
 
 	private static void IgnoringObjectDisposed(Action action)
