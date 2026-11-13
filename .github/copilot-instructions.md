@@ -1,7 +1,7 @@
 # Copilot Instructions
 
 ## General Guidelines
-- Target .NET 10 for all projects in this solution
+- Target .NET 11.0 for all projects in this solution
 - Use C# 14.0 language features where appropriate
 - Prefer async/await patterns throughout the codebase
 - Keep models as POCOs with no external dependencies

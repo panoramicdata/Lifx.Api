@@ -2,6 +2,8 @@
 
 A unified .NET API for LIFX smart lighting supporting both Cloud HTTP API and LAN protocol.
 
+Supports .NET 11.0.
+
 [![Nuget](https://img.shields.io/nuget/v/Lifx.Api)](https://www.nuget.org/packages/Lifx.Api/)
 [![Nuget](https://img.shields.io/nuget/dt/Lifx.Api)](https://www.nuget.org/packages/Lifx.Api/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -40,7 +42,7 @@ Lifx.Api is a comprehensive .NET library that provides a unified interface for c
 - Fully async/await throughout
 - Comprehensive error handling
 - Extensive unit and integration test coverage (232+ tests)
-- .NET 10.0 support
+- .NET 11.0 support
 - MIT licensed
 
 ## Installation
@@ -466,7 +468,7 @@ All async methods follow these conventions:
 
 ## Requirements
 
-- .NET 10.0 or later
+- .NET 11.0 or later
 - For Cloud API: LIFX API token from [https://cloud.lifx.com/settings](https://cloud.lifx.com/settings)
 - For LAN: LIFX devices on the same local network
 
