@@ -1,7 +1,6 @@
 using AwesomeAssertions;
 using Lifx.Api.Lan;
 using Lifx.Api.Models.Lan;
-using System.Reflection;
 using System.Text;
 
 namespace Lifx.Api.Test.Lan;
@@ -16,29 +15,12 @@ namespace Lifx.Api.Test.Lan;
 public class LanMessageTests
 {
 	/// <summary>
-	/// Invokes one of the private static packet helpers on <see cref="LifxLanClient"/>.
-	/// </summary>
-	/// <remarks>
-	/// ParseMessage and WritePacketToStream have no public surface to reach them through, so these
-	/// tests go in by reflection. Each test used to repeat the GetMethod/Invoke pair itself, which
-	/// was the bulk of this file's duplication.
-	/// </remarks>
-	private static object? InvokePrivateStatic(string name, object?[] arguments)
-	{
-		var method = typeof(LifxLanClient).GetMethod(
-			name,
-			BindingFlags.NonPublic | BindingFlags.Static);
-
-		return method!.Invoke(null, arguments);
-	}
-
-	/// <summary>
 	/// Writes a packet through WritePacketToStream and returns the bytes it produced.
 	/// </summary>
 	private static byte[] WritePacket(FrameHeader header, ushort messageType, byte[] payload)
 	{
 		using var stream = new MemoryStream();
-		InvokePrivateStatic("WritePacketToStream", [stream, header, messageType, payload]);
+		LifxPacketCodec.WritePacketToStream(stream, header, messageType, payload);
 		return stream.ToArray();
 	}
 
@@ -47,12 +29,9 @@ public class LanMessageTests
 	/// </summary>
 	private static void ParseMessageShouldRejectPacket(byte[] packet)
 	{
-		var exception = Assert.Throws<TargetInvocationException>(
-			() => InvokePrivateStatic("ParseMessage", [packet]));
+		var exception = Assert.Throws<Exception>(() => LifxPacketCodec.ParseMessage(packet));
 
-		// Verify the inner exception is the expected type
-		exception.InnerException.Should().BeOfType<Exception>();
-		exception.InnerException!.Message.Should().Contain("Invalid packet");
+		exception.Message.Should().Contain("Invalid packet");
 	}
 
 	/// <summary>
