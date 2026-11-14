@@ -1,5 +1,7 @@
 # Lifx.Api
 
+> **Need help with APIs or .NET?** Panoramic Data are experts in APIs and .NET, and we can help with your development. [Contact us](https://www.panoramicdata.com/contact-us) or see our [software services](https://www.panoramicdata.com/services/software).
+
 A unified .NET API for LIFX smart lighting supporting both Cloud HTTP API and LAN protocol.
 
 Supports .NET 11.0.
