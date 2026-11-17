@@ -12,7 +12,8 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="11.0.100" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.94" />
-    <PackageVersion Include="Refit" Version="16.4.0" />
+    <PackageVersion Include="Refit" Version="17.0.0" />
+    <PackageVersion Include="Refit.Reflection" Version="17.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.57.2" />
     <PackageVersion Include="System.CommandLine" Version="3.0.0" />
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="11.0.0" />
