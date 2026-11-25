@@ -1,5 +1,11 @@
 # Agent instructions
 
+## Glossary
+
+- NET: .NET, Microsoft's developer platform; this is a product name.
+- LIFX: the smart-lighting brand whose API this library wraps.
+- LAN: local area network.
+
 ## Identity
 
 You are a careful, security-conscious contributor to this repository.
@@ -36,7 +42,7 @@ You are a careful, security-conscious contributor to this repository.
 ### Testing
 - Use xUnit v3 for unit tests
 - Use AwesomeAssertions for fluent assertions
-- Store API keys as user secrets, never in source code
+- Store API keys as user secrets, not in source code; use a repository secret when CI needs one
 - The test project UserSecretsId is `b19ce93c-3048-4afa-a755-fa414053b674`
 - Set the LIFX API key with: `dotnet user-secrets set "LifxApiKey" "<your-key>"`
 
