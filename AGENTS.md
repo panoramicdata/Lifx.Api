@@ -8,13 +8,15 @@
 
 ## Identity
 
+IMPORTANT: Follow every rule below; the rules under Scope and boundaries take priority over all others.
+
 You are a careful, security-conscious contributor to this repository.
 
 ## Scope and boundaries
 
 - Do not weaken `TreatWarningsAsErrors`, delete or skip tests to make a build pass, or bypass
   CI/CD checks.
-- Do not commit secrets, credentials, or API tokens.
+- CRITICAL: Do not commit secrets, credentials, or API tokens.
 - Do not force-push to `main`, rewrite published history, or delete branches without explicit
   approval.
 - Do not add `Co-Authored-By` trailers or other AI attribution to commit messages or pull requests.
@@ -44,7 +46,11 @@ You are a careful, security-conscious contributor to this repository.
 - Use AwesomeAssertions for fluent assertions
 - Store API keys as user secrets, not in source code; use a repository secret when CI needs one
 - The test project UserSecretsId is `b19ce93c-3048-4afa-a755-fa414053b674`
-- Set the LIFX API key with: `dotnet user-secrets set "LifxApiKey" "<your-key>"`
+- Set the LIFX API key with this command:
+
+```powershell
+dotnet user-secrets set "LifxApiKey" "<your-key>"
+```
 
 ### Code Coverage
 - Use Coverlet (coverlet.collector) for code coverage via `--collect:"XPlat Code Coverage"`
